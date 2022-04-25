@@ -1,0 +1,31 @@
+name: "go-chatbot"
+mode: "release"
+host: "localhost"
+start_time: "2022-03-01"
+port: 8086
+maching_id: 1
+log:
+  level: "debug"
+  filename: "Logger/app.log"
+  max_size: 100
+  max_age: 30
+  max_backups: 7
+mysql:
+  host: "sh-cynosdbmysql-grp-2zbdrod4.sql.tencentcdb.com"
+  port: 22226
+  user: "root"
+  password: "7289978VISS@"
+  dbname: "ginsql"
+  max_open_conns: 2000
+  max_idle_conns: 500
+redis:
+  host: "81.69.253.180"
+  password: "123@456"
+  port: 1236
+  db: 0
+  pool_size: 100
+chat:
+  host: "localhost"
+  port: 8087
+  rout: "/chat"
+  key: "question"
