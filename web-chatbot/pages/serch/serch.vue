@@ -5,21 +5,21 @@
 				<input type="serch" placeholder="搜索用户/群" class="serch" placeholder-style="color:#bbb;font-weight:400;" @input="searchKey"/>
 				<image src="../../static/index/search.png" class="serch-img"></image>
 			</view>
-			<view class="top-bar-right" @tap="toSignUp">
+			<view class="top-bar-right" @tap="toIndex">
 				<view class="text">取消</view>
 			</view>
 		</view>
 		<view class="main">
 			<view class="serchUser">
-				<view class="titleUser">用户</view>
+				<view class="titleUser" v-if="userArr.length>0">用户</view>
 				<view class="listUser" v-for="(item,index) in userArr" :key="index">
 					<image :src="item.imgurl"></image>
 					<view class="nameUser" v-html="item.name"></view>
-					<view class="rightBt info" v-if="dis">发消息</view>
-					<view class="rightBt friend">加好友</view>
+					<view class="rightBt info" v-if="item.tip==1">发消息</view>
+					<view class="rightBt friend" v-if="item.tip!=1">加好友</view>
 				</view>
 			</view>
-			<view class="serchUser">
+<!-- 			<view class="serchUser">
 				<view class="titleUser">群组</view>
 				<view class="listUser">
 					<image src="../../static/index/1 (1).jpg"></image>
@@ -33,7 +33,7 @@
 					<view class="rightBt info">发消息</view>
 					<view class="rightBt friend" v-if="dis">加好友</view>
 				</view>
-			</view>
+			</view> -->
 		</view>
 	</view>
 </template>
@@ -61,8 +61,7 @@
 				let light=eval("/"+e+"/g");
 				for(let i=0;i<myArr.length;i++){
 					if(myArr[i].name.search(e)!=-1){
-						this.friendDel(myArr[i]);
-						console.log(myArr[i].tip);
+						myArr[i].tip=this.friendDel(myArr[i]);
 						myArr[i].imgurl='../../static/index/'+myArr[i].imgurl;
 						myArr[i].name=myArr[i].name.replace(light,"<span style='color:#4AAAFF;'>"+e+"</span>");
 						this.userArr.push(myArr[i]);
@@ -73,11 +72,16 @@
 				let friendArr=datas.friendTable();
 				for(let i=0;i<friendArr.length;i++){
 					if(friendArr[i].friendid==e.id){
-						e.tip=1;
+						return 1;
 					}else{
-						e.tip=0;
+						return 0;
 					}
 				}
+			},
+			toIndex: function(){
+				uni.navigateTo({
+					url: '../index/index',
+				});
 			}
 		}
 	}

@@ -8,7 +8,7 @@
 				<image src="../../static/general/logo.png" class="logo"></image>
 			</view>
 			<view class="top-bar-right">
-				<view class="serch"><image src="../../static/index/search.png"></image></view>
+				<view class="serch"  @tap="toSerch"><image src="../../static/index/search.png"></image></view>
 				<view class="add"><image src="../../static/index/add.png"></image></view>
 			</view>
 		</view>
@@ -56,7 +56,12 @@
 				for(let i=0;i<this.friends.length;i++){
 					this.friends[i].imgurl='../../static/index/'+this.friends[i].imgurl;
 				}
-				console.log(this.friends);
+				//console.log(this.friends);
+			},
+			toSerch: function(){
+				uni.navigateTo({
+					url: '../serch/serch',
+				});
 			}
 		}
 	}
