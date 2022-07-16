@@ -69,7 +69,8 @@
 					this.answerRandomUser(newMsg.message);
 				}else{
 					let newMsg2 = this.msgs[len-2];
-					console.log(newMsg2.message+' '+newMsg.message);
+					//console.log(newMsg2.message+'.'+newMsg.message);
+					console.log(3);
 					this.answerRandomUser(newMsg2.message+' '+newMsg.message);
 				}
 				
@@ -148,10 +149,12 @@
 				
 			},
 			answerRandomUser: async function(msg) {
+				
 				let retMsg= await this.chat(msg);
 				let len = this.msgs.length;
 				let theNum = Math.round(145*Math.random()).toString();
-				//console.log(retMsg);
+				
+				console.log(retMsg);
 				let newMsg = {
 					id: '1231',
 					imgurl: '1 ('+ theNum +').jpg',
@@ -186,28 +189,58 @@
 			chat: function(message) {
 				return new Promise((resolve, reject) => {
 					let retMsg = "1";
+
+					const xhr = new XMLHttpRequest();
+					const url = 'http://localhost:8086/ping';
+					
+					xhr.open('GET', url);
+					xhr.onreadystatechange = function () {
+						console.log(xhr.responseText)
+					};
+					xhr.send();
+					
+					
 					uni.request({
-						url: '/chat/chat',
+					    url: 'http://localhost:8086/chat', //仅为示例，并非真实接口地址。
 						method: "POST",
-						data: JSON.stringify({
-							chat_content: message,
-						}),
-						success: res => {
-							retMsg = res.data.Data;
-							// console.log(res.data.Data);
-							resolve(retMsg)
-						},
-						fail: () => {
-							//reject
-						},
-						complete: res => {},
-					})
+					    data: JSON.stringify({
+					    	chat_content: message,
+					    }),
+					    header: {
+					        'custom-header': 'hello' //自定义请求头信息
+					    },
+					    success: res => {
+					    	retMsg = res.data.Data;
+					    	resolve(retMsg)
+					    },
+					});
+					// uni.request({
+					// 	//url: '/chat/chat',
+					// 	url: '/chat/chat',
+					// 	method: "POST",
+					// 	data: JSON.stringify({
+					// 		chat_content: message,
+					// 	}),
+					// 	sslVerify:  false,
+					// 	success: res => {
+					// 		retMsg = res.data.Data;
+					// 		resolve(retMsg)
+					// 	},
+					// 	fail: res => {
+					// 		console.log(0);
+					// 		console.log(res);
+					// 		//reject
+					// 	},
+					// 	complete: res => {
+					// 		console.log(2);
+					// 	},
+					// })
 
 				})
 				
 			},
 			test: function() {
-				console.log(2);
+				//console.log(2);
 			}
 			
 			}

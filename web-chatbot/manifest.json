@@ -7,19 +7,23 @@
     "transformPx" : false,
     "h5" : {
         "devServer" : {
+			"host":"localhost",
             "port" : 8080,
             "disableHostCheck" : true,
-            "proxy" : {
-                "/chat" : {
-                    "target" : "http://localhost:8086",
-                    "changeOrigin" : true,
-                    "secure" : false,
-                    "pathRewrite" : {
-                        "^/chat" : ""
-                    }
-                }
-            },
+            // "proxy" : {
+            //     "/chat" : {
+            //         "target" : "http://localhost:8086",
+            //         "changeOrigin" : true,
+            //         "secure" : false,
+            //         "pathRewrite" : {
+            //             "^/chat" : ""
+            //         }
+            //     }
+            // },
             "https" : false
+        },
+        "router" : {
+            "mode" : "hash"
         }
     },
     /* 5+App特有相关 h5*/

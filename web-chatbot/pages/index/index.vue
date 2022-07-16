@@ -5,7 +5,7 @@
 				<image src="../../static/test/duan.png"></image>
 			</view>
 			<view class="top-bar-center">
-				<image src="../../static/index/fire.png" class="logo"></image>
+				<image src="../../static/general/logo.png" class="logo"></image>
 			</view>
 			<view class="top-bar-right">
 				<view class="serch"><image src="../../static/index/search.png"></image></view>
