@@ -60,16 +60,8 @@
 	.top-bar{
 		border-bottom: 1px solid $uni-border-color;
 		.top-bar-right{
-			image{
-				padding: 18rpx 0 0 18rpx;
-				width: 52rpx;
-				height: 52rpx;
-			}
 			.text{
 				font-size: 40rpx;
-				font-weight: 500;
-				color: $uni-text-color;
-				line-height: 80rpx;
 			}
 		}
 	}

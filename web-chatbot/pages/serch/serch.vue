@@ -13,8 +13,11 @@
 			<view class="serchUser">
 				<view class="titleUser" v-if="userArr.length>0">用户</view>
 				<view class="listUser" v-for="(item,index) in userArr" :key="index">
-					<image :src="item.imgurl"></image>
-					<view class="nameUser" v-html="item.name"></view>
+					<navigator :url="'../userhome/userhome?user='+encodeURIComponent(JSON.stringify(item))"
+					 hover-class="none">
+						<image :src="item.imgurl"></image>
+					</navigator>
+					<view class="nameUser" v-html="item.namel"></view>
 					<view class="rightBt info" v-if="item.tip==1">发消息</view>
 					<view class="rightBt friend" v-if="item.tip!=1">加好友</view>
 				</view>
@@ -63,7 +66,7 @@
 					if(myArr[i].name.search(e)!=-1){
 						myArr[i].tip=this.friendDel(myArr[i]);
 						myArr[i].imgurl='../../static/index/'+myArr[i].imgurl;
-						myArr[i].name=myArr[i].name.replace(light,"<span style='color:#4AAAFF;'>"+e+"</span>");
+						myArr[i].namel=myArr[i].name.replace(light,"<span style='color:#4AAAFF;'>"+e+"</span>");
 						this.userArr.push(myArr[i]);
 					}
 				}
@@ -99,6 +102,7 @@
 			width: 100%;
 			z-index: -1;
 			padding: 14rpx;
+			margin-top: var(--status-bar-height);
 			.serch{
 				width: 540rpx;
 				height: 60rpx;
@@ -118,9 +122,6 @@
 			padding-right: 0rpx;
 			.text{
 				font-size: 40rpx;
-				font-weight: 500;
-				color: $uni-text-color;
-				line-height: 80rpx;
 			}
 		}
 	}

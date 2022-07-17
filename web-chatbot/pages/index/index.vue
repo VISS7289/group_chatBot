@@ -1,9 +1,13 @@
 <template>
 	<view class="content">
 		<view class="top-bar">
-			<view class="top-bar-left">
-				<image src="../../static/test/duan.png"></image>
-			</view>
+			<!-- <view class="top-bar-left"> -->
+				<navigator 
+				:url="'../userhome/userhome?user='+encodeURIComponent(JSON.stringify(user))" 
+				hover-class="none" class="top-bar-left">
+					<image src="../../static/test/duan.png"></image>
+				</navigator>
+			<!-- </view> -->
 			<view class="top-bar-center">
 				<image src="../../static/general/logo.png" class="logo"></image>
 			</view>
@@ -42,6 +46,12 @@
 				friends:[
 					
 				],
+				user: {
+					imgurl:'../../static/test/duan.png',
+					name: 'duan',
+					nick: 'duan',
+					intr: '这个用户很懒，没有任何简介。这个用户很懒，没有任何简介。这个用户很懒，没有任何简介。'
+				},
 			}
 		},
 		onLoad() {
@@ -72,13 +82,6 @@
 	.top-bar{
 		background-color: rgba(255,255,255,0.98);
 		border-bottom: 1px solid $uni-border-color;
-		.top-bar-right{
-			image{
-				padding: 18rpx 0 0 18rpx;
-				width: 52rpx;
-				height: 52rpx;
-			}
-		}
 	}
 	.main{
 		padding: 108rpx 0rpx $uni-spacing-col-base;
