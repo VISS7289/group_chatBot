@@ -17,15 +17,6 @@
             
         }
         ,{
-            "path" : "pages/userDetials/userDetials",
-            "style" :                                                                                    
-            {
-                "navigationStyle":"custom",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
             "path" : "pages/signin/signin",
             "style" :
             {
@@ -62,6 +53,15 @@
         }
         ,{
             "path" : "pages/userdetail/userdetail",
+            "style" :                                                                                    
+            {
+                "navigationStyle":"custom",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/modify/modify",
             "style" :                                                                                    
             {
                 "navigationStyle":"custom",

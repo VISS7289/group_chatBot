@@ -29,7 +29,9 @@
 			<view class="line">
 				<view class="lineHead">昵称</view>
 				<view class="linetext">{{user.name}}</view>
-				<view class="lineBtn"><image src="../../static/general/more2.png"></view>
+				<view class="lineBtn" @tap="goModify(0)">
+					<image src="../../static/general/more2.png">
+				</view>
 			</view>
 			<view class="line">
 				<view class="lineHead">备注</view>
@@ -60,13 +62,17 @@
 			</view>
 			<view class="line">
 				<view class="lineHead">电话</view>
-				<view class="linetext">123456789</view>
-				<view class="lineBtn"><image src="../../static/general/more2.png"></view>
+				<view class="linetext">{{user.phone}}</view>
+				<view class="lineBtn" @tap="goModify(4)">
+					<image src="../../static/general/more2.png">
+				</view>
 			</view>
 			<view class="line">
 				<view class="lineHead">邮箱</view>
-				<view class="linetext">123456789@666.com</view>
-				<view class="lineBtn"><image src="../../static/general/more2.png"></view>
+				<view class="linetext">{{user.email}}</view>
+				<view class="lineBtn" @tap="goModify(3)">
+					<image src="../../static/general/more2.png">
+				</view>
 			</view>
 			<view class="line">
 				<view class="lineHead">密码</view>
@@ -96,11 +102,20 @@
 				sex: 0,
 				nick: '嘉嘉嘉',
 				intr: "明日复明日，明日何其多！日日待明日，万事成蹉跎。世人皆被明日累，明日无穷老将至。晨昏滚滚水东流。今古悠悠日西坠。百年明日能几何？请君听我《明日歌》。",
+				email: '123456@12.com',
+				phone: '12345678',
+				},
+				modifyInfo: {
+					type: 2, //infoType: ['昵称','备注','简介','邮箱','电话'],
+					userinfo: {}
 				},
 				array: ['男', '女', '未知'],
 				date: this.getDate({format: true}),
 				url: "",
 			};
+		},
+		onLoad: function (option) {
+			this.user = JSON.parse(decodeURIComponent(option.user));
 		},
 		computed: {
 			startDate() {
@@ -154,6 +169,13 @@
 			oncancel() {
 			    // url设置为空，隐藏控件
 			    this.url = "";
+			},
+			goModify: function(type) {
+				this.modifyInfo.type = type;
+				this.modifyInfo.userinfo = this.user;
+				uni.navigateTo({
+					url: '../modify/modify?modifyInfo='+encodeURIComponent(JSON.stringify(this.modifyInfo))
+				});
 			}
 		}
 	}
