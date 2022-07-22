@@ -5,6 +5,7 @@ type ParmRegister struct {
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	RePassword string `json:"re_password"`
+	Email    string `db:"email"`
 }
 
 type ParmLogin struct {

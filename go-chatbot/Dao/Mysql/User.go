@@ -18,9 +18,17 @@ func QuaryUserByUsername(username string) error {
 	return nil
 }
 
-func InsertUser(user *Models.User) (err error) {
-	sqlStr := `INSERT INTO user(user_id,username,password,email,gender) VALUES(?,?,?,?,?)`
-	if _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Gender); err != nil {
+//func InsertUser(user *Models.User) (err error) {
+//	sqlStr := `INSERT INTO user(user_id,username,password,email,gender) VALUES(?,?,?,?,?)`
+//	if _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Gender); err != nil {
+//		return err
+//	}
+//	return nil
+//}
+
+func InsertUser(user *Models.UserRegist) (err error) {
+	sqlStr := `INSERT INTO user(user_id,username,password,email) VALUES(?,?,?,?)`
+	if _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email); err != nil {
 		return err
 	}
 	return nil

@@ -29,5 +29,6 @@ func Init(mode string) *gin.Engine {
 	r.POST("/chat", Controler.ChatHandler)
 	r.POST("/chat_rand", Controler.RandChatHandler)
 	_ = r.Run(fmt.Sprintf(":%d", Settings.Conf.Port))
+
 	return r
 }

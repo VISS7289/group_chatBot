@@ -15,12 +15,11 @@ func Register(p *Models.ParmRegister) (aToken, rToken string, err error) {
 	}
 	//生成UID
 	userID := SnowFlake.GenID()
-	user := &Models.User{
+	user := &Models.UserRegist{
 		userID,
 		p.Username,
 		p.Password,
-		"def",
-		3,
+		p.Email,
 	}
 	//密码加密
 	user.Password = EncryptPassword.EP(user.Password)
