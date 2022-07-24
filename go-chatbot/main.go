@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"go-chatbot/Dao/Mysql"
+	"go-chatbot/Dao/Redis"
 	"go-chatbot/Logger"
+	"go-chatbot/Pkg/Email"
 	"go-chatbot/Pkg/GracefulShutDown"
 	"go-chatbot/Pkg/SnowFlake"
 	"go-chatbot/Routs"
@@ -38,12 +40,12 @@ func main() {
 	defer Mysql.Close()
 	zap.L().Debug("MysqlInit Success...")
 	//初始化redis连接
-	//if err := Redis.Init(); err != nil {
-	//zap.L().Error("RedisInit Error", zap.Error(err))
-	//return
-	//}
-	//defer Redis.Close()
-	//zap.L().Debug("RedisInit Success...")
+	if err := Redis.Init(); err != nil {
+	zap.L().Error("RedisInit Error", zap.Error(err))
+	return
+	}
+	defer Redis.Close()
+	zap.L().Debug("RedisInit Success...")
 
 	//启动雪花算法生成用户ID
 	if err := SnowFlake.Init(Settings.Conf.StartTime, Settings.Conf.MachingID); err != nil {
@@ -51,7 +53,9 @@ func main() {
 	}
 	zap.L().Debug("SnowFlakeInit Success...")
 	//注册路由
+	Email.EmailInit(Settings.Conf.EmailConfig)
 	r := Routs.Init(Settings.Conf.Mode)
+
 	//启动服务(优雅关机)
 	GracefulShutDown.ShutDown(r)
 }

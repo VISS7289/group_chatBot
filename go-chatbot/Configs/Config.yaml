@@ -1,5 +1,5 @@
 name: "go-chatbot"
-mode: "release"
+mode: "debug"
 host: "localhost"
 start_time: "2022-03-01"
 port: 3250
@@ -19,9 +19,9 @@ mysql:
   max_open_conns: 2000
   max_idle_conns: 500
 redis:
-  host: "81.69.253.180"
-  password: "123@456"
-  port: 1236
+  host: "127.0.0.1"
+  password: ""
+  port: 6379
   db: 0
   pool_size: 100
 chat:
@@ -29,3 +29,8 @@ chat:
   port: 8087
   rout: "/chat"
   key: "question"
+email:
+  from: "registe@qkgzs.com"
+  password: "7289978VISSdx"
+  host: "smtp.qcloudmail.com"
+  port: 465

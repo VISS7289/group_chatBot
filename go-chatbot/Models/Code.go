@@ -12,6 +12,9 @@ const (
 	CodeServerBusy
 	CodeAuthHeaderIsNil
 	CodeAuthHeaderValid
+	CodeSendVerifiErr
+	CodeVerifiNotFund
+	CodeVerifiErr
 )
 
 var CodeMesMap = map[ResCode]string{
@@ -24,6 +27,9 @@ var CodeMesMap = map[ResCode]string{
 	CodeServerBusy:      "服务正忙",
 	CodeAuthHeaderIsNil: "需要登录后进行操作",
 	CodeAuthHeaderValid: "无效的Token",
+	CodeSendVerifiErr: "发送验证码失败",
+	CodeVerifiNotFund: "验证码过期或未发送",
+	CodeVerifiErr: "验证码错误",
 }
 
 func (c ResCode) Msg() string {

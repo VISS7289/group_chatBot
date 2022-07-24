@@ -5,7 +5,17 @@ type ParmRegister struct {
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	RePassword string `json:"re_password"`
-	Email    string `db:"email"`
+	Email      string `db:"email"`
+}
+
+type VerifiEmail struct {
+	To       string `json:"to"`
+	Username string `json:"username"`
+}
+
+type VerifiExam struct {
+	VerifiCode       string `json:"verifiCode"`
+	Username string `json:"username"`
 }
 
 type ParmLogin struct {

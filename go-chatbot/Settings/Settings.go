@@ -22,6 +22,7 @@ type AppConfig struct {
 	MySqlConfig `mapstructure:"mysql"`
 	RedisConfig `mapstructure:"redis"`
 	ChatConfig  `mapstructure:"chat"`
+	EmailConfig `mapstructure:"email"`
 }
 
 type LogConfig struct {
@@ -56,6 +57,14 @@ type ChatConfig struct {
 	Rout string
 	Key  string
 }
+
+type EmailConfig struct {
+	From string
+	Password string
+	Host string
+	Port int
+}
+
 
 func Init() (err error) {
 	viper.SetConfigName("Config")
