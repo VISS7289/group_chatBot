@@ -38,13 +38,23 @@
 					<image src="../../static/general/look.png" class="look" v-if="look" @tap="lookPassword"></image>
 					<image src="../../static/general/unlook.png" class="look" v-if="!look" @tap="lookPassword"></image>
 				</view>
+				<view class="vertify-div">
+					<input :type="type" placeholder="请重新输入验证码" class="paw" placeholder-style="color:#bbb;font-weight:400;" @blur="inputVerifi"/>
+					<view class="vertifySend" @tap="sendVertify">
+						<view v-if="send">发送验证码</view>
+						<view v-if="unSend" class="unSelect">{{this.time}}s</view>
+						<view v-if="reSend">重新发送</view>
+					</view>
+				</view>
 			</view>
+			<view class="tips" v-if="wrong">{{this.errInfo}}</view>
 		</view>
 		<view class="submit" @tap="subInfo">注册</view>
 	</view>
 </template>
 
 <script>
+	import config from '../../commons/js/config.js';
 	export default {
 		data() {
 			return {
@@ -64,6 +74,13 @@
 				emailValue: '',
 				userPassword: '',
 				userPasswordRe: '',
+				verifiValue: '',
+				wrong: false,
+				send: true,
+				reSend: false,
+				unSend: false,
+				time: 60,
+				errInfo: ''
 			}
 		},
 		methods: {
@@ -133,13 +150,74 @@
 					}
 				}
 			},
+			inputVerifi: function(e){
+				this.verifiValue=e.detail.value;
+			},
 			subInfo: function(){
+				this.wrong=!this.wrong;
 				if(this.okUsername && this.okEmail && this.okPa && this.okRe){
-					console.log(this.userValue);
-					console.log(this.emailValue);
-					console.log(this.userPassword);
+					uni.request({
+						url: config.myurl+'/register',
+						method: 'POST',
+						data: {
+							"username": this.userValue,
+							"password": this.userPassword,
+							"re_password": this.userPasswordRe,
+							"email": this.emailValue,
+							"verifiCode": this.verifiValue
+						},
+						success:(data)=> {
+							console.log(data.data)
+							if(data.data.Code!=1000){
+								this.wrong=true;
+								this.errInfo=data.data.Msg;
+							}else{
+								this.wrong=false;
+							}
+						}
+					})
+				}else{
+					this.shortUsername=!this.okUsername;
+					this.invilid=!this.okEmail;
+					this.shortPassword=!this.okPa;
+					this.shortRe=!this.okRe;
+				}
+				
+			},
+			sendVertify: function(){
+				if(this.okEmail&&!this.unSend){
+					this.send=false;
+					this.reSend=false;
+					this.unSend=true;
+					var obj = setInterval(() => {
+						if(this.time<=0){
+							this.time=0;
+							this.reSend=true;
+							this.unSend=false;
+							clearInterval(obj);
+						}else{
+							this.time=this.time-1;
+						}
+					}, 1000);
+					uni.request({
+						url: config.myurl+'/verificationCode',
+						method: 'POST',
+						data: {
+							"to": this.emailValue,
+							"username": "duan666"
+						},
+						complete:(data)=> {
+							console.log(data)
+						}
+					})
+				}else{
+					this.invilid=!this.okEmail;
 				}
 			},
+			timeReduce: function(t){
+				
+				return
+			}
 		}
 	}
 </script>
@@ -166,7 +244,8 @@
 		}
 	}
 	.main{
-		padding:54rpx $uni-spacing-row-lg 54rpx;
+		padding:54rpx $uni-spacing-row-lg 120rpx;
+		height: 850rpx;
 		.title{
 			font-size: 56rpx;
 			font-weight: 500;
@@ -190,7 +269,12 @@
 				border-bottom: 1px solid $uni-border-color;
 			}
 		}
-
+		.tips{
+			float: left;
+			font-size: $uni-font-size-lg;
+			color: $uni-color-warning;
+			line-height: 56rpx;
+		}
 	}
 	.submit{
 		margin: 0 auto;
@@ -204,6 +288,22 @@
 		color: $uni-text-color;
 		line-height: 96rpx;
 		text-align: center;
+	}
+	.vertify-div{
+		display: flex;
+		flex-direction: cow;
+		align-items: center;
+		.vertifySend{
+			padding-top: 48rpx;
+			padding-left: $uni-spacing-row-base;
+			font-weight: 500;
+			color: $uni-text-color;
+			width: 200rpx;
+			text-align: center;
+		}
+		.unSelect{
+			color: $uni-text-color-disable;
+		}
 	}
 	.inputs-div{
 		position: relative;
@@ -230,6 +330,7 @@
 		.wTextPassword{
 			right: 45rpx;
 		}
+		
 		
 	}
 </style>

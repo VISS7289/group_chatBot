@@ -18,6 +18,18 @@ func QuaryUserByUsername(username string) error {
 	return nil
 }
 
+func QuaryUserByEmail(email string) error {
+	sqlStr := `SELECT COUNT(user_id) FROM user WHERE email = ?`
+	var count int
+	if err := db.Get(&count, sqlStr, email); err != nil {
+		return err
+	}
+	if count > 0 {
+		return Models.ErrorEmailExit
+	}
+	return nil
+}
+
 //func InsertUser(user *Models.User) (err error) {
 //	sqlStr := `INSERT INTO user(user_id,username,password,email,gender) VALUES(?,?,?,?,?)`
 //	if _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Gender); err != nil {

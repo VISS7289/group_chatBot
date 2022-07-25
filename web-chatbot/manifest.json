@@ -7,19 +7,8 @@
     "transformPx" : false,
     "h5" : {
         "devServer" : {
-			"host":"localhost",
-            "port" : 8080,
-            "disableHostCheck" : true,
-            // "proxy" : {
-            //     "/chat" : {
-            //         "target" : "http://localhost:8086",
-            //         "changeOrigin" : true,
-            //         "secure" : false,
-            //         "pathRewrite" : {
-            //             "^/chat" : ""
-            //         }
-            //     }
-            // },
+			"host":"81.69.253.180",
+            "port" : 3250,
             "https" : false
         },
         "router" : {

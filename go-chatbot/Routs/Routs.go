@@ -19,7 +19,7 @@ func Init(mode string) *gin.Engine {
 	r.Use(Middlewares.Cors())
 	r.Use(Logger.GinLogger(), Logger.GinRecovery(true))
 	//debug路由
-	r.GET("/ping", Middlewares.JWTAuthMiddleware(), func(c *gin.Context) {
+	r.POST("/ping",  func(c *gin.Context) {
 		Models.ResponseSuccess(c, "helloWord")
 	})
 	//注册功能路由

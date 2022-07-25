@@ -22,7 +22,7 @@ func VerifiHandler(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeSendVerifiErr)
 		return
 	}
-	if err := Redis.RedisSet(verifEmail.Username, verifiCode); err != nil {
+	if err := Redis.RedisSet(verifEmail.To, verifiCode); err != nil {
 		zap.L().Error("Redis Set Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeServerBusy)
 		return

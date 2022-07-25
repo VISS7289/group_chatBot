@@ -37,8 +37,12 @@ func RegisterHandler(c *gin.Context) {
 		Models.ResponseErrorWithMsg(c, Models.CodeWrongPassword, "请重新确认密码")
 		return
 	}
+	//验证验证码
+	if code := Logic.VerifiExam(&p); code != Models.CodeSuccess {
+		Models.ResponseErrorWithMsg(c, code, "验证码错误")
+	}
 	//业务处理
-	atoken, rtoken, err := Logic.Register(&p)
+	atoken, rtoken, err, code := Logic.Register(&p)
 	if err != nil {
 		if Models.ErrorIs(err, Models.ErrorUserExit) {
 			Models.ResponseError(c, Models.CodeUserExist)
@@ -47,6 +51,9 @@ func RegisterHandler(c *gin.Context) {
 		zap.L().Error("SomeOne Have Unknow Error When Regist:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
+	}
+	if code != Models.CodeSuccess {
+		Models.ResponseErrorWithMsg(c, code, "验证码错误")
 	}
 	//返回响应
 	Models.ResponseSuccess(c, []string{atoken, rtoken})
