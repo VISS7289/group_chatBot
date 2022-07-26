@@ -9,6 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RegisterHandler 处理用户注册
+// @Summary 处理用户注册接口
+// @Description 处理用户注册接口
+// @Tags 注册登录相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmRegister false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /register [post]
 func RegisterHandler(c *gin.Context) {
 	//参数校验
 	var p Models.ParmRegister
@@ -59,6 +70,17 @@ func RegisterHandler(c *gin.Context) {
 	Models.ResponseSuccess(c, []string{atoken, rtoken})
 }
 
+// LoginHandler 处理用户登录
+// @Summary 处理用户登录接口
+// @Description 处理用户登录接口
+// @Tags 注册登录相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmLogin false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /login [post]
 func LoginHandler(c *gin.Context) {
 	//参数校验
 	var p Models.ParmLogin

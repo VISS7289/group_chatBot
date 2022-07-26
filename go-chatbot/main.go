@@ -14,6 +14,21 @@ import (
 	"go.uber.org/zap"
 )
 
+// @title 群聊聊天机器人app
+// @version 1.0
+// @description 群聊聊天机器人app
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name dxy
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host http://81.69.253.180:3250/
+
+
 func main() {
 
 	//加载配置文件

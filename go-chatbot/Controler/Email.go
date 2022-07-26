@@ -9,6 +9,17 @@ import (
 	"go.uber.org/zap"
 )
 
+// VerifiHandler 发送验证码
+// @Summary 发送验证码接口
+// @Description 发送验证码接口
+// @Tags 注册登录相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.VerifiEmail false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /verificationCode [post]
 func VerifiHandler(c *gin.Context) {
 	var verifEmail Models.VerifiEmail
 	if err := c.ShouldBindJSON(&verifEmail); err != nil {

@@ -1,0 +1,137 @@
+definitions:
+  Controler._ResponsePostList:
+    properties:
+      code:
+        description: 响应状态码
+        type: integer
+      data:
+        description: 数据
+        items: {}
+        type: array
+      message:
+        description: 提示信息
+        type: string
+    type: object
+  Models.ParmRegister:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      re_password:
+        type: string
+      username:
+        type: string
+      verifiCode:
+        type: string
+    type: object
+host: http://81.69.253.180:3250/
+info:
+  contact:
+    email: support@swagger.io
+    name: dxy
+    url: http://www.swagger.io/support
+  description: 群聊聊天机器人app
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: 群聊聊天机器人app
+  version: "1.0"
+paths:
+  /article:
+    post:
+      consumes:
+      - application/x-json-stream
+      operationId: "1"
+      parameters:
+      - description: 文章
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/Models.ParmRegister'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Models.ParmRegister'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Models.ParmRegister'
+      summary: 提交新的文章内容
+      tags:
+      - 文章
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: 可按社区按时间或分数排序查询帖子列表接口
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        type: string
+      - in: query
+        name: email
+        type: string
+      - in: query
+        name: password
+        type: string
+      - in: query
+        name: re_password
+        type: string
+      - in: query
+        name: username
+        type: string
+      - in: query
+        name: verifiCode
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Controler._ResponsePostList'
+      security:
+      - ApiKeyAuth: []
+      summary: 升级版帖子列表接口
+      tags:
+      - 帖子相关接口
+  /verificationCode:
+    post:
+      consumes:
+      - application/json
+      description: get string by ID
+      operationId: get-string-by-int
+      parameters:
+      - description: Some ID
+        in: path
+        name: some_id
+        required: true
+        type: integer
+      - description: Some ID
+        in: body
+        name: some_id
+        required: true
+        schema:
+          $ref: '#/definitions/Models.ParmRegister'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/Models.ParmRegister'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/Models.ParmRegister'
+      summary: Add a new pet to the store
+swagger: "2.0"

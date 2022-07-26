@@ -1,0 +1,210 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "群聊聊天机器人app",
+        "title": "群聊聊天机器人app",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "dxy",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "http://81.69.253.180:3250/",
+    "paths": {
+        "/article": {
+            "post": {
+                "consumes": [
+                    "application/x-json-stream"
+                ],
+                "tags": [
+                    "文章"
+                ],
+                "summary": "提交新的文章内容",
+                "operationId": "1",
+                "parameters": [
+                    {
+                        "description": "文章",
+                        "name": "article",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Models.ParmRegister"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Models.ParmRegister"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Models.ParmRegister"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "可按社区按时间或分数排序查询帖子列表接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "帖子相关接口"
+                ],
+                "summary": "升级版帖子列表接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "password",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "re_password",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "verifiCode",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Controler._ResponsePostList"
+                        }
+                    }
+                }
+            }
+        },
+        "/verificationCode": {
+            "post": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Add a new pet to the store",
+                "operationId": "get-string-by-int",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Some ID",
+                        "name": "some_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Some ID",
+                        "name": "some_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Models.ParmRegister"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "We need ID!!",
+                        "schema": {
+                            "$ref": "#/definitions/Models.ParmRegister"
+                        }
+                    },
+                    "404": {
+                        "description": "Can not find ID",
+                        "schema": {
+                            "$ref": "#/definitions/Models.ParmRegister"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Controler._ResponsePostList": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "响应状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "数据",
+                    "type": "array",
+                    "items": {}
+                },
+                "message": {
+                    "description": "提示信息",
+                    "type": "string"
+                }
+            }
+        },
+        "Models.ParmRegister": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "re_password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "verifiCode": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

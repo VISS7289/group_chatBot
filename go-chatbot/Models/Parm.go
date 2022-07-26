@@ -2,16 +2,16 @@ package Models
 
 //定义请求参数结构体
 type ParmRegister struct {
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	RePassword string `json:"re_password"`
-	Email      string `json:"email"`
-	VerifiCode string `json:"verifiCode"`
+	Username   string `json:"username"`    //用户名
+	Password   string `json:"password"`    //密码
+	RePassword string `json:"re_password"` //确认密码
+	Email      string `json:"email"`       //邮箱
+	VerifiCode string `json:"verifiCode"`  //验证码
 }
 
 type VerifiEmail struct {
-	To       string `json:"to"`
-	Username string `json:"username"`
+	To       string `json:"to"`       //用户的邮箱地址
+	Username string `json:"username"` //用户名
 }
 
 type VerifiExam struct {
@@ -20,8 +20,8 @@ type VerifiExam struct {
 }
 
 type ParmLogin struct {
-	Username string
-	Password string
+	Username string `json:"username"` //用户名
+	Password string `json:"password"` //密码
 }
 
 type ParmChat struct {
