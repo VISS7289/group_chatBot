@@ -15,19 +15,21 @@
 				<input type="text" placeholder="用户名/邮箱" class="user" placeholder-style="color:#bbb;font-weight:400;" @blur="subUsername"/>
 				<input type="password" placeholder="密码" class="paw" placeholder-style="color:#bbb;font-weight:400;" @blur="subPassword"/>
 			</view>
-			<view class="tips" v-if="wrong">输入用户名或密码错误！</view>
+			<view class="tips" v-if="wrong">{{this.errInfo}}</view>
 		</view>
 		<view class="submit" @tap="subInfo">登录</view>
 	</view>
 </template>
 
 <script>
+	import config from '../../commons/js/config.js';
 	export default {
 		data() {
 			return {
 				wrong: false,
 				username: '',
 				password: '',
+				errInfo: "输入用户名或密码错误！"
 			}
 		},
 		methods: {
@@ -44,9 +46,23 @@
 			},
 			subInfo: function(){
 				if(this.username && this.password){
-					this.wrong=false;
-					console.log(this.username);
-					console.log(this.password);
+					uni.request({
+						url: config.myurl+'/login',
+						method: 'POST',
+						data: {
+							"username": this.username,
+							"password": this.password,
+						},
+						success:(data)=> {
+							console.log(data.data)
+							if(data.data.Code!=1000){
+								this.wrong=true;
+								this.errInfo=data.data.Msg;
+							}else{
+								this.wrong=false;
+							}
+						}
+					})
 				}else{
 					this.wrong=true;
 				}

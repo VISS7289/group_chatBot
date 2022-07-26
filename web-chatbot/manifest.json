@@ -7,8 +7,7 @@
     "transformPx" : false,
     "h5" : {
         "devServer" : {
-			"host":"81.69.253.180",
-            "port" : 3250,
+			"host":"localhost",
             "https" : false
         },
         "router" : {
