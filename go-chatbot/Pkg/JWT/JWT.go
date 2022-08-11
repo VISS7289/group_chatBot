@@ -1,6 +1,7 @@
 package JWT
 
 import (
+	"fmt"
 	"go-chatbot/Models"
 	"time"
 
@@ -62,7 +63,9 @@ func RefreshToken(aToken, rToken string) (newAToken, newRtoken string, err error
 	}
 	var mc = new(MyClaims)
 	_, err = jwt.ParseWithClaims(aToken, mc, JWTKeyFunc)
-	v, _ := err.(jwt.ValidationError)
+	fmt.Println(err)
+	v, _ := err.(*jwt.ValidationError)
+	fmt.Println(v.Errors)
 	if v.Errors == jwt.ValidationErrorExpired {
 		return GenToken(mc.UserID)
 	}

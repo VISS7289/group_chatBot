@@ -32,4 +32,9 @@ type ParmReturnChat struct {
 	ChatContent string `json:"chat_content"`
 }
 
+type ParmToken struct {
+	AToken string `json:"a_token"`
+	RToken string `json:"r_token"`
+}
+
 var JWTSercet = []byte("7289978VISS")

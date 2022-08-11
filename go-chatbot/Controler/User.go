@@ -1,6 +1,7 @@
 package Controler
 
 import (
+	"fmt"
 	"go-chatbot/Logic"
 	"go-chatbot/Models"
 
@@ -51,6 +52,7 @@ func RegisterHandler(c *gin.Context) {
 	//验证验证码
 	if code := Logic.VerifiExam(&p); code != Models.CodeSuccess {
 		Models.ResponseErrorWithMsg(c, code, "验证码错误")
+		return
 	}
 	//业务处理
 	atoken, rtoken, err, code := Logic.Register(&p)
@@ -65,9 +67,20 @@ func RegisterHandler(c *gin.Context) {
 	}
 	if code != Models.CodeSuccess {
 		Models.ResponseErrorWithMsg(c, code, "验证码错误")
+		return
 	}
 	//返回响应
 	Models.ResponseSuccess(c, []string{atoken, rtoken})
+}
+
+func ExistName(c *gin.Context) {
+	name := c.Query("username")
+	fmt.Println(name)
+	if err, code := Logic.RepeatUsername(name); err != nil {
+		Models.ResponseErrorWithMsg(c, code, "用户名重复")
+		return
+	}
+	Models.ResponseSuccess(c, []string{})
 }
 
 // LoginHandler 处理用户登录

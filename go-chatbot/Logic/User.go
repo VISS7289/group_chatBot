@@ -36,6 +36,13 @@ func Register(p *Models.ParmRegister) (string, string, error, Models.ResCode) {
 	return atoken, rtoken, err, Models.CodeSuccess
 }
 
+func RepeatUsername(username string)(error, Models.ResCode){
+	if err := Mysql.QuaryUserByUsername(username); err != nil {
+		return err, Models.CodeUserExist
+	}
+	return nil, Models.CodeSuccess
+}
+
 func Login(p *Models.ParmLogin) (aToken, rToken string, err error) {
 	user := &Models.User{
 		Username: p.Username,

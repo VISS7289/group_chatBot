@@ -10,8 +10,8 @@ import (
 
 	_ "go-chatbot/docs"
 
-	gs "github.com/swaggo/gin-swagger"
 	swaggerfiles "github.com/swaggo/files"
+	gs "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,11 +26,15 @@ func Init(mode string) *gin.Engine {
 	//接口文档路由
 	r.GET("/swagger/*any", gs.WrapHandler(swaggerfiles.Handler))
 	//debug路由
-	r.POST("/ping",  func(c *gin.Context) {
+	r.POST("/ping", Middlewares.JWTAuthMiddleware(), func(c *gin.Context) {
 		Models.ResponseSuccess(c, "helloWord")
 	})
+	//刷新token路由
+	r.POST("/refersh", Controler.RefershHandler)
 	//注册功能路由
 	r.POST("/register", Controler.RegisterHandler)
+	r.GET("/existName", Controler.ExistName)
+	r.POST("/existEmail", Controler.RegisterHandler)
 	//登录功能路由
 	r.POST("/login", Controler.LoginHandler)
 	//聊天功能路由

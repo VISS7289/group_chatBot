@@ -5,8 +5,6 @@ import (
 	"go-chatbot/Pkg/JWT"
 	"strings"
 
-	"github.com/dgrijalva/jwt-go"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,12 +25,12 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			return
 		}
 		mc, err := JWT.ParseToken(parts[1])
-		v, _ := err.(*jwt.ValidationError)
-		if v.Errors == jwt.ValidationErrorExpired {
-			Models.ResponseError(c, Models.CodeAuthHeaderIsNil)
-			c.Abort()
-			return
-		}
+		//v, _ := err.(*jwt.ValidationError)
+		//if v.Errors == jwt.ValidationErrorExpired {
+		//	Models.ResponseError(c, Models.CodeAuthHeaderIsNil)
+		//	c.Abort()
+		//	return
+		//}
 		if err != nil {
 			Models.ResponseError(c, Models.CodeAuthHeaderValid)
 			c.Abort()

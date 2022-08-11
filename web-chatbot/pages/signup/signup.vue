@@ -101,11 +101,23 @@
 				if(e.detail.cursor>0){
 					this.userValue=e.detail.value;
 					if(e.detail.cursor>=6){
-						this.okUsername=true;
 						this.shortUsername=false;
+						uni.request({
+							url: config.myurl+'/existName?username='+this.userValue,
+							method: 'GET',
+							success:(data)=> {
+								console.log(data.data)
+								if(data.data.Code==1002){
+									this.occupyUsername=true;
+								}else{
+									this.occupyUsername=false;
+								}
+								this.okUsername=!(this.occupyUsername||this.shortUsername);
+							},
+						})
 					}else{
-						this.okUsername=false;
 						this.shortUsername=true;
+						this.occupyUsername=false;
 					}
 				}
 			},
@@ -206,8 +218,12 @@
 							"to": this.emailValue,
 							"username": "duan666"
 						},
-						complete:(data)=> {
-							console.log(data)
+						success:(data)=> {
+							console.log(data.data)
+							if(data.data.Code==1000){
+								uni.setStorageSync('aToken', data.data.Data[0]);
+								uni.setStorageSync('rToken', data.data.Data[1]);
+							}
 						}
 					})
 				}else{

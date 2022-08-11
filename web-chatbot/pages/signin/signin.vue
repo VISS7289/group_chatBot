@@ -11,18 +11,24 @@
 		<view class="main">
 			<view class="title">登录</view>
 			<view class="slogan">您好，欢迎来到AI聊天室！</view>
-			<view class="inputs">
+			<!-- <view class="inputs">
 				<input type="text" placeholder="用户名/邮箱" class="user" placeholder-style="color:#bbb;font-weight:400;" @blur="subUsername"/>
 				<input type="password" placeholder="密码" class="paw" placeholder-style="color:#bbb;font-weight:400;" @blur="subPassword"/>
+			</view> -->
+			<view class="inputs">
+				<input type="text" v-model="username" placeholder="用户名/邮箱" class="user" placeholder-style="color:#bbb;font-weight:400;"/>
+				<input type="password" v-model="password" placeholder="密码" class="paw" placeholder-style="color:#bbb;font-weight:400;"/>
 			</view>
 			<view class="tips" v-if="wrong">{{this.errInfo}}</view>
 		</view>
 		<view class="submit" @tap="subInfo">登录</view>
+		<view class="submit" @tap="Test">Test</view>
 	</view>
 </template>
 
 <script>
 	import config from '../../commons/js/config.js';
+	import common from '../../commons/js/common.js';
 	export default {
 		data() {
 			return {
@@ -60,12 +66,29 @@
 								this.errInfo=data.data.Msg;
 							}else{
 								this.wrong=false;
+								uni.setStorageSync('aToken', data.data.Data[0]);
+								uni.setStorageSync('rToken', data.data.Data[1]);
 							}
 						}
 					})
 				}else{
 					this.wrong=true;
 				}
+			},
+			Test: function(){
+				console.log(uni.getStorageSync('aToken'));
+				console.log(uni.getStorageSync('rToken'));
+				uni.request({
+					url: config.myurl+'/ping',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + uni.getStorageSync('aToken') },
+					success:(data)=> {
+						console.log(data.data)
+						if(data.data.Code==1009){
+							common.refersh(config.myurl);
+						}
+					}
+				})
 			}
 		}
 	}
