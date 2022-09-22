@@ -21,3 +21,12 @@ type UserRegist struct {
 	Password string `db:"password"`
 	Email    string `db:"email"`
 }
+
+type UserInfoReturn struct {
+	UserID   int64 `db:"user_id"`
+	Username string `db:"username"`
+	ImgUrl   string `db:"imgurl"`
+	Email  string `db:"email"`
+	AToken string
+	RToken string
+}

@@ -9,10 +9,11 @@ import (
 	"go-chatbot/Pkg/SnowFlake"
 )
 
-func Register(p *Models.ParmRegister) (string, string, error, Models.ResCode) {
+func Register(p *Models.ParmRegister) (Models.UserInfoReturn, error, Models.ResCode) {
 	//查重
 	if err := Mysql.QuaryUserByUsername(p.Username); err != nil {
-		return "", "", err, Models.CodeUserExist
+		var re Models.UserInfoReturn
+		return  re, err, Models.CodeUserExist
 	}
 	//查重 debug阶段去掉该代码
 	//if err := Mysql.QuaryUserByEmail(p.Email); err != nil {
@@ -30,10 +31,19 @@ func Register(p *Models.ParmRegister) (string, string, error, Models.ResCode) {
 	user.Password = EncryptPassword.EP(user.Password)
 	//保存入数据库
 	if err := Mysql.InsertUser(user); err != nil {
-		return "", "", err, Models.CodeServerBusy
+		var re Models.UserInfoReturn
+		return re, err, Models.CodeServerBusy
 	}
-	atoken, rtoken, err := JWT.GenToken(user.UserID)
-	return atoken, rtoken, err, Models.CodeSuccess
+	resAToken, resRToken, err := JWT.GenToken(user.UserID)
+	info := Models.UserInfoReturn{
+		UserID:   user.UserID,
+		Username: user.Username,
+		ImgUrl:   "unknow",
+		Email:    user.Email,
+		AToken:   resAToken,
+		RToken:   resRToken,
+	}
+	return info, err, Models.CodeSuccess
 }
 
 func RepeatUsername(username string)(error, Models.ResCode){
@@ -43,7 +53,7 @@ func RepeatUsername(username string)(error, Models.ResCode){
 	return nil, Models.CodeSuccess
 }
 
-func Login(p *Models.ParmLogin) (aToken, rToken string, err error) {
+func Login(p *Models.ParmLogin) (info Models.UserInfoReturn, err error) {
 	user := &Models.User{
 		Username: p.Username,
 		Password: p.Password,
@@ -51,7 +61,16 @@ func Login(p *Models.ParmLogin) (aToken, rToken string, err error) {
 	if err = Mysql.Login(user); err != nil {
 		return
 	}
-	return JWT.GenToken(user.UserID)
+	resAToken, resRToken, err := JWT.GenToken(user.UserID)
+	info = Models.UserInfoReturn{
+		UserID:   user.UserID,
+		Username: user.Username,
+		ImgUrl:   "unknow",
+		Email:    user.Email,
+		AToken:   resAToken,
+		RToken:   resRToken,
+	}
+	return info, err
 }
 
 func VerifiExam(p *Models.ParmRegister) Models.ResCode {

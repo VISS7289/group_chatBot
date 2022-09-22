@@ -48,7 +48,7 @@ func InsertUser(user *Models.UserRegist) (err error) {
 
 func Login(u *Models.User) error {
 	oPassword := u.Password
-	sqlStr := `SELECT user_id, username, password FROM user WHERE username = ?`
+	sqlStr := `SELECT user_id, username, password, email FROM user WHERE username = ?`
 	err := db.Get(u, sqlStr, u.Username)
 	if err == sql.ErrNoRows {
 		return Models.ErrorUserNotExit

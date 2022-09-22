@@ -55,7 +55,7 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 	//业务处理
-	atoken, rtoken, err, code := Logic.Register(&p)
+	info, err, code := Logic.Register(&p)
 	if err != nil {
 		if Models.ErrorIs(err, Models.ErrorUserExit) {
 			Models.ResponseError(c, Models.CodeUserExist)
@@ -70,7 +70,7 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 	//返回响应
-	Models.ResponseSuccess(c, []string{atoken, rtoken})
+	Models.ResponseSuccess(c, info)
 }
 
 func ExistName(c *gin.Context) {
@@ -111,7 +111,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 	//业务处理
-	atoken, rtoken, err := Logic.Login(&p)
+	info, err := Logic.Login(&p)
 	if err != nil {
 		if Models.ErrorIs(err, Models.ErrorWrongPassword) || Models.ErrorIs(err, Models.ErrorUserNotExit) {
 			Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, err.Error())
@@ -122,5 +122,6 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 	//返回响应
-	Models.ResponseSuccess(c, []string{atoken, rtoken})
+
+	Models.ResponseSuccess(c, info)
 }
