@@ -39,8 +39,8 @@ func QuaryUserByEmail(email string) error {
 //}
 
 func InsertUser(user *Models.UserRegist) (err error) {
-	sqlStr := `INSERT INTO user(user_id,username,password,email) VALUES(?,?,?,?)`
-	if _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email); err != nil {
+	sqlStr := `INSERT INTO user(user_id,username,password,email,imgBase64) VALUES(?,?,?,?,?)`
+	if _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Img); err != nil {
 		return err
 	}
 	return nil
@@ -48,7 +48,7 @@ func InsertUser(user *Models.UserRegist) (err error) {
 
 func Login(u *Models.User) error {
 	oPassword := u.Password
-	sqlStr := `SELECT user_id, username, password, email FROM user WHERE username = ?`
+	sqlStr := `SELECT user_id, username, password, email, imgBase64 FROM user WHERE username = ?`
 	err := db.Get(u, sqlStr, u.Username)
 	if err == sql.ErrNoRows {
 		return Models.ErrorUserNotExit

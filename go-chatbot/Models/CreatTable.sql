@@ -10,11 +10,12 @@ CREATE TABLE `user` (
     `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `birthday` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `intr` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '这个人很懒，没有简介',
-    `imgBlob` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user.png',
+    `imgBase64` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `idx_username` (`username`) USING BTREE,
     UNIQUE KEY `idx_user_id` (`user_id`) USING BTREE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 CREATE TABLE `friend` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -44,7 +45,7 @@ CREATE TABLE `group` (
      `id` bigint(20) NOT NULL AUTO_INCREMENT,
      `group_id` bigint(20) NOT NULL,
      `groupname` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
-     `imgBlob` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'group.png',
+     `imgBase64` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
      `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
      `notice` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '这个群没有公告',
      PRIMARY KEY (`id`),

@@ -5,6 +5,7 @@ import (
 	"go-chatbot/Dao/Redis"
 	"go-chatbot/Models"
 	"go-chatbot/Pkg/EncryptPassword"
+	"go-chatbot/Pkg/Img"
 	"go-chatbot/Pkg/JWT"
 	"go-chatbot/Pkg/SnowFlake"
 )
@@ -13,7 +14,7 @@ func Register(p *Models.ParmRegister) (Models.UserInfoReturn, error, Models.ResC
 	//查重
 	if err := Mysql.QuaryUserByUsername(p.Username); err != nil {
 		var re Models.UserInfoReturn
-		return  re, err, Models.CodeUserExist
+		return re, err, Models.CodeUserExist
 	}
 	//查重 debug阶段去掉该代码
 	//if err := Mysql.QuaryUserByEmail(p.Email); err != nil {
@@ -26,6 +27,7 @@ func Register(p *Models.ParmRegister) (Models.UserInfoReturn, error, Models.ResC
 		p.Username,
 		p.Password,
 		p.Email,
+		Img.DefaultImg,
 	}
 	//密码加密
 	user.Password = EncryptPassword.EP(user.Password)
@@ -38,7 +40,7 @@ func Register(p *Models.ParmRegister) (Models.UserInfoReturn, error, Models.ResC
 	info := Models.UserInfoReturn{
 		UserID:   user.UserID,
 		Username: user.Username,
-		ImgUrl:   "unknow",
+		Img:      user.Img,
 		Email:    user.Email,
 		AToken:   resAToken,
 		RToken:   resRToken,
@@ -46,7 +48,7 @@ func Register(p *Models.ParmRegister) (Models.UserInfoReturn, error, Models.ResC
 	return info, err, Models.CodeSuccess
 }
 
-func RepeatUsername(username string)(error, Models.ResCode){
+func RepeatUsername(username string) (error, Models.ResCode) {
 	if err := Mysql.QuaryUserByUsername(username); err != nil {
 		return err, Models.CodeUserExist
 	}
@@ -65,7 +67,7 @@ func Login(p *Models.ParmLogin) (info Models.UserInfoReturn, err error) {
 	info = Models.UserInfoReturn{
 		UserID:   user.UserID,
 		Username: user.Username,
-		ImgUrl:   "unknow",
+		Img:      user.Img,
 		Email:    user.Email,
 		AToken:   resAToken,
 		RToken:   resRToken,

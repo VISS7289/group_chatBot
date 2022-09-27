@@ -38,6 +38,8 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 	if len(p.Username) < 4 {
+		println(p.Username)
+		println(len(p.Username))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "用户名过短")
 		return
 	}

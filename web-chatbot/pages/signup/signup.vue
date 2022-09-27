@@ -192,7 +192,7 @@
 								try {
 									uni.setStorageSync('user', {
 										'id': res.UserID,
-										'imgurl': res.ImgUrl,
+										'img': res.Img,
 										'email': res.Email,
 										'username': res.Username,
 										'atoken': res.AToken,
