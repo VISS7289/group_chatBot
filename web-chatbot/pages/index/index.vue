@@ -94,20 +94,20 @@
 						this.user.id = value.id
 						this.user.email = value.email
 						this.user.name = value.username
+						this.user.nick = value.username
 						this.atoken = value.atoken
 						this.rtoken = value.rtoken
 					}else{
 						uni.navigateTo({ url: '../signin/signin', })
 					}
-					console.log(this.atoken)
-					console.log(this.rtoken)
+					console.log(value)
 				} catch (e) {
 					// error
 				}
 			},
 			Test: function() {
 				var img = document.createElement('img')
-				img.src = '../../static/test/1 (45).jpg'
+				img.src = '../../static/test/1 (3).jpg'
 				uni.request({
 					url: img.src,
 					method: 'GET',

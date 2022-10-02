@@ -1,16 +1,16 @@
 package Models
 
 type User struct {
-	UserID   int64  `db:"user_id"`
-	Username string `db:"username"`
-	Password string `db:"password"`
-	Email    string `db:"email"`
-	Img      string `db:"imgBase64"`
-	Gender   int
-	//Birthday string `db:"birthday"`
-	//Intr string `db:"intr"`
-	//ImgBlob string `db:"imgBlob"`
-	//Phone
+	UserID     int64  `db:"user_id"`
+	Username   string `db:"username"`
+	Password   string `db:"password"`
+	Email      string `db:"email"`
+	Img        string `db:"imgBase64"`
+	Gender     int    `db:"gender"`
+	Birthday   string `db:"birthday"`
+	Intr       string `db:"intr"`
+	CreateTime string `db:"creat_time"`
+	Phone      string `db:"phone"`
 	//RegistDay
 	//BriefInt
 	//HeadPhoto
@@ -31,4 +31,16 @@ type UserInfoReturn struct {
 	Email    string `db:"email"`
 	AToken   string
 	RToken   string
+}
+
+type UserInfoDetailReturn struct {
+	UserID     int64  `db:"user_id"`
+	Username   string `db:"username"`
+	Email      string `db:"email"`
+	Img        string `db:"imgBase64"`
+	Gender     int    `db:"gender"`
+	Birthday   string `db:"birthday"`
+	Intr       string `db:"intr"`
+	CreateTime string `db:"creat_time"`
+	Phone      string `db:"phone"`
 }

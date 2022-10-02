@@ -194,10 +194,10 @@
 										'id': res.UserID,
 										'img': res.Img,
 										'email': res.Email,
-										'username': res.Username,
-										'atoken': res.AToken,
-										'rtoken': res.RToken
+										'username': res.Username
 									})
+									uni.setStorageSync('atoken', res.AToken)
+									uni.setStorageSync('rtoken', res.RToken)
 								} catch (e) {
 									console.log('数据存储出错')
 									console.log(e)

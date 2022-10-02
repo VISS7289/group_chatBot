@@ -18,6 +18,18 @@ func QuaryUserByUsername(username string) error {
 	return nil
 }
 
+func QuaryUserById(u *Models.User) error {
+	sqlStr := `SELECT username, email, imgBase64, gender, birthday, intr, creat_time, phone FROM user WHERE user_id = ?`
+	err := db.Get(u, sqlStr, u.UserID)
+	if err == sql.ErrNoRows {
+		return Models.ErrorUserNotExit
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func QuaryUserByEmail(email string) error {
 	sqlStr := `SELECT COUNT(user_id) FROM user WHERE email = ?`
 	var count int

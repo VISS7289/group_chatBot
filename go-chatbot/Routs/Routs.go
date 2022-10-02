@@ -31,6 +31,11 @@ func Init(mode string) *gin.Engine {
 	})
 	//刷新token路由
 	r.POST("/refersh", Controler.RefershHandler)
+	//获取用户详情路由
+	r.POST("/user/detial", Middlewares.JWTAuthMiddleware(), Controler.GetUserDetail)
+	//根据用户名模糊搜索
+	r.POST("/serch/username", Middlewares.JWTAuthMiddleware(), Controler.SerchUsername)
+	r.POST("/serch/isfriend", Middlewares.JWTAuthMiddleware(), Controler.SerchIsFriend)
 	//注册功能路由
 	r.POST("/register", Controler.RegisterHandler)
 	r.GET("/existName", Controler.ExistName)

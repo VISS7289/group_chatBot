@@ -6,7 +6,7 @@
 					<view class="top-bar-left" @tap="backOne">
 						<image src="../../static/general/return.png"></image>
 					</view>
-					<view class="top-bar-right">
+					<view class="top-bar-right" v-if="relation==0||relation==3">
 						<view class="more">
 							<image src="../../static/general/more.png"></image>
 						</view>
@@ -20,19 +20,23 @@
 			<view class="main">
 				<view class="userHeader">
 					<image :src="user.img" mode="aspectFill" class="userImg" :animation="animationData2"></image>
-					<image src="../../static/general/man.png" class="userSex man" v-if="user.sex==0"
+					<image src="../../static/general/man.png" class="userSex man" v-if="userDetail.Gender==0"
 						:animation="animationData3"></image>
-					<image src="../../static/general/woman.png" class="userSex woman" v-if="user.sex==1"
+					<image src="../../static/general/woman.png" class="userSex woman" v-if="userDetail.Gender==1"
 						:animation="animationData3"></image>
-					<image src="../../static/general/alien.png" class="userSex alien" v-if="user.sex==2"
+					<image src="../../static/general/alien.png" class="userSex alien" v-if="userDetail.Gender==2"
 						:animation="animationData3"></image>
 				</view>
-				<view class="titleUser">{{user.name}}</view>
-				<view class="nickUser">昵称：{{user.nick}}</view>
-				<view class="intrUser">{{user.intr}}</view>
+				<view class="titleUser">{{userNick}}</view>
+				<view class="nickUser">昵称：{{user.name}}</view>
+				<!-- <view class="intrUser">{{user.intr}}</view> -->
+				<view class="intrUser">{{userDetail.Intr}}</view>
 			</view>
 			<view class="buttomBig">
-				<view class="buttomText" @tap="addFriendAnmi">加为好友</view>
+				<!-- <view class="buttomText" @tap="addFriendAnmi">加为好友</view> -->
+				<view class="buttomText" @tap="getUserDetail" v-if="relation==0">发送消息</view>
+				<view class="buttomText" @tap="getUserDetail" v-if="relation==1">申请中</view>
+				<view class="buttomText" @tap="getUserDetail" v-if="relation==2">加为好友</view>
 			</view>
 			<view class="addFriend" :animation="animationData">
 				<view class="titleUser">{{user.name}}</view>
@@ -47,6 +51,8 @@
 </template>
 
 <script>
+	import config from '../../commons/js/config.js'
+	import refersh from '../../commons/js/refershToken.js'
 	export default {
 		data() {
 			return {
@@ -62,10 +68,30 @@
 				imgTop: 0,
 				pageHeight: 0,
 				user: {},
+				userDetail: {},
+				userid: 0,
+				userNick: '',
+				atoken: '',
+				rtoken: '',
+				relation: 0, //0好友 1申请中 2非好友 3自己
 			}
 		},
 		onLoad: function(option) {
 			this.user = JSON.parse(decodeURIComponent(option.user))
+			try {
+				const value = uni.getStorageSync('user')
+				if (value) {
+					this.userid = value.id
+					this.atoken = uni.getStorageSync('atoken')
+					this.rtoken = uni.getStorageSync('rtoken')
+					this.getUserDetail()
+					this.getUserNick()
+				} else {
+					uni.navigateTo({ url: '../signin/signin', })
+				}
+			} catch (e) {
+				// error
+			}
 		},
 		onReady: function() {
 			this.getElementStyle()
@@ -83,6 +109,47 @@
 					this.imgTop = data.top
 				}).exec()
 				this.pageTop = uni.getSystemInfoSync().statusBarHeight
+			},
+			getUserNick: function() {
+				if (this.userid == this.user.id) {
+					this.userNick = this.user.name
+					this.relation = 3
+					return
+				}
+				uni.request({
+					url: config.myurl + '/serch/isfriend',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: {
+						'user_id': this.user.id,
+						'friend_id': this.userid
+					},
+					success: data => {
+						if (data.data.Code == 1009) {
+							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.getUserNick()
+							} else {
+								// err
+							}
+						} else if (data.data.Code == 1000) {
+							console.log(data.data.Data)
+							this.relation = data.data.Data.State
+							if (data.data.Data.State == 0) {
+								if(len(data.data.Data.Markname)!=0){
+									this.userNick = data.data.Data.Markname
+								}else{
+									this.userNick = this.user.name
+								}
+								
+							} else {
+								this.userNick = this.user.name
+							}
+						} else {
+							// err
+						}
+					}
+				})
 			},
 			addFriendAnmi: function() {
 				this.isAdd = !this.isAdd
@@ -128,7 +195,32 @@
 				this.animationData3 = animation3.export()
 				this.animationData4 = animation4.export()
 
-			}
+			},
+			getUserDetail: function() {
+				uni.request({
+					url: config.myurl + '/user/detial',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: { 'id': this.user.id },
+					success: data => {
+						if (data.data.Code == 1009) {
+							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.getUserDetail()
+							} else {
+								// err
+							}
+
+						} else if (data.data.Code == 1000) {
+							// console.log(data.data.Data)
+							this.userDetail = data.data.Data
+							console.log(this.userDetail)
+						} else {
+							// err
+						}
+					}
+				})
+			},
 		}
 	}
 </script>

@@ -5,7 +5,7 @@ CREATE TABLE `user` (
     `password` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
     `email` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
     `phone` varchar(64) NOT NULL DEFAULT 'unknow',
-    `gender` tinyint(4) NOT NULL DEFAULT '0',
+    `gender` tinyint(4) NOT NULL DEFAULT 0,
     `creat_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `birthday` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -23,6 +23,7 @@ CREATE TABLE `friend` (
     `friend_id` bigint(20) NOT NULL,
     `state` tinyint(4) NOT NULL,
     `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `markName` varchar(64) COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `userIdInFriend` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`) ON DELETE CASCADE,
     CONSTRAINT `friendIdInFriend` FOREIGN KEY (`friend_id`) REFERENCES `user`(`user_id`)  ON DELETE CASCADE

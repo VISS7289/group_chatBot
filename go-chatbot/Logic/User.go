@@ -86,3 +86,24 @@ func VerifiExam(p *Models.ParmRegister) Models.ResCode {
 		return Models.CodeVerifiErr
 	}
 }
+
+func QueryDetialByID(p *Models.ParmQueryUserDetial) (info Models.UserInfoDetailReturn, err error) {
+	user := &Models.User{
+		UserID: p.ID,
+	}
+	if err = Mysql.QuaryUserById(user); err != nil {
+		return info, err
+	}
+	info = Models.UserInfoDetailReturn{
+		UserID:   user.UserID,
+		Username: user.Username,
+		Img:      user.Img,
+		Email:    user.Email,
+		Gender: user.Gender,
+		Birthday: user.Birthday,
+		Intr: user.Intr,
+		CreateTime: user.CreateTime,
+		Phone: user.Phone,
+	}
+	return info, err
+}

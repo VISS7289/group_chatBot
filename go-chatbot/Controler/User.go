@@ -127,3 +127,22 @@ func LoginHandler(c *gin.Context) {
 
 	Models.ResponseSuccess(c, info)
 }
+
+func GetUserDetail(c *gin.Context)  {
+	var p Models.ParmQueryUserDetial
+	if err := c.ShouldBindJSON(&p); err != nil {
+		zap.L().Error("Get User Detail Error", zap.Error(err))
+		Models.ResponseError(c, Models.CodeInvalidParm)
+		return
+	}
+	info, err := Logic.QueryDetialByID(&p)
+	//业务处理
+	if err != nil {
+		zap.L().Error("SomeOne Have Unknow Error When Login:", zap.Error(err))
+		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
+		return
+	}
+	//返回响应
+	Models.ResponseSuccess(c, info)
+
+}
