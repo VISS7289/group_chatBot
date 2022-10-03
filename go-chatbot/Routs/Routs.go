@@ -35,7 +35,10 @@ func Init(mode string) *gin.Engine {
 	r.POST("/user/detial", Middlewares.JWTAuthMiddleware(), Controler.GetUserDetail)
 	//根据用户名模糊搜索
 	r.POST("/serch/username", Middlewares.JWTAuthMiddleware(), Controler.SerchUsername)
+	//判断两个id是否为好友
 	r.POST("/serch/isfriend", Middlewares.JWTAuthMiddleware(), Controler.SerchIsFriend)
+	//好友申请
+	r.POST("/friend/request", Middlewares.JWTAuthMiddleware(), Controler.FriendRequest)
 	//注册功能路由
 	r.POST("/register", Controler.RegisterHandler)
 	r.GET("/existName", Controler.ExistName)

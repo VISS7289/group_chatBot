@@ -84,7 +84,7 @@
 				//console.log(this.friends);
 			},
 			toSerch: function() {
-				uni.navigateTo({ url: '../serch/serch', })
+				uni.navigateTo({ url: '../serch/serch?user='+encodeURIComponent(JSON.stringify(this.user)), })
 			},
 			userInit: function() {
 				try {

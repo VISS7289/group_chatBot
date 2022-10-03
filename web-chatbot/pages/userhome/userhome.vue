@@ -197,12 +197,14 @@
 
 			},
 			getUserDetail: function() {
+				console.log(666)
 				uni.request({
 					url: config.myurl + '/user/detial',
 					method: 'POST',
 					header: { 'Authorization': 'Bearer ' + this.atoken },
 					data: { 'id': this.user.id },
 					success: data => {
+						console.log(data.data)
 						if (data.data.Code == 1009) {
 							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
@@ -214,7 +216,7 @@
 						} else if (data.data.Code == 1000) {
 							// console.log(data.data.Data)
 							this.userDetail = data.data.Data
-							console.log(this.userDetail)
+							
 						} else {
 							// err
 						}

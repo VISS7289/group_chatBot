@@ -33,7 +33,7 @@ type ParmReturnChat struct {
 }
 
 type ParmQueryUserDetial struct {
-	ID int64 `json:"id"`
+	ID string `json:"id"`
 }
 
 type ParmToken struct {
@@ -43,11 +43,18 @@ type ParmToken struct {
 
 type ParmSerchUsername struct {
 	Username string `json:"username"`
+	UserId   string  `json:"user_id"`
 }
 
 type ParmSerchIsFriend struct {
-	UserId   int64 `json:"user_id"`
-	FriendId int64 `json:"friend_id"`
+	UserId   string `json:"user_id"`
+	FriendId string `json:"friend_id"`
+}
+
+type ParmFriendRequest struct {
+	UserId   string  `json:"user_id"`
+	FriendId string  `json:"friend_id"`
+	Msg      string `json:"msg"`
 }
 
 var JWTSercet = []byte("7289978VISS")

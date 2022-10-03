@@ -3,6 +3,7 @@ package JWT
 import (
 	"fmt"
 	"go-chatbot/Models"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -18,9 +19,10 @@ type MyClaims struct {
 	jwt.StandardClaims
 }
 
-func GenToken(userID int64) (aToken, rToken string, err error) {
+func GenToken(userID string) (aToken, rToken string, err error) {
+	uid, _ := strconv.ParseInt(userID, 10, 64)
 	aToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, MyClaims{
-		userID,
+		uid,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(TokenAExpireDuration).Unix(),
 			Issuer:    "my-project",
@@ -67,7 +69,7 @@ func RefreshToken(aToken, rToken string) (newAToken, newRtoken string, err error
 	v, _ := err.(*jwt.ValidationError)
 	fmt.Println(v.Errors)
 	if v.Errors == jwt.ValidationErrorExpired {
-		return GenToken(mc.UserID)
+		return GenToken(strconv.FormatInt(mc.UserID, 10))
 	}
 	return
 }

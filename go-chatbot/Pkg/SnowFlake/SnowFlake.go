@@ -1,6 +1,7 @@
 package SnowFlake
 
 import (
+	"strconv"
 	"time"
 
 	sf "github.com/bwmarrin/snowflake"
@@ -19,6 +20,6 @@ func Init(stateTime string, machineID int64) (err error) {
 	return nil
 }
 
-func GenID() int64 {
-	return node.Generate().Int64()
+func GenID() string {
+	return strconv.FormatInt(node.Generate().Int64(),10)
 }

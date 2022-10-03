@@ -1,6 +1,6 @@
 CREATE TABLE `user` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `user_id` bigint(20) NOT NULL,
+    `user_id` varchar(20) NOT NULL,
     `username` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
     `password` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
     `email` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
@@ -19,10 +19,11 @@ CREATE TABLE `user` (
 
 CREATE TABLE `friend` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `user_id` bigint(20) NOT NULL,
-    `friend_id` bigint(20) NOT NULL,
+    `user_id` varchar(20) NOT NULL,
+    `friend_id` varchar(20) NOT NULL,
     `state` tinyint(4) NOT NULL,
     `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `markName` varchar(64) COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `userIdInFriend` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`) ON DELETE CASCADE,
@@ -31,8 +32,8 @@ CREATE TABLE `friend` (
 
 CREATE TABLE `singleMessage` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `send_id` bigint(20) NOT NULL,
-    `accept_id` bigint(20) NOT NULL,
+    `send_id` varchar(20) NOT NULL,
+    `accept_id` varchar(20) NOT NULL,
     `state` bool NOT NULL DEFAULT false,
     `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `message` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
@@ -44,7 +45,7 @@ CREATE TABLE `singleMessage` (
 
 CREATE TABLE `group` (
      `id` bigint(20) NOT NULL AUTO_INCREMENT,
-     `group_id` bigint(20) NOT NULL,
+     `group_id` varchar(20) NOT NULL,
      `groupname` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
      `imgBase64` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
      `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -56,10 +57,11 @@ CREATE TABLE `group` (
 
 CREATE TABLE `groupMember` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `group_id` bigint(20) NOT NULL,
-    `user_id` bigint(20) NOT NULL,
+    `group_id` varchar(20) NOT NULL,
+    `user_id` varchar(20) NOT NULL,
     `state` tinyint(4) NOT NULL,
     `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `shield` bool NOT NULL DEFAULT false,
     PRIMARY KEY (`id`),
     CONSTRAINT `groupIdInMember` FOREIGN KEY (`group_id`) REFERENCES `group`(`group_id`) ON DELETE CASCADE,
@@ -68,8 +70,8 @@ CREATE TABLE `groupMember` (
 
 CREATE TABLE `groupMessage` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `group_id` bigint(20) NOT NULL,
-    `user_id` bigint(20) NOT NULL,
+    `group_id` varchar(20) NOT NULL,
+    `user_id` varchar(20) NOT NULL,
     `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `message` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
     `type` tinyint(4) NOT NULL,
