@@ -103,6 +103,7 @@
 			this.modifyInfo = JSON.parse(decodeURIComponent(option.modifyInfo))
 			if (this.modifyInfo.type == 6) {
 				this.userRequest = this.modifyInfo.userRequest
+				this.ok = true
 			}
 			try {
 				this.atoken = uni.getStorageSync('atoken')
@@ -248,13 +249,20 @@
 								// err
 							}
 						} else if (data.data.Code == 1000) {
-							console.log(data.data.Data)
 							uni.showToast({
 								title: '好友请求发送成功',
 								icon: 'none',
 								duration: 2000
 							})
-							uni.navigateBack({ delta: 1 })
+
+							let pages = getCurrentPages() // 当前页面
+							let beforePage = pages[pages.length - 2]
+							uni.navigateBack({
+								delta: 1,
+								success: function() {
+									beforePage.AddSuccess() // 执行上一页的onLoad方法
+								}
+							})
 						} else {
 							uni.showToast({
 								title: '好友请求发送失败',

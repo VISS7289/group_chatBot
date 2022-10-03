@@ -107,7 +107,7 @@
 			},
 			Test: function() {
 				var img = document.createElement('img')
-				img.src = '../../static/test/1 (3).jpg'
+				img.src = '../../static/test/1 (1).jpg'
 				uni.request({
 					url: img.src,
 					method: 'GET',

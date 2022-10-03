@@ -1,7 +1,6 @@
 package Controler
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-chatbot/Logic"
 	"go-chatbot/Models"
@@ -42,7 +41,6 @@ func SerchIsFriend(c *gin.Context) {
 	//业务处理
 	// state 0为好友 1为申请中 2为非好友
 	friendRes, err := Logic.SerchIsFriend(&p)
-	fmt.Println(friendRes)
 	if err != nil {
 		if Models.ErrorIs(err, Models.ErrorWrongPassword) || Models.ErrorIs(err, Models.ErrorUserNotExit) {
 			Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, err.Error())

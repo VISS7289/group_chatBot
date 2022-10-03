@@ -20,8 +20,8 @@
 					</navigator>
 					<view class="nameUser" v-html="item.username"></view>
 					<view class="rightBt info" v-if="item.state==0">发消息</view>
-					<view class="rightBt info" v-if="item.state==1">申请中</view>
-					<view class="rightBt friend" v-if="item.state==2" @tap="goModify(6,item)">加好友</view>
+					<view class="rightBt friend" v-if="item.state==1" @tap="goModify(6,item,index)">申请中</view>
+					<view class="rightBt friend" v-if="item.state==2" @tap="goModify(6,item,index)">加好友</view>
 				</view>
 			</view>
 			<!-- 			<view class="serchUser">
@@ -72,6 +72,7 @@
 				},
 				atoken: '',
 				rtoken: '',
+				queryIndex: 0,
 			}
 		},
 		onLoad: function(option) {
@@ -91,6 +92,9 @@
 					this.userDel(serchVal)
 				}
 			}, 500),
+			AddSuccess:function(){
+				this.userArr[this.queryIndex].state=1
+			},
 			userDel: function(e) {
 				console.log(e)
 				uni.request({
@@ -126,13 +130,13 @@
 										continue
 									}
 									let item = {
-										'img' : 'data:image/png;base64,' + myArr[i].Img,
+										'img': 'data:image/png;base64,' + myArr[i].Img,
 										'name': myArr[i].Username,
-										'username' : myArr[i].Username.replace(light,
+										'username': myArr[i].Username.replace(light,
 											'<span style=\'color:#4AAAFF;\'>' + e +
 											'</span>'),
-										'state' : myArr[i].State,
-										'id' : myArr[i].UserId
+										'state': myArr[i].State,
+										'id': myArr[i].UserId
 									}
 									this.userArr.push(item)
 								}
@@ -147,11 +151,11 @@
 			toIndex: function() {
 				uni.navigateTo({ url: '../index/index', })
 			},
-			goModify: function(type, item) {
-				console.log(item)
+			goModify: function(type, item, index) {
+				this.queryIndex = index
 				this.modifyInfo.type = type
 				this.modifyInfo.userid = this.user.id
-				this.modifyInfo.modifyInfo = item.UserId
+				this.modifyInfo.friendid = item.id
 				this.modifyInfo.userRequest = this.user.name + '请求加为好友~'
 				uni.navigateTo({ url: '../modify/modify?modifyInfo=' + encodeURIComponent(JSON.stringify(this.modifyInfo)) })
 			}

@@ -43,7 +43,7 @@ type ParmToken struct {
 
 type ParmSerchUsername struct {
 	Username string `json:"username"`
-	UserId   string  `json:"user_id"`
+	UserId   string `json:"user_id"`
 }
 
 type ParmSerchIsFriend struct {
@@ -52,8 +52,8 @@ type ParmSerchIsFriend struct {
 }
 
 type ParmFriendRequest struct {
-	UserId   string  `json:"user_id"`
-	FriendId string  `json:"friend_id"`
+	UserId   string `json:"user_id"`
+	FriendId string `json:"friend_id"`
 	Msg      string `json:"msg"`
 }
 

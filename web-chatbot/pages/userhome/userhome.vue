@@ -34,17 +34,17 @@
 			</view>
 			<view class="buttomBig">
 				<!-- <view class="buttomText" @tap="addFriendAnmi">加为好友</view> -->
-				<view class="buttomText" @tap="getUserDetail" v-if="relation==0">发送消息</view>
-				<view class="buttomText" @tap="getUserDetail" v-if="relation==1">申请中</view>
-				<view class="buttomText" @tap="getUserDetail" v-if="relation==2">加为好友</view>
+				<view class="buttomText" @tap="getUserDetail" v-if="user.state==0">发送消息</view>
+				<view class="buttomText" @tap="addFriendAnmi" v-if="user.state==1">申请中</view>
+				<view class="buttomText" @tap="addFriendAnmi" v-if="user.state==2">加为好友</view>
 			</view>
 			<view class="addFriend" :animation="animationData">
 				<view class="titleUser">{{user.name}}</view>
-				<textarea :value="myname+'请求加为好友~'" maxlength="120" class="addText"></textarea>
+				<textarea :placeholder="myname+'请求加为好友~'" maxlength="120" class="addText" @blur="AddFriend"></textarea>
 			</view>
 			<view class="addButton" :animation="animationData1">
 				<view class="close" @tap="addFriendAnmi">取消</view>
-				<view class="send">发送</view>
+				<view class="send" @tap="addFriend">发送</view>
 			</view>
 		</scroll-view>
 	</view>
@@ -74,6 +74,7 @@
 				atoken: '',
 				rtoken: '',
 				relation: 0, //0好友 1申请中 2非好友 3自己
+				userRequest: '',
 			}
 		},
 		onLoad: function(option) {
@@ -92,6 +93,7 @@
 			} catch (e) {
 				// error
 			}
+			this.userRequest = this.myname+'请求加为好友~'
 		},
 		onReady: function() {
 			this.getElementStyle()
@@ -222,6 +224,58 @@
 						}
 					}
 				})
+			},
+			addFriend: function() {
+				uni.request({
+					url: config.myurl + '/friend/request',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: {
+						'user_id': this.userid,
+						'friend_id': this.user.id,
+						'msg': this.userRequest,
+					},
+					success: data => {
+						if (data.data.Code == 1009) {
+							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.addFriend()
+							} else {
+								// err
+							}
+						} else if (data.data.Code == 1000) {
+							uni.showToast({
+								title: '好友请求发送成功',
+								icon: 'none',
+								duration: 2000
+							})
+			
+							let pages = getCurrentPages() // 当前页面
+							let beforePage = pages[pages.length - 2]
+							uni.navigateBack({
+								delta: 1,
+								success: function() {
+									beforePage.AddSuccess() // 执行上一页的onLoad方法
+								}
+							})
+						} else {
+							uni.showToast({
+								title: '好友请求发送失败',
+								icon: 'none',
+								duration: 2000
+							})
+						}
+					}
+				})
+			},
+			AddFriend: function(e) {
+				this.ok = true
+				if (e.detail.cursor > 0) {
+					this.userRequest = e.detail.value
+				} else {
+					this.userRequest = this.myname+'请求加为好友~'
+				}
+			
 			},
 		}
 	}
