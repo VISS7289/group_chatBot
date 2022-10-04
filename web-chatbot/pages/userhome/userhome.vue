@@ -7,9 +7,10 @@
 						<image src="../../static/general/return.png"></image>
 					</view>
 					<view class="top-bar-right" v-if="relation==0||relation==3">
-						<view class="more">
+						<view class="more" @tap="Touserdetail">
 							<image src="../../static/general/more.png"></image>
 						</view>
+
 					</view>
 				</view>
 			</view>
@@ -69,7 +70,7 @@
 				pageHeight: 0,
 				user: {},
 				userDetail: {},
-				userid: 0,
+				userid: '',
 				userNick: '',
 				atoken: '',
 				rtoken: '',
@@ -93,12 +94,19 @@
 			} catch (e) {
 				// error
 			}
-			this.userRequest = this.myname+'请求加为好友~'
+			this.userRequest = this.myname + '请求加为好友~'
 		},
 		onReady: function() {
 			this.getElementStyle()
 		},
 		methods: {
+			refersh: function(parm) {
+				this.user.img = parm.img
+				this.user.name = parm.name
+				this.userDetail.Intr = parm.intr
+				this.userDetail.Gender = parm.sex
+				this.userNick = parm.nick
+			},
 			backOne: function() {
 				uni.navigateBack({ delta: 1 })
 			},
@@ -123,10 +131,11 @@
 					method: 'POST',
 					header: { 'Authorization': 'Bearer ' + this.atoken },
 					data: {
-						'user_id': this.user.id,
-						'friend_id': this.userid
+						'user_id': this.userid,
+						'friend_id': this.user.id
 					},
 					success: data => {
+						console.log(data.data)
 						if (data.data.Code == 1009) {
 							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
@@ -135,15 +144,15 @@
 								// err
 							}
 						} else if (data.data.Code == 1000) {
-							console.log(data.data.Data)
 							this.relation = data.data.Data.State
 							if (data.data.Data.State == 0) {
-								if(len(data.data.Data.Markname)!=0){
+								if (data.data.Data.Markname.length != 0) {
+									console.log(this.userNick)
 									this.userNick = data.data.Data.Markname
-								}else{
+								} else {
 									this.userNick = this.user.name
 								}
-								
+
 							} else {
 								this.userNick = this.user.name
 							}
@@ -218,7 +227,7 @@
 						} else if (data.data.Code == 1000) {
 							// console.log(data.data.Data)
 							this.userDetail = data.data.Data
-							
+
 						} else {
 							// err
 						}
@@ -249,7 +258,7 @@
 								icon: 'none',
 								duration: 2000
 							})
-			
+
 							let pages = getCurrentPages() // 当前页面
 							let beforePage = pages[pages.length - 2]
 							uni.navigateBack({
@@ -273,9 +282,14 @@
 				if (e.detail.cursor > 0) {
 					this.userRequest = e.detail.value
 				} else {
-					this.userRequest = this.myname+'请求加为好友~'
+					this.userRequest = this.myname + '请求加为好友~'
 				}
-			
+
+			},
+			//跳转用户详情页面
+			Touserdetail: function() {
+				console.log(this.user.id)
+				uni.navigateTo({ url: '../userdetail/userdetail?id=' + this.user.id })
 			},
 		}
 	}

@@ -194,7 +194,7 @@
 										'id': res.UserID,
 										'img': res.Img,
 										'email': res.Email,
-										'username': res.Username
+										'name': res.Username
 									})
 									uni.setStorageSync('atoken', res.AToken)
 									uni.setStorageSync('rtoken', res.RToken)
@@ -220,6 +220,7 @@
 					this.send = false
 					this.reSend = false
 					this.unSend = true
+					this.time = 60
 					var obj = setInterval(() => {
 						if (this.time <= 0) {
 							this.time = 0

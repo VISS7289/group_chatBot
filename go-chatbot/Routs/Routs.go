@@ -33,12 +33,22 @@ func Init(mode string) *gin.Engine {
 	r.POST("/refersh", Controler.RefershHandler)
 	//获取用户详情路由
 	r.POST("/user/detial", Middlewares.JWTAuthMiddleware(), Controler.GetUserDetail)
+
 	//根据用户名模糊搜索
 	r.POST("/serch/username", Middlewares.JWTAuthMiddleware(), Controler.SerchUsername)
 	//判断两个id是否为好友
 	r.POST("/serch/isfriend", Middlewares.JWTAuthMiddleware(), Controler.SerchIsFriend)
+
 	//好友申请
 	r.POST("/friend/request", Middlewares.JWTAuthMiddleware(), Controler.FriendRequest)
+
+	//修改用户图片
+	r.POST("/change/img", Middlewares.JWTAuthMiddleware(), Controler.ChangeUserImg)
+	//修改用户简介
+	r.POST("/change/update", Middlewares.JWTAuthMiddleware(), Controler.ChangeUser)
+	//修改好友备注
+	r.POST("/change/nick", Middlewares.JWTAuthMiddleware(), Controler.ChangeNick)
+
 	//注册功能路由
 	r.POST("/register", Controler.RegisterHandler)
 	r.GET("/existName", Controler.ExistName)

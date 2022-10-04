@@ -1,7 +1,6 @@
 package Controler
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-chatbot/Logic"
 	"go-chatbot/Models"
@@ -16,7 +15,6 @@ func FriendRequest(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	fmt.Println(p)
 	q := Models.ParmSerchIsFriend{
 		UserId:   p.UserId,
 		FriendId: p.FriendId,

@@ -9,6 +9,7 @@ var (
 	ErrorUserNotExit     = errors.New("用户名不存在")
 	ErrorUserNotLogin    = errors.New("用户未登录")
 	ErrorAuthHeaderValid = errors.New("无效Token")
+	ErrorInvalidParm     = errors.New("参数错误")
 )
 
 func ErrorIs(err1 error, err2 error) bool {

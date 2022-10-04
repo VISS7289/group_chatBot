@@ -57,4 +57,16 @@ type ParmFriendRequest struct {
 	Msg      string `json:"msg"`
 }
 
+type ParmChangeImg struct {
+	UserId string `json:"user_id"`
+	Img    string `json:"img_base64"`
+}
+
+type ParmChange struct {
+	UserId string `json:"user_id"`
+	Data   string `json:"data"`
+	Type   string `json:"type"`
+	Psw    string `json:"psw"`
+}
+
 var JWTSercet = []byte("7289978VISS")

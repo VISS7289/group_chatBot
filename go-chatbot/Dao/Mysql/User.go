@@ -30,6 +30,18 @@ func QuaryUserById(u *Models.User) error {
 	return nil
 }
 
+func QuaryPswById(psw string, id string) error {
+	var newpsw string
+	sqlStr := `SELECT password FROM user WHERE user_id = ?`
+	if err := db.Get(newpsw, sqlStr, id); err != nil {
+		return err
+	}
+	if newpsw != EncryptPassword.EP(psw) {
+		return Models.ErrorWrongPassword
+	}
+	return nil
+}
+
 func QuaryUserByEmail(email string) error {
 	sqlStr := `SELECT COUNT(user_id) FROM user WHERE email = ?`
 	var count int

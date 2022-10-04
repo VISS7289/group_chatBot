@@ -11,36 +11,39 @@
 		<view class="main">
 			<view class="line">
 				<view class="lineHead">头像</view>
-				<view class="lineInfo" @click="select">
-					<image :src="user.imgurl" mode="aspectFill" class="lineImg"></image>
+				<view class="lineInfo" v-if="userid != optid">
+					<image :src="userDetail.img" mode="aspectFill" class="lineImg"></image>
+				</view>
+				<view class="lineInfo" @click="select" v-if="userid == optid">
+					<image :src="userDetail.img" mode="aspectFill" class="lineImg"></image>
 				</view>
 				<ksp-cropper mode="free" :width="200" :height="140" :maxWidth="1024" :maxHeight="1024" :url="url"
-					@cancel="oncancel" @ok="onok"></ksp-cropper>
-				<view class="lineBtn">
+					@cancel="oncancel" @ok="onok" v-if="userid == optid"></ksp-cropper>
+				<view class="lineBtn" v-if="userid == optid">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
 			<view class="line">
 				<view class="lineHead">签名</view>
-				<view class="linetext">{{user.intr}}</view>
-				<view class="lineBtn">
+				<view class="linetext">{{userDetail.intr}}</view>
+				<view class="lineBtn" @tap="goModify(2)" v-if="userid == optid">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
 			<view class="line">
 				<view class="lineHead">注册</view>
-				<view class="linetext">2020-10-17</view>
+				<view class="linetext">{{userDetail.createTime}}</view>
 			</view>
 			<view class="line">
 				<view class="lineHead">昵称</view>
-				<view class="linetext">{{user.name}}</view>
-				<view class="lineBtn" @tap="goModify(0)">
+				<view class="linetext">{{userDetail.name}}</view>
+				<view class="lineBtn" @tap="goModify(0)" v-if="userid == optid">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
-			<view class="line">
+			<view class="line" v-if="userid != optid">
 				<view class="lineHead">备注</view>
-				<view class="linetext">{{user.nick}}</view>
+				<view class="linetext">{{userDetail.nick}}</view>
 				<view class="lineBtn" @tap="goModify(5)">
 					<image src="../../static/general/more2.png">
 				</view>
@@ -49,12 +52,14 @@
 				<view class="lineHead">性别</view>
 				<view class="linetext">
 					<view class="uni-list-cell-db">
-						<picker @change="bindPickerChange" :value="user.sex" :range="array">
-							<view class="uni-input">{{array[user.sex]}}</view>
+						<picker @change="bindPickerChange" :value="userDetail.sex" :range="array"
+							v-if="userid == optid">
+							<view class="uni-input">{{array[userDetail.sex]}}</view>
 						</picker>
+						<view class="uni-input" v-if="userid != optid">{{array[userDetail.sex]}}</view>
 					</view>
 				</view>
-				<view class="lineBtn">
+				<view class="lineBtn" v-if="userid == optid">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
@@ -62,37 +67,39 @@
 				<view class="lineHead">生日</view>
 				<view class="linetext">
 					<view class="uni-list-cell-db">
-						<picker mode="date" :value="date" :start="startDate" :end="endDate" @change="bindDateChange">
-							<view class="uni-input">{{date}}</view>
+						<picker mode="date" :value="userDetail.birthday" :start="startDate" :end="endDate"
+							@change="bindDateChange" v-if="userid == optid">
+							<view class="uni-input">{{userDetail.birthday}}</view>
 						</picker>
+						<view class="uni-input" v-if="userid != optid">{{userDetail.birthday}}</view>
 					</view>
 				</view>
-				<view class="lineBtn">
+				<view class="lineBtn" v-if="userid == optid">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
 			<view class="line">
 				<view class="lineHead">电话</view>
-				<view class="linetext">{{user.phone}}</view>
-				<view class="lineBtn" @tap="goModify(4)">
+				<view class="linetext">{{userDetail.phone}}</view>
+				<view class="lineBtn" @tap="goModify(4)" v-if="userid == optid">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
 			<view class="line">
 				<view class="lineHead">邮箱</view>
-				<view class="linetext">{{user.email}}</view>
-				<view class="lineBtn" @tap="goModify(3)">
+				<view class="linetext">{{userDetail.email}}</view>
+				<view class="lineBtn" @tap="goModify(3)" v-if="userid == optid">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
-			<view class="line">
+			<view class="line" v-if="userid == optid">
 				<view class="lineHead">密码</view>
 				<view class="linetext">*********</view>
 				<view class="lineBtn">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
-			<view class="btn">
+			<view class="btn" v-if="userid == optid">
 				退出登录
 			</view>
 		</view>
@@ -101,6 +108,8 @@
 
 <script>
 	import ksp from '../../commons/js/ksp.js'
+	import config from '../../commons/js/config.js'
+	import refersh from '../../commons/js/refershToken.js'
 	//import {saveBase64Img,dataURItoBlob} from '../../commons/js/blobImg.js';
 	export default {
 		data() {
@@ -118,6 +127,12 @@
 					email: '123456@12.com',
 					phone: '12345678',
 				},
+				userid: '',
+				optid: '',
+				userDetail: {},
+				atoken: '',
+				rtoken: '',
+				userNick: '',
 				modifyInfo: {
 					type: 2, //infoType: ['昵称','备注','简介','邮箱','电话'],
 					userinfo: {}
@@ -128,7 +143,22 @@
 			}
 		},
 		onLoad: function(option) {
-			this.user = JSON.parse(decodeURIComponent(option.user))
+			this.optid = option.id
+			try {
+				const value = uni.getStorageSync('user')
+				if (value) {
+					this.userid = value.id
+					this.userNick = value.username
+					this.atoken = uni.getStorageSync('atoken')
+					this.rtoken = uni.getStorageSync('rtoken')
+					this.getUserDetail()
+					this.getUserNick()
+				} else {
+					uni.navigateTo({ url: '../signin/signin', })
+				}
+			} catch (e) {
+				// error
+			}
 		},
 		computed: {
 			startDate() {
@@ -140,13 +170,111 @@
 		},
 		methods: {
 			backOne: function() {
+				let pages = getCurrentPages() // 当前页面
+				let beforePage = pages[pages.length - 2]
+				
+				beforePage.$vm.refersh(this.userDetail) 
 				uni.navigateBack({ delta: 1 })
 			},
+			refersh: function(parm) {
+				this.userDetail[parm.type]=parm.req
+			},
+			getUserDetail: function() {
+				console.log(this.optid)
+				uni.request({
+					url: config.myurl + '/user/detial',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: { 'id': this.optid },
+					success: data => {
+						console.log(data.data)
+						if (data.data.Code == 1009) {
+							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.getUserDetail()
+							} else {
+								// err
+							}
+
+						} else if (data.data.Code == 1000) {
+							console.log(data.data.Data)
+							this.userDetail = {
+								'id': this.optid,
+								'img': 'data:image/png;base64,' + data.data.Data.Img,
+								'intr': data.data.Data.Intr,
+								'createTime': data.data.Data.CreateTime.substring(0, 10),
+								'name': data.data.Data.Username,
+								'sex': data.data.Data.Gender,
+								'birthday': data.data.Data.Birthday.substring(0, 10),
+								'phone': data.data.Data.Phone,
+								'email': data.data.Data.Email,
+								'nick': this.userNick
+							}
+
+						} else {
+							// err
+						}
+					}
+				})
+				console.log(777)
+			},
+			getUserNick: function() {
+				if (this.userid == this.optid) {
+					return
+				}
+				uni.request({
+					url: config.myurl + '/serch/isfriend',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: {
+						'user_id': this.userid,
+						'friend_id': this.optid
+					},
+					success: data => {
+						if (data.data.Code == 1009) {
+							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.getUserNick()
+							} else {
+								// err
+							}
+						} else if (data.data.Code == 1000) {
+							console.log(data.data.Data)
+							if (data.data.Data.State == 0) {
+								if (data.data.Data.Markname.length != 0) {
+									this.userNick = data.data.Data.Markname
+								} else {
+									this.userNick = this.user.name
+								}
+								this.userDetail.nick = this.userNick
+							} else {
+								this.userNick = this.user.name
+							}
+						} else {
+							// err
+						}
+					}
+				})
+			},
 			bindPickerChange: function(e) {
-				this.user.sex = e.detail.value
+				if(this.userDetail.sex == e.detail.value){
+					return
+				}
+				var fn = () => {
+					this.userDetail['sex'] = e.detail.value
+				}
+				this.update('gender', this.optid, e.detail.value.toString(), '', fn)
+
+				// this.userDetail.sex = e.detail.value
 			},
 			bindDateChange: function(e) {
-				this.date = e.detail.value
+				if(this.userDetail.birthday == e.detail.value){
+					return
+				}
+				var fn = () => {
+					this.userDetail['birthday'] = e.detail.value
+				}
+				this.update('birthday', this.optid, e.detail.value.toString(), '', fn)
 			},
 			getDate(type) {
 				const date = new Date()
@@ -174,8 +302,24 @@
 			},
 			onok(ev) {
 				this.url = ''
-				this.user.imgurl = ev.path
-				//console.log(this.user.imgurl);
+				console.log(this.userDetail)
+				var fn = () => {
+					console.log(2020)
+					try {
+						let value = uni.getStorageSync('user')
+						if (value) {
+							value.img = ev.base64.substring(22)
+							this.userDetail['img'] = ev.base64
+							uni.setStorageSync('user', value)
+						} else {
+							uni.navigateTo({ url: '../signin/signin', })
+						}
+						console.log(value)
+					} catch (e) {
+						console.log(e)
+					}
+				}
+				this.update('imgBase64', this.optid, ev.base64.substring(22), '', fn)
 			},
 			oncancel() {
 				// url设置为空，隐藏控件
@@ -183,8 +327,38 @@
 			},
 			goModify: function(type) {
 				this.modifyInfo.type = type
-				this.modifyInfo.userinfo = this.user
+				this.modifyInfo.userinfo = this.userDetail
 				uni.navigateTo({ url: '../modify/modify?modifyInfo=' + encodeURIComponent(JSON.stringify(this.modifyInfo)) })
+			},
+			update(type, optid, data, psw, fn) {
+				console.log(fn)
+				uni.request({
+					url: config.myurl + '/change/update',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: {
+						'user_id': optid,
+						'data': data,
+						'type': type,
+						'psw': psw
+					},
+					success: data => {
+						console.log(data.data)
+						if (data.data.Code == 1009) {
+							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.update(type, optid, data, psw)
+							} else {
+								//err
+							}
+						} else if (data.data.Code == 1000) {
+							console.log(1010)
+							fn.apply()
+						} else {
+							//err
+						}
+					}
+				})
 			}
 		}
 	}
