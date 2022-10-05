@@ -103,7 +103,7 @@
 				console.log(this.serchname)
 				this.userDel(this.serchname)
 			},
-			userDel: function(e) {
+			userDel(e) {
 				this.serchname = e
 				console.log(this.serchname)
 				uni.request({
@@ -114,14 +114,16 @@
 						'username': e,
 						'user_id': this.user.id
 					},
-					success: data => {
-						console.log(data.data.Data)
+					success: async data => {
+						console.log(data.data.Code)
 						if (data.data.Code == 1009) {
 							console.log(this.atoken)
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
-							console.log(this.atoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							console.log(newCode)
 							if (newCode == 1000) {
-								this.userDel()
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
+								this.userDel(e)
 							} else {
 								// err
 							}

@@ -39,7 +39,6 @@
 		</view>
 		<view class="submit" @tap="Test">Test</view>
 		<view class="submit" @tap="Test2">Test2</view>
-		<image :src="imgData"></image>
 		<!-- <image src="data:image/png;base64,{{imgData}}"></image> -->
 	</view>
 </template>

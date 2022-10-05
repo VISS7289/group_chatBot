@@ -40,6 +40,7 @@
 				errInfo: '输入用户名或密码错误！'
 			}
 		},
+		
 		methods: {
 			toSignUp: function() {
 				uni.navigateTo({ url: '../signup/signup', })

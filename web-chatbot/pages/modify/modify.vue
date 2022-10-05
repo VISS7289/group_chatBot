@@ -396,11 +396,13 @@
 						'type': type,
 						'psw': psw
 					},
-					success: data => {
+					success: async data => {
 						console.log(data.data)
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.update(type, optid, data, psw)
 							} else {
 								//err
@@ -425,11 +427,13 @@
 						'friend_id': optid,
 						'msg': msg
 					},
-					success: data => {
+					success: async data => {
 						console.log(data.data)
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.updateNick(optid, msg, fn)
 							} else {
 								//err
@@ -453,10 +457,12 @@
 						'friend_id': this.modifyInfo.friendid,
 						'msg': this.modifyInfo.userRequest,
 					},
-					success: data => {
+					success: async data => {
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.addFriend()
 							} else {
 								// err
@@ -520,13 +526,13 @@
 						'n_email': this.modifyInfo.userinfo.email,
 						'verifiCode': this.verifiValue2
 					},
-					success: data => {
+					success: async data => {
 						console.log(data.data)
 						if (data.data.Code == 1009) {
-							console.log(this.atoken)
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
-							console.log(this.atoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.subInfo2()
 							} else {
 								// err
@@ -564,9 +570,18 @@
 						're_password': this.userPasswordRe,
 						'verifiCode': this.verifiValue
 					},
-					success: data => {
+					success: async data => {
 						console.log(data.data)
-						if (data.data.Code != 1000) {
+						if (data.data.Code == 1009) {
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
+								this.subInfoPsw()
+							} else {
+								// err
+							}
+						} else if (data.data.Code == 1000) {
 							this.wrong = true
 							this.errInfo = data.data.Msg
 						} else {

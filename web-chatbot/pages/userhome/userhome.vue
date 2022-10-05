@@ -152,11 +152,13 @@
 						'user_id': this.userid,
 						'friend_id': this.user.id
 					},
-					success: data => {
+					success: async data => {
 						console.log(data.data)
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.getUserNick()
 							} else {
 								// err
@@ -232,16 +234,17 @@
 					method: 'POST',
 					header: { 'Authorization': 'Bearer ' + this.atoken },
 					data: { 'id': this.user.id },
-					success: data => {
+					success: async data => {
 						console.log(data.data)
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.getUserDetail()
 							} else {
 								// err
 							}
-
 						} else if (data.data.Code == 1000) {
 							// console.log(data.data.Data)
 							this.userDetail = data.data.Data
@@ -262,10 +265,12 @@
 						'friend_id': this.user.id,
 						'msg': this.userRequest,
 					},
-					success: data => {
+					success: async data => {
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.addFriend()
 							} else {
 								// err

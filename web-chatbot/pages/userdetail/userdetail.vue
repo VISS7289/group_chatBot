@@ -175,7 +175,7 @@
 			exit: function() {
 				uni.navigateTo({ url: '../signin/signin' })
 			},
-			delFriend: function(){
+			delFriend: function() {
 				uni.showModal({
 					title: '提示',
 					content: '确认要删除好友吗？',
@@ -190,10 +190,13 @@
 									'user_id': this.userid,
 									'friend_id': this.optid
 								},
-								success: data => {
+								success: async data => {
 									if (data.data.Code == 1009) {
-										let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+										let newCode = await refersh.refersh(config.myurl, this
+											.atoken, this.rtoken)
 										if (newCode == 1000) {
+											this.atoken = uni.getStorageSync('atoken')
+											this.rtoken = uni.getStorageSync('rtoken')
 											this.delFriend()
 										} else {
 											// err
@@ -205,7 +208,8 @@
 										uni.navigateBack({
 											delta: 1,
 											success: function() {
-												beforePage.delfriend() // 执行上一页的onLoad方法
+												beforePage
+												.delfriend() // 执行上一页的onLoad方法
 											}
 										})
 									} else {
@@ -218,17 +222,17 @@
 						}
 					}
 				})
-				
+
 			},
 			backOne: function() {
 				let pages = getCurrentPages() // 当前页面
 				let beforePage = pages[pages.length - 2]
-				
-				beforePage.$vm.refersh(this.userDetail) 
+
+				beforePage.$vm.refersh(this.userDetail)
 				uni.navigateBack({ delta: 1 })
 			},
 			refersh: function(parm) {
-				this.userDetail[parm.type]=parm.req
+				this.userDetail[parm.type] = parm.req
 			},
 			getUserDetail: function() {
 				console.log(this.optid)
@@ -237,16 +241,17 @@
 					method: 'POST',
 					header: { 'Authorization': 'Bearer ' + this.atoken },
 					data: { 'id': this.optid },
-					success: data => {
+					success: async data => {
 						console.log(data.data)
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.getUserDetail()
 							} else {
 								// err
 							}
-
 						} else if (data.data.Code == 1000) {
 							console.log(data.data.Data)
 							this.userDetail = {
@@ -281,10 +286,12 @@
 						'user_id': this.userid,
 						'friend_id': this.optid
 					},
-					success: data => {
+					success: async data => {
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
 								this.getUserNick()
 							} else {
 								// err
@@ -308,7 +315,7 @@
 				})
 			},
 			bindPickerChange: function(e) {
-				if(this.userDetail.sex == e.detail.value){
+				if (this.userDetail.sex == e.detail.value) {
 					return
 				}
 				var fn = () => {
@@ -319,7 +326,7 @@
 				// this.userDetail.sex = e.detail.value
 			},
 			bindDateChange: function(e) {
-				if(this.userDetail.birthday == e.detail.value){
+				if (this.userDetail.birthday == e.detail.value) {
 					return
 				}
 				var fn = () => {
@@ -393,14 +400,16 @@
 						'type': type,
 						'psw': psw
 					},
-					success: data => {
+					success: async data => {
 						console.log(data.data)
 						if (data.data.Code == 1009) {
-							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
-								this.update(type, optid, data, psw)
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
+								this.update(type, optid, data, psw, fn)
 							} else {
-								//err
+								// err
 							}
 						} else if (data.data.Code == 1000) {
 							console.log(1010)
