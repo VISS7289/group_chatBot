@@ -1,17 +1,17 @@
 <template>
 	<view>
-		<view class="submit" @tap="setImage">Test</view>
+		<view class="submit" @tap="setImage2">Test</view>
 		<view>
-			<canvas style="width: 600px; height: 600px;" canvas-id="cv" type="2d"></canvas>
-
+			<canvas style="width: 100px; height: 100px; position:fixed;left:100%;" canvas-id="cv" type="2d"></canvas>
 		</view>
+		<image :src="myimg"></image>
 	</view>
 </template>
 
 <script>
 	export default {
 		data() {
-			return {}
+			return { myimg: '', }
 		},
 
 		methods: {
@@ -38,18 +38,80 @@
 					}
 				})
 			},
-			setImage: function() {
+			getImgInfo(url) {
+				return new Promise((resolve, reject) => {
+					let image = new Image()
+					image.src = url
+					let timer = setInterval(() => {
+						if (image.width > 0 || image.height > 0) {
+							resolve([image.width, image.height]) // 图片宽*高
+							clearInterval(timer)
+						}
+					}, 50)
+				})
+			},
+			setImage: async function() {
 				//2. 获取2D上下文
-				var ctx = uni.createCanvasContext('cv') 
-				//3. 新建一个Image对象
-				var img = new Image()
+				var ctx = uni.createCanvasContext('cv',this)
 				//4. 设置Image的src
-				img.src = '../../static/test/1 (1).jpg'
+				let src = '../../static/test/1 (20).jpg'
+				let w, h
 				//5. 确定Image加载完毕后将Image画到canvas上
-				img.onload = () => {
-					ctx.drawImage(img, 0, 0, 400, 400)
-				}
-
+				await this.getImgInfo(src).then(res => {
+					w = res[0]
+					h = res[1]
+				})
+				let d = this.Afill(w, h, 100, 100)
+				console.log()
+				ctx.drawImage(src, d[0], d[1], d[2], d[3], 0, 0, 100, 100)
+				ctx.draw(false,()=>{
+					uni.canvasToTempFilePath({
+					  canvasId: 'cv',
+					  fileType: 'jpg',
+					  quality: 0.8,
+					  success: function(res) {
+					    // 在H5平台下，tempFilePath 为 base64
+					    console.log(res.tempFilePath)
+						this.myimg=res.tempFilePath
+						console.log(this.myimg)
+					  } 
+					},this)
+				}) //绘制
+				
+			},
+			setImage2: async function() {
+				let src = '../../static/test/1 (20).jpg'
+				let res= await this.compressImg(src)
+				console.log(res)
+				
+			},
+			compressImg: function(src){
+				return new Promise(async (resolve, reject)=> {
+					var ctx = uni.createCanvasContext('cv',this)
+					let w, h
+					await this.getImgInfo(src).then(res => {
+						w = res[0]
+						h = res[1]
+					})
+					let d = this.Afill(w, h, 100, 100)
+					console.log()
+					ctx.drawImage(src, d[0], d[1], d[2], d[3], 0, 0, 100, 100)
+					ctx.draw(false,()=>{
+						uni.canvasToTempFilePath({
+						  canvasId: 'cv',
+						  fileType: 'jpg',
+						  quality: 0.8,
+						  success: function(res) {
+						    // 在H5平台下，tempFilePath 为 base64
+							console.log(res.tempFilePath)
+							resolve(res.tempFilePath)
+						  } ,
+						  fail: function() {
+							  reject('error')
+						  }
+						},this)
+					}) //绘制
+				}) 
 			},
 			Afill: function(imageWidth, imageHeight, canvasWidth, canvasHeight) {
 				const imageRate = imageWidth / imageHeight

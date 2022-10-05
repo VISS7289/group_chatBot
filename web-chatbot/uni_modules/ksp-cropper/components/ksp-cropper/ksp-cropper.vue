@@ -52,11 +52,11 @@ export default {
 	props: {
 		mode: {
 			type: String,
-			default: "free"
+			default: 'free'
 		},
 		url: {
 			type: String,
-			default: ""
+			default: ''
 		},
 		width: {
 			type: Number,
@@ -104,307 +104,299 @@ export default {
 			},
 			rotate: 0,
 			transit: false,
-			modeValue: ""
-		};
+			modeValue: ''
+		}
 	},
 	methods: {
 		imageLoad(event) {
             uni.getImageInfo({
                 src: this.url,
-                success: (rst) => {
-                    this.real.width = rst.width;
-                    this.real.height = rst.height;
-                    this.target = {};
-                    var query = uni.createSelectorQuery().in(this);
-                    query.select(".body").boundingClientRect((data) => {
-                    	this.body.width = data.width;
-                    	this.body.height = data.height;
-                    	this.init();
-                    }).exec();
+                success: rst => {
+                    this.real.width = rst.width
+                    this.real.height = rst.height
+                    this.target = {}
+                    var query = uni.createSelectorQuery().in(this)
+                    query.select('.body').boundingClientRect(data => {
+                    	this.body.width = data.width
+                    	this.body.height = data.height
+                    	this.init()
+                    }).exec()
                 }
-            });
+            })
 		},
 		init() {
-			this.modeValue = this.mode;
-			this.rotate = 0;
-			var rate = this.width / this.height;
-			var width = this.body.width * 0.7;
-			var height = this.body.height * 0.7;
+			this.modeValue = this.mode
+			this.rotate = 0
+			var rate = this.width / this.height
+			var width = this.body.width * 0.7
+			var height = this.body.height * 0.7
 			if (width / height > rate) {
-				width = height * rate;
+				width = height * rate
 			} else {
-				height = width / rate;
+				height = width / rate
 			}
-			var left = (this.body.width - width) / 2;
-			var top = (this.body.height - height) / 2;
+			var left = (this.body.width - width) / 2
+			var top = (this.body.height - height) / 2
 			this.frame = {
 				left: left,
 				top: top,
 				width: width,
 				height: height
-			};
-			rate = this.real.width / this.real.height;
-			width = this.frame.width;
-			height = this.frame.height;
-			if (width / height > rate) {
-				height = width / rate;
-			} else {
-				width = height * rate;
 			}
-			left = (this.frame.width - width) / 2 + this.frame.left;
-			top = (this.frame.height - height) / 2 + this.frame.top;
+			rate = this.real.width / this.real.height
+			width = this.frame.width
+			height = this.frame.height
+			if (width / height > rate) {
+				height = width / rate
+			} else {
+				width = height * rate
+			}
+			left = (this.frame.width - width) / 2 + this.frame.left
+			top = (this.frame.height - height) / 2 + this.frame.top
 			this.image = {
 				left: left,
 				top: top,
 				width: width,
 				height: height
-			};
+			}
 		},
 		async updateData(data) {
-			this.frame = data.frame;
-			this.image = data.image;
-			await this.$nextTick();
-			this.trimImage();
+			this.frame = data.frame
+			this.image = data.image
+			await this.$nextTick()
+			this.trimImage()
 		},
 		trimImage() {
-			var rate = this.frame.width / this.frame.height;
-			var width = this.body.width * 0.7;
-			var height = this.body.height * 0.7;
+			var rate = this.frame.width / this.frame.height
+			var width = this.body.width * 0.7
+			var height = this.body.height * 0.7
 			if (width / height > rate) {
-				width = height * rate;
+				width = height * rate
 			} else {
-				height = width / rate;
+				height = width / rate
 			}
-			var left = (this.body.width - width) / 2;
-			var top = (this.body.height - height) / 2;
-			var mul = width / this.frame.width;
-			var ox = this.frame.left - this.image.left;
-			var oy = this.frame.top - this.image.top;
+			var left = (this.body.width - width) / 2
+			var top = (this.body.height - height) / 2
+			var mul = width / this.frame.width
+			var ox = this.frame.left - this.image.left
+			var oy = this.frame.top - this.image.top
 			this.frame = {
 				left: left,
 				top: top,
 				width: width,
 				height: height
-			};
-			width = this.image.width * mul;
-			height = this.image.height * mul;
-			left = this.frame.left - ox * mul;
-			top = this.frame.top - oy * mul;
+			}
+			width = this.image.width * mul
+			height = this.image.height * mul
+			left = this.frame.left - ox * mul
+			top = this.frame.top - oy * mul
 			this.image = {
 				left: left,
 				top: top,
 				width: width,
 				height: height
-			};
+			}
 			if (mul != 1) {
-				this.transit = true;
+				this.transit = true
 				setTimeout(() => {
-					this.transit = false;
-				}, 300);
+					this.transit = false
+				}, 300)
 			}
 		},
 		rotateAngle() {
-			this.rotate -= 90;
-			var width = this.image.height;
-			var height = this.image.width;
-			var left = this.image.left;
-			var top = this.image.top;
-			var rate = width / height;
+			this.rotate -= 90
+			var width = this.image.height
+			var height = this.image.width
+			var left = this.image.left
+			var top = this.image.top
+			var rate = width / height
 			if (width < this.frame.width) {
-				width = this.frame.width;
-				height = width / rate;
+				width = this.frame.width
+				height = width / rate
 			}
 			if (height < this.frame.height) {
-				height = this.frame.height;
-				width = height * rate;
+				height = this.frame.height
+				width = height * rate
 			}
 			if (left > this.frame.left) {
-				left = this.frame.left;
+				left = this.frame.left
 			}
 			if (top > this.frame.top) {
-				top = this.frame.top;
+				top = this.frame.top
 			}
 			if (left + width < this.frame.left + this.frame.width) {
-				left = this.frame.left + this.frame.width - width; 
+				left = this.frame.left + this.frame.width - width 
 			}
 			if (top + height < this.frame.top + this.frame.height) {
-				top = this.frame.top + this.frame.height - height; 
+				top = this.frame.top + this.frame.height - height 
 			}
 			this.image = {
 				left: left,
 				top: top,
 				width: width,
 				height: height
-			};
-			this.transit = true;
+			}
+			this.transit = true
 			setTimeout(() => {
-				this.transit = false;
-			}, 300);
+				this.transit = false
+			}, 300)
 		},
 		onok() {
 			// #ifdef MP-WEIXIN
-			this.cropWx();
+			this.cropWx()
 			// #endif
 			// #ifdef APP-PLUS || H5
-			this.cropAppH5();
+			this.cropAppH5()
 			// #endif
 		},
 		oncancle() {
-			this.$emit("cancel");
+			this.$emit('cancel')
 		},
 		async cropWx() {
-			var mx = this.computeMatrix();
+			var mx = this.computeMatrix()
 			this.target = {
 				width: mx.tw,
 				height: mx.th
-			};
-			var canvas = await new Promise((resolve) => {
+			}
+			var canvas = await new Promise(resolve => {
 				uni.createSelectorQuery()
 				.in(this)
-				.select(".canvas")
-				.fields({node: true})
-				.exec((rst) => {
-					var node = rst[0].node;
-					resolve(node);
-				});
-			});
-			canvas.width = mx.tw;
-			canvas.height = mx.th;
-			uni.showLoading({
-				title: "处理中"
-			});
-			await new Promise((resolve) => {
-				setTimeout(resolve, 200);
-			});
-			var context = canvas.getContext("2d");
-			var image = canvas.createImage();
+				.select('.canvas')
+				.fields({ node: true })
+				.exec(rst => {
+					var node = rst[0].node
+					resolve(node)
+				})
+			})
+			canvas.width = mx.tw
+			canvas.height = mx.th
+			uni.showLoading({ title: '处理中' })
+			await new Promise(resolve => {
+				setTimeout(resolve, 200)
+			})
+			var context = canvas.getContext('2d')
+			var image = canvas.createImage()
 			await new Promise((resolve, reject) => {
-				image.onload = resolve;
-				image.onerror = reject;
-				image.src = this.url;
-			});
-			context.save();
-			context.rotate(this.rotate * Math.PI / 180);
-			context.drawImage(image, mx.sx, mx.sy, mx.sw, mx.sh, mx.dx, mx.dy, mx.dw, mx.dh);
-			context.restore();
+				image.onload = resolve
+				image.onerror = reject
+				image.src = this.url
+			})
+			context.save()
+			context.rotate(this.rotate * Math.PI / 180)
+			context.drawImage(image, mx.sx, mx.sy, mx.sw, mx.sh, mx.dx, mx.dy, mx.dw, mx.dh)
+			context.restore()
 			wx.canvasToTempFilePath({
 				canvas: canvas,
 				destWidth: mx.tw,
 				destHeight: mx.th,
-				success: (rst) => {
-					var path = rst.tempFilePath;
-					this.$emit("ok", {
-						path: path
-					});
+				success: rst => {
+					var path = rst.tempFilePath
+					this.$emit('ok', { path: path })
 				},
 				complete: () => {
-					uni.hideLoading();
+					uni.hideLoading()
 				}
-			});
+			})
 		},
 		async cropAppH5() {
-			var mx = this.computeMatrix();
+			var mx = this.computeMatrix()
 			this.target = {
 				width: mx.tw,
 				height: mx.th
-			};
-			uni.showLoading({
-				title: "处理中"
-			});
-			await new Promise((resolve) => {
-				setTimeout(resolve, 200);
-			});
-			var context = uni.createCanvasContext(this.canvasId, this);
-			context.save();
-			context.rotate(this.rotate * Math.PI / 180);
-			context.drawImage(this.url, mx.sx, mx.sy, mx.sw, mx.sh, mx.dx, mx.dy, mx.dw, mx.dh);
-			context.restore();
-			await new Promise((resolve) => {
-				context.draw(false, resolve);
-			});
+			}
+			uni.showLoading({ title: '处理中' })
+			await new Promise(resolve => {
+				setTimeout(resolve, 200)
+			})
+			var context = uni.createCanvasContext(this.canvasId, this)
+			context.save()
+			context.rotate(this.rotate * Math.PI / 180)
+			context.drawImage(this.url, mx.sx, mx.sy, mx.sw, mx.sh, mx.dx, mx.dy, mx.dw, mx.dh)
+			context.restore()
+			await new Promise(resolve => {
+				context.draw(false, resolve)
+			})
 			uni.canvasToTempFilePath({ 
 				canvasId: this.canvasId,
 				destWidth: mx.tw,
 				destHeight: mx.th,
-				success: (rst) => {
-					var path = rst.tempFilePath;
+				success: rst => {
+					var path = rst.tempFilePath
 					// #ifdef H5
-					var base64 = path;
-					path = this.parseBlob(path);
+					var base64 = path
+					path = this.parseBlob(path)
 					
-					this.$emit("ok", {
+					this.$emit('ok', {
 						path: path,
 						base64: base64
-					});
+					})
 					// #endif
 					// #ifdef APP-PLUS
-					this.$emit("ok", {
-						path: path
-					});
+					this.$emit('ok', { path: path })
 					// #endif
 				},
 				complete: () => {
-					uni.hideLoading();
+					uni.hideLoading()
 				}
-			}, this);
+			}, this)
 		},
 		computeMatrix() {
-			var width = this.width;
-			var height = this.height;
-			var mul = this.image.width / this.real.width;
+			var width = this.width
+			var height = this.height
+			var mul = this.image.width / this.real.width
 			if (this.rotate % 180 != 0) {
-				mul = this.image.height / this.real.width;
+				mul = this.image.height / this.real.width
 			}
-			if (this.mode != "fixed") {
-				width = this.frame.width / mul;
-				height = this.frame.height / mul;
+			if (this.mode != 'fixed') {
+				width = this.frame.width / mul
+				height = this.frame.height / mul
 			}
-			var rate = width / height;
+			var rate = width / height
 			if (width > this.maxWidth) {
-				width = this.maxWidth;
-				height = width / rate;
+				width = this.maxWidth
+				height = width / rate
 			}
 			if (height > this.maxHeight) {
-				height = this.maxHeight;
-				width = height * rate;
+				height = this.maxHeight
+				width = height * rate
 			}
-			var sx = (this.frame.left - this.image.left) / mul;
-			var sy = (this.frame.top - this.image.top) / mul;
-			var sw = this.frame.width / mul;
-			var sh = this.frame.height / mul;
-			var ox = sx + sw / 2;
-			var oy = sy + sh / 2;
+			var sx = (this.frame.left - this.image.left) / mul
+			var sy = (this.frame.top - this.image.top) / mul
+			var sw = this.frame.width / mul
+			var sh = this.frame.height / mul
+			var ox = sx + sw / 2
+			var oy = sy + sh / 2
 			if (this.rotate % 180 != 0) {
-				var temp = sw;
-				sw = sh;
-				sh = temp;
+				var temp = sw
+				sw = sh
+				sh = temp
 			}
-			var angle = this.rotate % 360;
+			var angle = this.rotate % 360
 			if (angle < 0) {
-				angle += 360;
+				angle += 360
 			}
 			if (angle == 270) {
-				var x = this.real.width - oy;
-				var y = ox;
-				ox = x;
-				oy = y;
+				var x = this.real.width - oy
+				var y = ox
+				ox = x
+				oy = y
 			}
 			if (angle == 180) {
-				var x = this.real.width - ox;
-				var y = this.real.height - oy;
-				ox = x;
-				oy = y;
+				var x = this.real.width - ox
+				var y = this.real.height - oy
+				ox = x
+				oy = y
 			}
 			if (angle == 90) {
-				var x = oy;
-				var y = this.real.height - ox;
-				ox = x;
-				oy = y;
+				var x = oy
+				var y = this.real.height - ox
+				ox = x
+				oy = y
 			}
-			sx = ox - sw / 2;
-			sy = oy - sh / 2;
-			var dr = {x: 0, y: 0, w: width, h: height};
-			dr = this.parseRect(dr, -this.rotate);
+			sx = ox - sw / 2
+			sy = oy - sh / 2
+			var dr = { x: 0, y: 0, w: width, h: height }
+			dr = this.parseRect(dr, -this.rotate)
 			return {
 				tw: width,
 				th: height,
@@ -416,42 +408,42 @@ export default {
 				dy: dr.y,
 				dw: dr.w,
 				dh: dr.h
-			};
+			}
 		},
 		parsePoint(point, angle) {
-			var result = {};
-			result.x = point.x * Math.cos(angle * Math.PI / 180) - point.y * Math.sin(angle * Math.PI / 180);
-			result.y = point.y * Math.cos(angle * Math.PI / 180) + point.x * Math.sin(angle * Math.PI / 180);
-			return result;
+			var result = {}
+			result.x = point.x * Math.cos(angle * Math.PI / 180) - point.y * Math.sin(angle * Math.PI / 180)
+			result.y = point.y * Math.cos(angle * Math.PI / 180) + point.x * Math.sin(angle * Math.PI / 180)
+			return result
 		},
 		parseRect(rect, angle) {
-			var x1 = rect.x;
-			var y1 = rect.y;
-			var x2 = rect.x + rect.w;
-			var y2 = rect.y + rect.h;
-			var p1 = this.parsePoint({x: x1, y: y1}, angle);
-			var p2 = this.parsePoint({x: x2, y: y2}, angle);
-			var result = {};
-			result.x = Math.min(p1.x, p2.x);
-			result.y = Math.min(p1.y, p2.y);
-			result.w = Math.abs(p2.x - p1.x);
-			result.h = Math.abs(p2.y - p1.y);
-			return result;
+			var x1 = rect.x
+			var y1 = rect.y
+			var x2 = rect.x + rect.w
+			var y2 = rect.y + rect.h
+			var p1 = this.parsePoint({ x: x1, y: y1 }, angle)
+			var p2 = this.parsePoint({ x: x2, y: y2 }, angle)
+			var result = {}
+			result.x = Math.min(p1.x, p2.x)
+			result.y = Math.min(p1.y, p2.y)
+			result.w = Math.abs(p2.x - p1.x)
+			result.h = Math.abs(p2.y - p1.y)
+			return result
 		},
 		parseBlob(base64) {
-			var arr = base64.split(',');
-			var mime = arr[0].match(/:(.*?);/)[1];
-			var bstr = atob(arr[1]);
-			var n = bstr.length;
-			var u8arr = new Uint8Array(n);
+			var arr = base64.split(',')
+			var mime = arr[0].match(/:(.*?);/)[1]
+			var bstr = atob(arr[1])
+			var n = bstr.length
+			var u8arr = new Uint8Array(n)
 			for(var i = 0; i < n; i++) {
-				u8arr[i] = bstr.charCodeAt(i);
+				u8arr[i] = bstr.charCodeAt(i)
 			}
-			var url = URL || webkitURL;
-			return url.createObjectURL(new Blob([u8arr], {type: mime}));
+			var url = URL || webkitURL
+			return url.createObjectURL(new Blob([u8arr], { type: mime }))
 		},
 	}
-};
+}
 </script>
 
 <script module="mwx" lang="wxs">

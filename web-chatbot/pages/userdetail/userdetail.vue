@@ -105,6 +105,7 @@
 			<view class="btn" v-if="userid != optid" @tap="delFriend()">
 				删除好友
 			</view>
+			<canvas style="width: 100px; height: 100px; position:fixed;left:100%;" canvas-id="cv" type="2d"></canvas>
 		</view>
 	</view>
 </template>
@@ -358,7 +359,7 @@
 					}
 				})
 			},
-			onok(ev) {
+			async onok(ev) {
 				this.url = ''
 				console.log(this.userDetail)
 				var fn = () => {
@@ -377,7 +378,64 @@
 						console.log(e)
 					}
 				}
-				this.update('imgBase64', this.optid, ev.base64.substring(22), '', fn)
+				let res= await this.compressImg(ev.base64)
+				this.update('imgBase64', this.optid, res.substring(22), '', fn)
+			},
+			getImgInfo(url) {
+				return new Promise((resolve, reject) => {
+					let image = new Image()
+					image.src = url
+					let timer = setInterval(() => {
+						if (image.width > 0 || image.height > 0) {
+							resolve([image.width, image.height]) // 图片宽*高
+							clearInterval(timer)
+						}
+					}, 50)
+				})
+			},
+			compressImg: function(src){
+				return new Promise(async (resolve, reject)=> {
+					var ctx = uni.createCanvasContext('cv',this)
+					let w, h
+					await this.getImgInfo(src).then(res => {
+						w = res[0]
+						h = res[1]
+					})
+					let d = this.Afill(w, h, 100, 100)
+					ctx.drawImage(src, d[0], d[1], d[2], d[3], 0, 0, 100, 100)
+					ctx.draw(false,()=>{
+						uni.canvasToTempFilePath({
+						  canvasId: 'cv',
+						  fileType: 'jpg',
+						  quality: 0.8,
+						  success: function(res) {
+						    // 在H5平台下，tempFilePath 为 base64
+							console.log(res.tempFilePath)
+							resolve(res.tempFilePath)
+						  } ,
+						  fail: function() {
+							  reject('error')
+						  }
+						},this)
+					}) //绘制
+				}) 
+			},
+			Afill: function(imageWidth, imageHeight, canvasWidth, canvasHeight) {
+				const imageRate = imageWidth / imageHeight
+				const canvasRate = canvasWidth / canvasHeight
+				let [sx, sy, sw, sh] = []
+				if (imageRate >= canvasRate) {
+					sw = imageHeight * canvasRate
+					sh = imageHeight
+					sx = (imageWidth - sw) / 2
+					sy = 0
+				} else {
+					sh = imageWidth / canvasRate
+					sw = imageWidth
+					sx = 0
+					sy = (imageHeight - sh) / 2
+				}
+				return [sx, sy, sw, sh]
 			},
 			oncancel() {
 				// url设置为空，隐藏控件
