@@ -22,3 +22,7 @@ func SerchUser(p *Models.ParmSerchUsername) ([]Models.SerchUserInfo, error) {
 func SerchIsFriend(p *Models.ParmSerchIsFriend) (Models.SerchIsFriend, error) {
 	return Mysql.SerchIsFriend(p.UserId, p.FriendId)
 }
+
+func DelFriend(p *Models.ParmSerchIsFriend) error {
+	return Mysql.DelFriendById(p.UserId, p.FriendId)
+}

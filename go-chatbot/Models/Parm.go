@@ -16,7 +16,7 @@ type VerifiEmail struct {
 
 type VerifiExam struct {
 	VerifiCode string `json:"verifiCode"`
-	Username   string `json:"username"`
+	Email      string `json:"email"`
 }
 
 type ParmLogin struct {
@@ -55,6 +55,20 @@ type ParmFriendRequest struct {
 	UserId   string `json:"user_id"`
 	FriendId string `json:"friend_id"`
 	Msg      string `json:"msg"`
+}
+
+type ParmChangeEmail struct {
+	UserId     string `json:"user_id"`
+	NewEmail   string `json:"n_email"`
+	VerifiCode string `json:"verifiCode"`
+}
+
+type ParmChangePsw struct {
+	UserId     string `json:"user_id"`
+	Email   string `json:"email"`
+	Password   string `json:"password"`
+	RePassword string `json:"re_password"`
+	VerifiCode string `json:"verifiCode"`
 }
 
 type ParmChangeImg struct {

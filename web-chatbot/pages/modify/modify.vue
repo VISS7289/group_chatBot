@@ -38,6 +38,16 @@
 					<image src="../../static/general/look.png" class="look" v-if="look" @tap="lookPassword"></image>
 					<image src="../../static/general/unlook.png" class="look" v-if="!look" @tap="lookPassword"></image>
 				</view>
+				<view class="vertify-div" v-if="!verifi">
+					<input type="text" placeholder="请重新输入验证码" class="paw"
+						placeholder-style="color:#bbb;font-weight:400;" @blur="inputVerifi" />
+					<view class="vertifySend" @tap="sendVertify">
+						<view v-if="send">发送验证码</view>
+						<view v-if="unSend" class="unSelect">{{this.time}}s</view>
+						<view v-if="reSend">重新发送</view>
+					</view>
+				</view>
+				<view class="tips" v-if="wrong">{{this.errInfo}}</view>
 			</view>
 			<view class="modifyText" v-if="modifyInfo.type==2">
 				<textarea v-model="modifyInfo.userinfo.intr" :placeholder="userRequest" class="modifyContent"
@@ -60,6 +70,15 @@
 					<view class="wText" v-if="occupyEmail">邮箱已被占用</view>
 					<view class="wText" v-if="invilid">邮箱无效</view>
 					<image src="../../static/general/right.png" class="ok" v-if="ok"></image>
+				</view>
+				<view class="vertify-div" v-if="verifi">
+					<input type="text" placeholder="请重新输入验证码" class="paw"
+						placeholder-style="color:#bbb;font-weight:400;" @blur="inputVerifi2" />
+					<view class="vertifySend" @tap="sendVertify2">
+						<view v-if="send2">发送验证码</view>
+						<view v-if="unSend2" class="unSelect">{{this.time2}}s</view>
+						<view v-if="reSend2">重新发送</view>
+					</view>
 				</view>
 				<view class="tips" v-if="wrong">{{this.errInfo}}</view>
 			</view>
@@ -118,11 +137,17 @@
 				reqRes: '',
 				userid: '',
 				verifi: false,
-				verifiCode: '',
+				shortPassword: false,
+				shortRe: false,
+				verifiValue: '',
+				verifiValue2: '',
 				time: 0,
 				send: true,
 				reSend: false,
 				unSend: false,
+				send2: true,
+				reSend2: false,
+				unSend2: false,
 				okEmail: false,
 				errInfo: '',
 				wrong: false
@@ -151,7 +176,10 @@
 					break
 				case 3:
 					this.userRequest = this.modifyInfo.userinfo.email
-					this.ok = true
+					this.ok = false
+					break
+				case 1:
+					this.ok = false
 					break
 			}
 			try {
@@ -169,6 +197,9 @@
 			},
 			inputVerifi: function(e) {
 				this.verifiValue = e.detail.value
+			},
+			inputVerifi2: function(e) {
+				this.verifiValue2 = e.detail.value
 			},
 			infoChange: function() {
 				var fn = () => {
@@ -195,6 +226,7 @@
 						console.log(e)
 					}
 				}
+				console.log(this.ok)
 				if (this.ok) {
 					switch (this.modifyInfo.type) {
 						case 6:
@@ -223,7 +255,12 @@
 							this.reqRes = this.modifyInfo.userinfo.nick
 							this.updateNick(this.modifyInfo.userinfo.id, this.modifyInfo.userinfo.nick, fn)
 							break
-
+						case 3:
+							this.subInfo2()
+							break
+						case 1:
+							this.subInfoPsw()
+							break
 					}
 
 				}
@@ -270,10 +307,12 @@
 						this.okEmail = true
 						this.modifyInfo.userinfo.email = e.detail.value
 						this.invilid = false
+						this.ok = true
 					} else {
 						this.okEmail = false
 						this.invilid = true
 						this.modifyInfo.userinfo.email = this.userRequest
+						this.ok = false
 					}
 				}
 			},
@@ -313,9 +352,11 @@
 					if (e.detail.cursor >= 6 && this.userPasswordRe == this.userPassword) {
 						this.okRe = true
 						this.shortRe = false
+						this.ok = true
 					} else {
 						this.okRe = false
 						this.shortRe = true
+						this.ok = false
 					}
 				}
 			},
@@ -446,12 +487,14 @@
 				})
 			},
 			subInfo: function() {
+				console.log(this.modifyInfo.userinfo.email)
+				console.log(this.verifiValue)
 				uni.request({
 					url: config.myurl + '/verifiExam',
 					method: 'POST',
 					data: {
-						'username': this.modifyInfo.userinfo.name,
-						'verifiCode': this.verifiCode,
+						'email': this.modifyInfo.userinfo.email,
+						'verifiCode': this.verifiValue,
 					},
 					success: data => {
 						console.log(data.data)
@@ -462,6 +505,75 @@
 							//SUCCESS
 							this.wrong = false
 							this.verifi = true
+						}
+					}
+				})
+			},
+			subInfo2: function(){
+				console.log(this.verifiValue2)
+				uni.request({
+					url: config.myurl + '/change/email',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: {
+						'user_id': this.modifyInfo.userinfo.id,
+						'n_email': this.modifyInfo.userinfo.email,
+						'verifiCode': this.verifiValue2
+					},
+					success: data => {
+						console.log(data.data)
+						if (data.data.Code == 1009) {
+							console.log(this.atoken)
+							let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							console.log(this.atoken)
+							if (newCode == 1000) {
+								this.subInfo2()
+							} else {
+								// err
+							}
+						} else if (data.data.Code == 1000) {
+							let value = uni.getStorageSync('user')
+							if (value) {
+								value.email = this.modifyInfo.userinfo.email
+								this.modifyInfo.email = this.modifyInfo.userinfo.email
+								uni.setStorageSync('user', value)
+							
+								let pages = getCurrentPages() // 当前页面
+								let beforePage = pages[pages.length - 2]
+								beforePage.$vm.refersh({
+									'type': 'email',
+									'req': this.modifyInfo.userinfo.email
+								})
+								uni.navigateBack({ delta: 1 })
+							} else {
+								uni.navigateTo({ url: '../signin/signin', })
+							}
+						}
+					}
+				})
+			},
+			subInfoPsw: function() {
+				uni.request({
+					url: config.myurl + '/change/psw',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: {
+						'user_id': this.modifyInfo.userinfo.id,
+						'email': this.modifyInfo.userinfo.email,
+						'password': this.userPassword,
+						're_password': this.userPasswordRe,
+						'verifiCode': this.verifiValue
+					},
+					success: data => {
+						console.log(data.data)
+						if (data.data.Code != 1000) {
+							this.wrong = true
+							this.errInfo = data.data.Msg
+						} else {
+							//SUCCESS
+							this.wrong = false
+							this.verifi = true
+							uni.navigateBack({ delta: 1 })
 						}
 					}
 				})
@@ -491,11 +603,38 @@
 						},
 						success: data => {
 							console.log(data.data)
-							//登录成功
-							if (data.data.Code == 1000) {
-								uni.setStorageSync('aToken', data.data.Data[0])
-								uni.setStorageSync('rToken', data.data.Data[1])
-							}
+							
+						}
+					})
+				} else {
+					this.invilid = !this.okEmail
+				}
+			},
+			sendVertify2: function() {
+				if (!this.unSend) {
+					this.send2 = false
+					this.reSend2 = false
+					this.unSend2 = true
+					this.time2 = 60
+					var obj = setInterval(() => {
+						if (this.time2 <= 0) {
+							this.time2 = 0
+							this.reSend2 = true
+							this.unSend2 = false
+							clearInterval(obj)
+						} else {
+							this.time2 = this.time2 - 1
+						}
+					}, 1000)
+					uni.request({
+						url: config.myurl + '/verificationCode',
+						method: 'POST',
+						data: {
+							'to': this.modifyInfo.userinfo.email,
+							'username': this.modifyInfo.userinfo.name
+						},
+						success: data => {
+							console.log(data.data)
 						}
 					})
 				} else {

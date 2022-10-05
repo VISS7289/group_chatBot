@@ -95,12 +95,15 @@
 			<view class="line" v-if="userid == optid">
 				<view class="lineHead">密码</view>
 				<view class="linetext">*********</view>
-				<view class="lineBtn">
+				<view class="lineBtn" @tap="goModify(1)">
 					<image src="../../static/general/more2.png">
 				</view>
 			</view>
-			<view class="btn" v-if="userid == optid">
+			<view class="btn" v-if="userid == optid" @tap="exit()">
 				退出登录
+			</view>
+			<view class="btn" v-if="userid != optid" @tap="delFriend()">
+				删除好友
 			</view>
 		</view>
 	</view>
@@ -134,7 +137,7 @@
 				rtoken: '',
 				userNick: '',
 				modifyInfo: {
-					type: 2, //infoType: ['昵称','备注','简介','邮箱','电话'],
+					type: 2, //infoType: ['昵称', '密码', '签名', '邮箱', '电话', '备注', '添加好友']
 					userinfo: {}
 				},
 				array: ['男', '女', '未知'],
@@ -169,6 +172,54 @@
 			}
 		},
 		methods: {
+			exit: function() {
+				uni.navigateTo({ url: '../signin/signin' })
+			},
+			delFriend: function(){
+				uni.showModal({
+					title: '提示',
+					content: '确认要删除好友吗？',
+					success: res => {
+						console.log(this.atoken)
+						if (res.confirm) {
+							uni.request({
+								url: config.myurl + '/friend/deleate',
+								method: 'POST',
+								header: { 'Authorization': 'Bearer ' + this.atoken },
+								data: {
+									'user_id': this.userid,
+									'friend_id': this.optid
+								},
+								success: data => {
+									if (data.data.Code == 1009) {
+										let newCode = refersh.refersh(config.myurl, this.atoken, this.rtoken)
+										if (newCode == 1000) {
+											this.delFriend()
+										} else {
+											// err
+										}
+									} else if (data.data.Code == 1000) {
+										//success
+										let pages = getCurrentPages() // 当前页面
+										let beforePage = pages[pages.length - 2]
+										uni.navigateBack({
+											delta: 1,
+											success: function() {
+												beforePage.delfriend() // 执行上一页的onLoad方法
+											}
+										})
+									} else {
+										//err
+									}
+								}
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消')
+						}
+					}
+				})
+				
+			},
 			backOne: function() {
 				let pages = getCurrentPages() // 当前页面
 				let beforePage = pages[pages.length - 2]

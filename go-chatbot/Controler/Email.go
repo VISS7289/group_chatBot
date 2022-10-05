@@ -48,7 +48,7 @@ func VerifiExam(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	val, err := Redis.RedisFind(verifExam.Username)
+	val, err := Redis.RedisFind(verifExam.Email)
 	if err != nil {
 		Models.ResponseError(c, Models.CodeVerifiNotFund)
 		return

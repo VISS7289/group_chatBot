@@ -65,6 +65,7 @@
 				animationData3: {},
 				animationData4: {},
 				isAdd: false,
+				isDelete: false,
 				pageTop: 0,
 				imgTop: 0,
 				pageHeight: 0,
@@ -108,7 +109,24 @@
 				this.userNick = parm.nick
 			},
 			backOne: function() {
-				uni.navigateBack({ delta: 1 })
+				if (!this.isDelete) {
+					uni.navigateBack({ delta: 1 })
+				} else {
+					let pages = getCurrentPages() // 当前页面
+					let beforePage = pages[pages.length - 2]
+					uni.navigateBack({
+						delta: 1,
+						success: function() {
+							beforePage.DeleteSuccess() // 执行上一页的onLoad方法
+						}
+					})
+				}
+
+			},
+			delfriend: function() {
+				this.user.state = 2
+				this.isDelete = true
+				this.userNick = this.user.name
 			},
 			getElementStyle: function() {
 				const query = uni.createSelectorQuery().in(this)

@@ -14,10 +14,10 @@
 			<view class="serchUser">
 				<view class="titleUser" v-if="userArr.length>0">用户</view>
 				<view class="listUser" v-for="(item,index) in userArr" :key="index">
-					<navigator :url="'../userhome/userhome?user='+encodeURIComponent(JSON.stringify(item))"
-						hover-class="none">
+					<!-- <navigator @tap="goUserhome(index)" hover-class="none">
 						<image :src="item.img" mode="aspectFill"></image>
-					</navigator>
+					</navigator> -->
+					<image :src="item.img" @tap="goUserhome(item,index)" mode="aspectFill"></image>
 					<view class="nameUser" v-html="item.username"></view>
 					<view class="rightBt info" v-if="item.state==0">发消息</view>
 					<view class="rightBt friend" v-if="item.state==1" @tap="goModify(6,item,index)">申请中</view>
@@ -73,6 +73,7 @@
 				atoken: '',
 				rtoken: '',
 				queryIndex: 0,
+				serchname: '',
 			}
 		},
 		onLoad: function(option) {
@@ -92,11 +93,19 @@
 					this.userDel(serchVal)
 				}
 			}, 500),
-			AddSuccess:function(){
-				this.userArr[this.queryIndex].state=1
+			AddSuccess: function() {
+				this.userArr[this.queryIndex].state = 1
+			},
+			DeleteSuccess: function(){
+				this.userArr[this.queryIndex].state = 2
+			},
+			refersh: function() {
+				console.log(this.serchname)
+				this.userDel(this.serchname)
 			},
 			userDel: function(e) {
-				console.log(e)
+				this.serchname = e
+				console.log(this.serchname)
 				uni.request({
 					url: config.myurl + '/serch/username',
 					method: 'POST',
@@ -124,11 +133,11 @@
 							let light = eval('/' + e + '/g')
 							console.log(data.data)
 							for (let i = 0; i < myArr.length; i++) {
+								//0好友 1申请中 2非好友 3自己
+								if (myArr[i].UserId == this.user.id) {
+									continue
+								}
 								if (myArr[i].Username.search(e) != -1) {
-									//0好友 1申请中 2非好友 3自己
-									if (myArr[i].UserId == this.user.id) {
-										continue
-									}
 									let item = {
 										'img': 'data:image/png;base64,' + myArr[i].Img,
 										'name': myArr[i].Username,
@@ -158,6 +167,10 @@
 				this.modifyInfo.friendid = item.id
 				this.modifyInfo.userRequest = this.user.name + '请求加为好友~'
 				uni.navigateTo({ url: '../modify/modify?modifyInfo=' + encodeURIComponent(JSON.stringify(this.modifyInfo)) })
+			},
+			goUserhome: function(item,index) {
+				this.queryIndex = index
+				uni.navigateTo({ url: '../userhome/userhome?user=' + encodeURIComponent(JSON.stringify(item)) })
 			}
 		}
 	}
