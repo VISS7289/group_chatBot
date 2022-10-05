@@ -41,8 +41,14 @@ func Init(mode string) *gin.Engine {
 
 	//好友申请
 	r.POST("/friend/request", Middlewares.JWTAuthMiddleware(), Controler.FriendRequest)
+	//好友接受
+	r.POST("/friend/accept", Middlewares.JWTAuthMiddleware(), Controler.FriendAccept)
 	//好友删除
 	r.POST("/friend/deleate", Middlewares.JWTAuthMiddleware(), Controler.FriendDeleate)
+	//好友请求拒绝
+	r.POST("/friend/reject", Middlewares.JWTAuthMiddleware(), Controler.FriendReject)
+	//获取好友
+	r.POST("/friend/myFriend", Middlewares.JWTAuthMiddleware(), Controler.GetMyFriend)
 
 	//修改用户图片
 	r.POST("/change/img", Middlewares.JWTAuthMiddleware(), Controler.ChangeUserImg)
@@ -54,6 +60,8 @@ func Init(mode string) *gin.Engine {
 	r.POST("/change/email", Middlewares.JWTAuthMiddleware(), Controler.ChangeEmail)
 	//修改密码
 	r.POST("/change/psw", Middlewares.JWTAuthMiddleware(), Controler.ChangePsw)
+
+
 	//注册功能路由
 	r.POST("/register", Controler.RegisterHandler)
 	r.GET("/existName", Controler.ExistName)

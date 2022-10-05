@@ -24,13 +24,5 @@ func SerchIsFriend(userId string, friendId string) (Models.SerchIsFriend, error)
 	return friendRes, err
 }
 
-func DelFriendById(userId string, friendId string) error {
-	sqlStr := "DELETE FROM friend WHERE user_id = ? AND friend_id = ?"
-	if _,err := db.Exec(sqlStr,userId,friendId);err!=nil{
-		return err
-	}
-	if _,err := db.Exec(sqlStr,friendId,userId);err!=nil{
-		return err
-	}
-	return nil
-}
+
+

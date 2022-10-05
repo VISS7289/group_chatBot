@@ -65,7 +65,7 @@ type ParmChangeEmail struct {
 
 type ParmChangePsw struct {
 	UserId     string `json:"user_id"`
-	Email   string `json:"email"`
+	Email      string `json:"email"`
 	Password   string `json:"password"`
 	RePassword string `json:"re_password"`
 	VerifiCode string `json:"verifiCode"`
@@ -81,6 +81,11 @@ type ParmChange struct {
 	Data   string `json:"data"`
 	Type   string `json:"type"`
 	Psw    string `json:"psw"`
+}
+
+type ParmGetFriend struct {
+	UserId string `json:"user_id"`
+	State  int    `json:"state"`
 }
 
 var JWTSercet = []byte("7289978VISS")

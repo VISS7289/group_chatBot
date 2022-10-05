@@ -44,3 +44,8 @@ type UserInfoDetailReturn struct {
 	CreateTime string `db:"creat_time"`
 	Phone      string `db:"phone"`
 }
+
+type UserShortInfo struct {
+	Username   string `db:"username"`
+	Img        string `db:"imgBase64"`
+}

@@ -21,11 +21,41 @@
 		</view>
 		<view class="main">
 			<view class="apply"></view>
-			<view class="friends" v-for="(item,index) in friends" :key="index">
+			<view class="friends">
+				<view class="friends-list" v-if="friendReq.tip>0" @tap="goRequest">
+					<view class="friends-list-l">
+						<text class="tip" v-if="friendReq.tip>0">{{friendReq.tip}}</text>
+						<image :src="friendReq.img" mode="aspectFill"></image>
+					</view>
+					<view class="friends-list-r">
+						<view class="top">
+							<view class="name">{{friendReq.name}}</view>
+							<view class="time">{{changeTime2(friendReq.time)}}</view>
+						</view>
+						<view class="info">{{friendReq.info}}</view>
+					</view>
+				</view>
+			</view>
+			<view class="friends" v-for="(item,index) in friends2" :key="index">
 				<view class="friends-list">
 					<view class="friends-list-l">
 						<text class="tip" v-if="item.tip>0">{{item.tip}}</text>
-						<image :src="item.imgurl"></image>
+						<image :src="item.img" mode="aspectFill"></image>
+					</view>
+					<view class="friends-list-r">
+						<view class="top">
+							<view class="name">{{item.name}}</view>
+							<view class="time">{{changeTime2(item.time)}}</view>
+						</view>
+						<view class="info">{{item.info}}</view>
+					</view>
+				</view>
+			</view>
+			<!-- <view class="friends" v-for="(item,index) in friends" :key="index">
+				<view class="friends-list">
+					<view class="friends-list-l">
+						<text class="tip" v-if="item.tip>0">{{item.tip}}</text>
+						<image :src="item.imgurl" mode="aspectFill"></image>
 					</view>
 					<view class="friends-list-r">
 						<view class="top">
@@ -35,7 +65,7 @@
 						<view class="info">{{item.info}}</view>
 					</view>
 				</view>
-			</view>
+			</view> -->
 		</view>
 		<view class="submit" @tap="Test">Test</view>
 		<view class="submit" @tap="Test2">Test2</view>
@@ -46,12 +76,15 @@
 <script>
 	import datas from '../../commons/js/datas.js'
 	import calT from '../../commons/js/calTime.js'
+	import config from '../../commons/js/config.js'
+	import refersh from '../../commons/js/refershToken.js'
 	export default {
 		data() {
 			return {
 				friends: [
 
 				],
+				friends2: [],
 				user: {
 					imgurl: '../../static/test/duan.png',
 					id: 123,
@@ -61,20 +94,37 @@
 					nick: 'duan',
 					intr: '这个用户很懒，没有任何简介。这个用户很懒，没有任何简介。这个用户很懒，没有任何简介。'
 				},
+				friendReq: {
+					img: '../../static/index/addUser.png',
+					tip: 0,
+					name: '好友申请',
+					info: '茫茫人海，相见既是缘分。',
+					time: '19:46:35'
+				},
 				atoken: '',
 				rtoken: '',
 				imgurl: '../../static/test/duan.png',
-				}
+			}
 		},
 		onLoad() {
+			this.userInit()
 			this.getFriends()
+			this.getFriendsReq()
+			this.getFriends2()
+
 		},
-		onShow(){
+		onShow() {
 			this.userInit()
 		},
 		methods: {
+			goRequest: function() {
+				uni.navigateTo({ url: '../friendReq/friendReq' })
+			},
 			changeTime: function(date) {
 				return calT.dateTime(date)
+			},
+			changeTime2: function(date) {
+				return calT.dateTime2(date)
 			},
 			getFriends: function() {
 				this.friends = datas.friends()
@@ -83,8 +133,97 @@
 				}
 				//console.log(this.friends);
 			},
+			getFriends2: function() {
+				uni.request({
+					url: config.myurl + '/friend/myFriend',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: {
+						'user_id': this.user.id,
+						'state': 0
+					},
+					success: async data => {
+						console.log(data.data)
+						if (data.data.Code == 1009) {
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
+								this.getFriends2()
+							} else {
+								// err
+							}
+						} else if (data.data.Code == 1000) {
+							console.log('friends')
+							console.log(data.data.Data.length)
+							console.log(data.data.Data)
+							console.log(data.data.Data[0])
+							this.friends2 = []
+							for (let i = 0; i < data.data.Data.length; i++) {
+								let frinick = data.data.Data[i].FriendNick
+								if (frinick == '') {
+									frinick = data.data.Data[i].FriendName
+								}
+								this.friends2.push({
+									id: data.data.Data[i].Friendid,
+									name: frinick,
+									truname: data.data.Data[i].FriendName,
+									img: 'data:image/png;base64,' + data.data.Data[i].FriendImg,
+									info: 'unknow',
+									time: data.data.Data[i].LastTime,
+									tip: 10
+								})
+							}
+							this.friends2 = calT.mySortByTime(this.friends2, 'time', 1)
+						} else {
+							//err
+						}
+					}
+				})
+			},
+			getFriendsReq: function() {
+				console.log('send')
+				uni.request({
+					url: config.myurl + '/friend/myFriend',
+					method: 'POST',
+					header: { 'Authorization': 'Bearer ' + this.atoken },
+					data: {
+						'user_id': this.user.id,
+						'state': 1
+					},
+					success: async data => {
+						console.log(data.data)
+						if (data.data.Code == 1009) {
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
+								this.getFriendsReq()
+							} else {
+								// err
+							}
+						} else if (data.data.Code == 1000) {
+							console.log('Req')
+							this.friendReq.tip = data.data.Data.length
+							this.friendReq.time = data.data.Data[0].LastTime
+							for (let i = 0; i < data.data.Data.length; i++) {
+								//1第1个大 2第2个大 0 一样大
+								if (calT.compareTime(data.data.Data[i].LastTime, this.friendReq.time) ==
+									1) {
+									this.friendReq.time = data.data.Data[i].LastTime
+								}
+
+							}
+							console.log(this.friendReq.tip)
+						} else {
+							//err
+						}
+					}
+				})
+				console.log('get')
+			},
 			toSerch: function() {
-				uni.navigateTo({ url: '../serch/serch?user='+encodeURIComponent(JSON.stringify(this.user)), })
+				uni.navigateTo({ url: '../serch/serch?user=' + encodeURIComponent(JSON.stringify(this.user)), })
 			},
 			userInit: function() {
 				try {
@@ -95,9 +234,9 @@
 						this.user.email = value.email
 						this.user.name = value.name
 						this.user.nick = value.name
-						this.atoken = value.atoken
-						this.rtoken = value.rtoken
-					}else{
+						this.atoken = uni.getStorageSync('atoken')
+						this.rtoken = uni.getStorageSync('rtoken')
+					} else {
 						uni.navigateTo({ url: '../signin/signin', })
 					}
 					console.log(value)
@@ -107,9 +246,18 @@
 			},
 			Test: function() {
 				var img = document.createElement('img')
+				var tempP = ''
 				img.src = '../../static/test/1 (1).jpg'
+				uni.compressImage({
+					src: img.src,
+					quality: 80,
+					success: res => {
+						tempP = res.tempFilePath
+						console.log(res.tempFilePath)
+					}
+				})
 				uni.request({
-					url: img.src,
+					url: tempP,
 					method: 'GET',
 					responseType: 'arraybuffer',
 					success: ress => {

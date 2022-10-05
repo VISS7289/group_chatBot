@@ -26,3 +26,16 @@ func SerchIsFriend(p *Models.ParmSerchIsFriend) (Models.SerchIsFriend, error) {
 func DelFriend(p *Models.ParmSerchIsFriend) error {
 	return Mysql.DelFriendById(p.UserId, p.FriendId)
 }
+
+func RejectFriend(p *Models.ParmSerchIsFriend) error {
+	return Mysql.RejectFriendById(p.UserId, p.FriendId)
+}
+
+func AcceptFriend(p *Models.ParmSerchIsFriend) error {
+	req := Models.ParmFriendRequest{
+		UserId:   p.UserId,
+		FriendId: p.FriendId,
+		Msg:      "",
+	}
+	return Mysql.ChangeFriend(&req, 0)
+}
