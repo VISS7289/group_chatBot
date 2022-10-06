@@ -21,6 +21,11 @@
 		</view>
 		<view class="main">
 			<view class="apply"></view>
+			<view class="noone" v-if="noone">
+				<image src="../../static/index/lonely.png" mode="aspectFill"></image>
+				<view class="no-title">您还没有好友~</view>
+				<view class="serch-bt" @tap="toSerch">搜索好友</view>
+			</view>
 			<view class="friends">
 				<view class="friends-list" v-if="friendReq.tip>0" @tap="goRequest">
 					<view class="friends-list-l">
@@ -67,7 +72,7 @@
 				</view>
 			</view> -->
 		</view>
-		<view class="submit" @tap="Test">Test</view>
+		<view class="submit" @tap="getNewMsg">Test</view>
 		<view class="submit" @tap="Test2">Test2</view>
 		<!-- <image src="data:image/png;base64,{{imgData}}"></image> -->
 	</view>
@@ -104,6 +109,7 @@
 				atoken: '',
 				rtoken: '',
 				imgurl: '../../static/test/duan.png',
+				noone: true,
 			}
 		},
 		onLoad() {
@@ -115,6 +121,18 @@
 		},
 		onShow() {
 			this.userInit()
+			this.getFriends()
+			this.getFriendsReq()
+			this.getFriends2()
+		},
+		onPullDownRefresh() {
+			this.userInit()
+			this.getFriends()
+			this.getFriendsReq()
+			this.getFriends2()
+			setTimeout(function() {
+				uni.stopPullDownRefresh()
+			}, 1000)
 		},
 		methods: {
 			goRequest: function() {
@@ -155,26 +173,32 @@
 							}
 						} else if (data.data.Code == 1000) {
 							console.log('friends')
-							console.log(data.data.Data.length)
-							console.log(data.data.Data)
-							console.log(data.data.Data[0])
-							this.friends2 = []
-							for (let i = 0; i < data.data.Data.length; i++) {
-								let frinick = data.data.Data[i].FriendNick
-								if (frinick == '') {
-									frinick = data.data.Data[i].FriendName
+							if(data.data.Data!=null){
+								this.noone=false
+								console.log(data.data.Data)
+								this.friends2 = []
+								for (let i = 0; i < data.data.Data.length; i++) {
+									let frinick = data.data.Data[i].FriendNick
+									if (frinick == '') {
+										frinick = data.data.Data[i].FriendName
+									}
+									this.friends2.push({
+										id: data.data.Data[i].Friendid,
+										name: frinick,
+										truname: data.data.Data[i].FriendName,
+										img: 'data:image/png;base64,' + data.data.Data[i].FriendImg,
+										info: 'unknow',
+										time: data.data.Data[i].LastTime,
+										tip: 0
+									})
 								}
-								this.friends2.push({
-									id: data.data.Data[i].Friendid,
-									name: frinick,
-									truname: data.data.Data[i].FriendName,
-									img: 'data:image/png;base64,' + data.data.Data[i].FriendImg,
-									info: 'unknow',
-									time: data.data.Data[i].LastTime,
-									tip: 10
-								})
+								this.friends2 = calT.mySortByTime(this.friends2, 'time', 1)
+								this.refershMsg()
+							}else{
+								this.noone=true
+								this.friends2 = []
 							}
-							this.friends2 = calT.mySortByTime(this.friends2, 'time', 1)
+							
 						} else {
 							//err
 						}
@@ -204,23 +228,120 @@
 							}
 						} else if (data.data.Code == 1000) {
 							console.log('Req')
-							this.friendReq.tip = data.data.Data.length
-							this.friendReq.time = data.data.Data[0].LastTime
-							for (let i = 0; i < data.data.Data.length; i++) {
-								//1第1个大 2第2个大 0 一样大
-								if (calT.compareTime(data.data.Data[i].LastTime, this.friendReq.time) ==
-									1) {
-									this.friendReq.time = data.data.Data[i].LastTime
-								}
+							if (data.data.Data != null) {
+								this.friendReq.tip = data.data.Data.length
+								this.friendReq.time = data.data.Data[0].LastTime
+								for (let i = 0; i < data.data.Data.length; i++) {
+									//1第1个大 2第2个大 0 一样大
+									if (calT.compareTime(data.data.Data[i].LastTime, this.friendReq
+										.time) ==
+										1) {
+										this.friendReq.time = data.data.Data[i].LastTime
+									}
 
+								}
+								console.log(this.friendReq.tip)
+							} else {
+								this.friendReq = {
+									img: '../../static/index/addUser.png',
+									tip: 0,
+									name: '好友申请',
+									info: '茫茫人海，相见既是缘分。',
+									time: '19:46:35'
+								}
 							}
-							console.log(this.friendReq.tip)
+
 						} else {
 							//err
 						}
 					}
 				})
 				console.log('get')
+			},
+			refershMsg: async function() {
+				for (let i = 0; i < this.friends2.length; i++) {
+					this.friends2[i].info = await this.getNewMsg(this.friends2[i].id)
+					this.friends2[i].tip = await this.getUnReadMsg(this.friends2[i].id)
+					// this.friends2[i].info=this.getNewMsg(this.friends2[i].id)
+				}
+			},
+			getNewMsg: function(fid) {
+				return new Promise((resolve, reject) => {
+					uni.request({
+						url: config.myurl + '/msg/newone',
+						method: 'POST',
+						header: { 'Authorization': 'Bearer ' + this.atoken },
+						data: {
+							'send_id': this.user.id,
+							'accept_id': fid
+						},
+						success: async data => {
+							console.log(data.data)
+							if (data.data.Code == 1009) {
+								let newCode = await refersh.refersh(config.myurl, this.atoken, this
+									.rtoken)
+								if (newCode == 1000) {
+									this.atoken = uni.getStorageSync('atoken')
+									this.rtoken = uni.getStorageSync('rtoken')
+									this.getNewMsg()
+								} else {
+									// err
+								}
+							} else if (data.data.Code == 1000) {
+								switch (data.data.Data.Type) {
+									case 0:
+										resolve(data.data.Data.Msg)
+										break
+									case 1:
+										resolve('[图片]')
+										break
+									case 2:
+										resolve('[音频]')
+										break
+									case 3:
+										resolve('[位置]')
+										break
+								}
+								resolve('unknow')
+							} else {
+								resolve('unknow')
+							}
+						}
+					})
+				})
+
+			},
+			getUnReadMsg: function(fid) {
+				return new Promise((resolve, reject) => {
+					uni.request({
+						url: config.myurl + '/msg/unread',
+						method: 'POST',
+						header: { 'Authorization': 'Bearer ' + this.atoken },
+						data: {
+							'send_id': this.user.id,
+							'accept_id': fid
+						},
+						success: async data => {
+							console.log(data.data)
+							if (data.data.Code == 1009) {
+								let newCode = await refersh.refersh(config.myurl, this.atoken, this
+									.rtoken)
+								if (newCode == 1000) {
+									this.atoken = uni.getStorageSync('atoken')
+									this.rtoken = uni.getStorageSync('rtoken')
+									this.getUnReadMsg()
+								} else {
+									// err
+								}
+							} else if (data.data.Code == 1000) {
+								resolve(data.data.Data)
+							} else {
+								resolve(0)
+							}
+						}
+					})
+				})
+
 			},
 			toSerch: function() {
 				uni.navigateTo({ url: '../serch/serch?user=' + encodeURIComponent(JSON.stringify(this.user)), })
@@ -285,6 +406,36 @@
 		width: 100%;
 		//border: 1px solid red;
 		box-sizing: border-box;
+	}
+	
+	.noone{
+		margin: 0 auto;
+		text-align: center;
+		padding-top: 200rpx;
+		image{
+			height: 500rpx;
+			width: 316rpx;
+		}
+		.no-title{
+			font-size: $uni-font-size-base;
+			color: rgba(40,30,50,0.4);
+			line-height: 40rpx;
+			padding-bottom: 32rpx;
+			padding-top: 32rpx;
+		}
+		.serch-bt{
+			margin: 0 auto;
+			width: 520rpx;
+			height: 96rpx;
+			background: $uni-color-primary;
+			box-shadow: 0rpx 50rpx 32rpx -36rpx rgba(255, 228, 49, 0.4);
+			border-radius: 48rpx;
+			font-size: $uni-font-size-lg;
+			font-weight: 500;
+			color: $uni-text-color;
+			line-height: 96rpx;
+			text-align: center;
+		}
 	}
 
 	.friends-list {

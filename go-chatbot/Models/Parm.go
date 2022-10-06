@@ -88,4 +88,9 @@ type ParmGetFriend struct {
 	State  int    `json:"state"`
 }
 
+type ParmGetNewMsgOne struct {
+	SendId   string `json:"send_id"`
+	AcceptId string `json:"accept_id"`
+}
+
 var JWTSercet = []byte("7289978VISS")

@@ -61,6 +61,11 @@ func Init(mode string) *gin.Engine {
 	//修改密码
 	r.POST("/change/psw", Middlewares.JWTAuthMiddleware(), Controler.ChangePsw)
 
+	//获取最新一条消息
+	r.POST("/msg/newone", Middlewares.JWTAuthMiddleware(), Controler.GetNewMsgOne)
+	//获取未读消息数
+	r.POST("/msg/unread", Middlewares.JWTAuthMiddleware(), Controler.GetUnReadMsgNum)
+
 
 	//注册功能路由
 	r.POST("/register", Controler.RegisterHandler)
