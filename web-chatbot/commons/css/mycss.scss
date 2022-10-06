@@ -66,8 +66,8 @@
 	}
 	.top-bar-right{
 		float: right;
-		padding-left: 14rpx;
-		padding-right: 14rpx;
+		margin-left: 14rpx;
+		margin-right: 14rpx;
 		//border: 1px solid red;
 		.serch{
 			width: 88rpx;
@@ -96,7 +96,7 @@
 			padding-right: $uni-spacing-col-base;
 		}
 		image{
-			padding: 18rpx 0 0 18rpx;
+			margin: 18rpx 0 0 18rpx;
 			width: 52rpx;
 			height: 52rpx;
 		}

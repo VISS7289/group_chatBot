@@ -42,7 +42,7 @@
 				</view>
 			</view>
 			<view class="friends" v-for="(item,index) in friends2" :key="index">
-				<view class="friends-list">
+				<view class="friends-list" @tap="goChatRoom(item)">
 					<view class="friends-list-l">
 						<text class="tip" v-if="item.tip>0">{{item.tip}}</text>
 						<image :src="item.img" mode="aspectFill"></image>
@@ -109,7 +109,7 @@
 				atoken: '',
 				rtoken: '',
 				imgurl: '../../static/test/duan.png',
-				noone: true,
+				noone: false,
 			}
 		},
 		onLoad() {
@@ -137,6 +137,9 @@
 		methods: {
 			goRequest: function() {
 				uni.navigateTo({ url: '../friendReq/friendReq' })
+			},
+			goChatRoom: function(item) {
+				uni.navigateTo({ url: '../chatRoom/chatRoom?friendInfo='+ encodeURIComponent(JSON.stringify(item)) +'&type=0' })
 			},
 			changeTime: function(date) {
 				return calT.dateTime(date)
@@ -173,8 +176,8 @@
 							}
 						} else if (data.data.Code == 1000) {
 							console.log('friends')
-							if(data.data.Data!=null){
-								this.noone=false
+							if (data.data.Data != null) {
+								this.noone = false
 								console.log(data.data.Data)
 								this.friends2 = []
 								for (let i = 0; i < data.data.Data.length; i++) {
@@ -186,7 +189,8 @@
 										id: data.data.Data[i].Friendid,
 										name: frinick,
 										truname: data.data.Data[i].FriendName,
-										img: 'data:image/png;base64,' + data.data.Data[i].FriendImg,
+										img: 'data:image/png;base64,' + data.data.Data[i]
+											.FriendImg,
 										info: 'unknow',
 										time: data.data.Data[i].LastTime,
 										tip: 0
@@ -194,11 +198,11 @@
 								}
 								this.friends2 = calT.mySortByTime(this.friends2, 'time', 1)
 								this.refershMsg()
-							}else{
-								this.noone=true
+							} else {
+								this.noone = true
 								this.friends2 = []
 							}
-							
+
 						} else {
 							//err
 						}
@@ -234,7 +238,7 @@
 								for (let i = 0; i < data.data.Data.length; i++) {
 									//1第1个大 2第2个大 0 一样大
 									if (calT.compareTime(data.data.Data[i].LastTime, this.friendReq
-										.time) ==
+											.time) ==
 										1) {
 										this.friendReq.time = data.data.Data[i].LastTime
 									}
@@ -407,23 +411,26 @@
 		//border: 1px solid red;
 		box-sizing: border-box;
 	}
-	
-	.noone{
+
+	.noone {
 		margin: 0 auto;
 		text-align: center;
 		padding-top: 200rpx;
-		image{
+
+		image {
 			height: 500rpx;
 			width: 316rpx;
 		}
-		.no-title{
+
+		.no-title {
 			font-size: $uni-font-size-base;
-			color: rgba(40,30,50,0.4);
+			color: rgba(40, 30, 50, 0.4);
 			line-height: 40rpx;
 			padding-bottom: 32rpx;
 			padding-top: 32rpx;
 		}
-		.serch-bt{
+
+		.serch-bt {
 			margin: 0 auto;
 			width: 520rpx;
 			height: 96rpx;

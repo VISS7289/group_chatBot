@@ -63,6 +63,15 @@ func GetNameAndImgById(userId string) (Models.UserShortInfo, error) {
 	return info, nil
 }
 
+func GetImgById(userId string) (string, error) {
+	sqlStr := `SELECT  imgBase64 FROM user WHERE user_id = ?`
+	var info string
+	if err := db.Get(&info, sqlStr, userId); err != nil {
+		return info, err
+	}
+	return info, nil
+}
+
 //func InsertUser(user *Models.User) (err error) {
 //	sqlStr := `INSERT INTO user(user_id,username,password,email,gender) VALUES(?,?,?,?,?)`
 //	if _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Gender); err != nil {

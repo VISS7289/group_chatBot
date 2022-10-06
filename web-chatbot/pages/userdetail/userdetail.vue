@@ -379,7 +379,7 @@
 					}
 				}
 				let res= await this.compressImg(ev.base64)
-				this.update('imgBase64', this.optid, res.substring(22), '', fn)
+				this.update('imgBase64', this.optid, res.substring(23), '', fn)
 			},
 			getImgInfo(url) {
 				return new Promise((resolve, reject) => {

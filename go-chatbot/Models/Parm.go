@@ -93,4 +93,11 @@ type ParmGetNewMsgOne struct {
 	AcceptId string `json:"accept_id"`
 }
 
+type ParmGetOldChat struct {
+	UserId string `json:"user_id"`
+	FriendId string `json:"friend_id"`
+	NowPage int `json:"now_page"`
+	MaxPage int `json:"max_page"`
+}
+
 var JWTSercet = []byte("7289978VISS")

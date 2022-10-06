@@ -26,7 +26,7 @@ export default {
 			parseInt(d.slice(11, 13)), parseInt(d.slice(14, 16)), parseInt(d.slice(17, 19))
 		]
 		let nowTime = new Date()
-		let now = [nowTime.getFullYear(), nowTime.getMonth(), nowTime.getDate(), nowTime.getHours(),
+		let now = [nowTime.getFullYear(), nowTime.getMonth() + 1, nowTime.getDate(), nowTime.getHours(),
 			nowTime.getMinutes(), nowTime.getMonth()
 		]
 		let delta = (now[0] - old[0]) * 365 + (now[1] - old[1]) * 30 + (now[2] - old[2])
@@ -36,13 +36,25 @@ export default {
 			}
 			return old[3] + ':' + old[4]
 		} else if (delta < 2) {
-			return '昨天'
+			if (old[4] < 10) {
+				return '昨天' + old[3] + ':0' + old[4]
+			}
+			return '昨天' + old[3] + ':' + old[4]
 		} else if (delta < 3) {
 			return '前天'
 		} else if (delta < 365) {
 			return old[0] + '/' + old[1] + '/' + old[2]
 		}
 		return '超过一年'
+	},
+	//2022-10-03T14:30:55Z padStart
+	getNewTime: function() {
+		let nowTime = new Date()
+		let m = nowTime.getMonth() + 1
+		return nowTime.getFullYear() + '-' + m.toString().padStart(2, '0') + '-' + nowTime.getDate().toString()
+			.padStart(2, '0') + 'T' +
+			nowTime.getHours().toString().padStart(2, '0') + ':' + nowTime.getMinutes().toString().padStart(2,
+				'0') + ':' + nowTime.getMonth().toString().padStart(2, '0') + 'Z'
 	},
 	//聊天时间
 	chatTime: function(d) {
@@ -79,6 +91,24 @@ export default {
 			(now.getMinutes() - old.getMinutes())
 		if (delta > 5) {
 			return oldTime
+		}
+		return ''
+	},
+	//间隔时间
+	spaceTime2: function(time1, time2) {
+		let time1d = [parseInt(time1.slice(0, 4)), parseInt(time1.slice(5, 7)), parseInt(time1.slice(8, 10)),
+			parseInt(time1.slice(11, 13)), parseInt(time1.slice(14, 16)), parseInt(time1.slice(17, 19))
+		]
+		let time2d = [parseInt(time2.slice(0, 4)), parseInt(time2.slice(5, 7)), parseInt(time2.slice(8, 10)),
+			parseInt(time2.slice(11, 13)), parseInt(time2.slice(14, 16)), parseInt(time2.slice(17, 19))
+		]
+		let delta = (time2d[0] - time1d[0]) * 60 * 24 * 30 * 365 +
+			(time2d[1] - time1d[1]) * 60 * 24 * 30 +
+			(time2d[2] - time1d[2]) * 60 * 24 +
+			(time2d[3] - time1d[3]) * 60 +
+			(time2d[4] - time1d[4])
+		if (delta > 5) {
+			return time2
 		}
 		return ''
 	},

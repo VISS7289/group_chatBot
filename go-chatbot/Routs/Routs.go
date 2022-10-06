@@ -65,6 +65,8 @@ func Init(mode string) *gin.Engine {
 	r.POST("/msg/newone", Middlewares.JWTAuthMiddleware(), Controler.GetNewMsgOne)
 	//获取未读消息数
 	r.POST("/msg/unread", Middlewares.JWTAuthMiddleware(), Controler.GetUnReadMsgNum)
+	//获取用户聊天消息
+	r.POST("/msg/getOldChatF", Middlewares.JWTAuthMiddleware(), Controler.GetOldChatF)
 
 
 	//注册功能路由

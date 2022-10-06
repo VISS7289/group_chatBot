@@ -53,3 +53,17 @@ func GetNewMsgOne(p *Models.ParmGetNewMsgOne) (Models.MsgRes, error) {
 func GetUnReadMsgNum(p *Models.ParmGetNewMsgOne) (int, error) {
 	return Mysql.GetUnKnowMsgNum(p.SendId, p.AcceptId)
 }
+
+func GetOldMsgF(p *Models.ParmGetOldChat) ([]Models.MsgOldF, error) {
+	info, err := Mysql.GetOldMsgF(p)
+	if err != nil {
+		return info, err
+	}
+	for i := 0; i < len(info); i++ {
+		info[i].Img, err = Mysql.GetImgById(info[i].SendId)
+		if err != nil {
+			return info, err
+		}
+	}
+	return info, nil
+}

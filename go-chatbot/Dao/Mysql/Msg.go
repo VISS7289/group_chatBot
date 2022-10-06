@@ -1,6 +1,8 @@
 package Mysql
 
-import "go-chatbot/Models"
+import (
+	"go-chatbot/Models"
+)
 
 func GetNewMsgOne(sendid string, acceptid string) (Models.MsgRes, error) {
 	sqlStr := `SELECT state, time, message, type FROM singleMessage WHERE send_id = ? AND accept_id = ? ORDER BY time DESC`
@@ -13,8 +15,18 @@ func GetNewMsgOne(sendid string, acceptid string) (Models.MsgRes, error) {
 
 func GetUnKnowMsgNum(sendid string, acceptid string) (num int, err error) {
 	sqlStr := `SELECT COUNT(id) FROM singleMessage WHERE send_id = ? AND accept_id = ? AND state=?`
-	if err := db.Get(&num, sqlStr,sendid, acceptid, 0); err != nil {
-		return 0,err
+	if err := db.Get(&num, sqlStr, sendid, acceptid, 0); err != nil {
+		return 0, err
 	}
-	return num,nil
+	return num, nil
+}
+
+func GetOldMsgF(p *Models.ParmGetOldChat) ([]Models.MsgOldF, error) {
+	//sqlStr := `SELECT send_id, accept_id, time, message, type FROM singleMessage WHERE (send_id = ? AND accept_id = ?) OR (send_id = ? AND accept_id = ?) ORDER BY time DESC LIMIT ?,?`
+	sqlStr := `SELECT send_id, id, time, message, type FROM singleMessage WHERE (send_id = ? AND accept_id = ?) OR (send_id = ? AND accept_id = ?) ORDER BY time LIMIT ?,?`
+	var info []Models.MsgOldF
+	if err := db.Select(&info, sqlStr, p.UserId, p.FriendId, p.FriendId, p.UserId, p.NowPage*p.MaxPage, (p.NowPage+1)*p.MaxPage); err != nil {
+		return info, err
+	}
+	return info, nil
 }
