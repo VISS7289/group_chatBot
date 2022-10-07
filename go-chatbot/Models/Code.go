@@ -17,6 +17,10 @@ const (
 	CodeVerifiNotFund
 	CodeVerifiErr
 	CodeIllegalityFriendReq
+	CodeExceedMsg
+	CodeWebSocketEnd
+	CodeWebSocketReply
+	CodeWebSocketReplyNoOne
 )
 
 var CodeMesMap = map[ResCode]string{
@@ -34,6 +38,10 @@ var CodeMesMap = map[ResCode]string{
 	CodeVerifiNotFund:       "验证码过期或未发送",
 	CodeVerifiErr:           "验证码错误",
 	CodeIllegalityFriendReq: "非法发送好友请求",
+	CodeExceedMsg:           "消息数量超过限制",
+	CodeWebSocketEnd:        "连接中断",
+	CodeWebSocketReply:      "对方在线应答",
+	CodeWebSocketReplyNoOne: "对方不在线",
 }
 
 func (c ResCode) Msg() string {

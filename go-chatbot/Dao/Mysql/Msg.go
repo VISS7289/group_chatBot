@@ -30,3 +30,11 @@ func GetOldMsgF(p *Models.ParmGetOldChat) ([]Models.MsgOldF, error) {
 	}
 	return info, nil
 }
+
+func InsertMsg(msg Models.NewMsg) error {
+	sqlStr := `INSERT INTO singleMessage(send_id,accept_id,state,message,type) VALUES(?,?,?,?,?)`
+	if _, err := db.Exec(sqlStr, msg.SendId, msg.AcceptId, msg.State, msg.Msg, msg.Type); err != nil {
+		return err
+	}
+	return nil
+}

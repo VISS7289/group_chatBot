@@ -15,3 +15,12 @@ type MsgOldF struct {
 	Msg    string `db:"message"`
 	Img    string `db:"imgBase64"`
 }
+
+type NewMsg struct {
+	SendId   string `db:"send_id"`
+	AcceptId string `db:"accept_id"`
+	State    bool   `db:"state"`
+	Msg      string `db:"message"`
+	Type     int    `db:"type"`
+}
+

@@ -16,7 +16,7 @@
 		<scroll-view class="chat" scroll-y="true" scroll-with-animation="true" :scroll-into-view="scrollToView">
 			<view class="chat-main" :style="{paddingBottom : h + 'px'}">
 				<view class="chat-ls" v-for="(item,index) in msgs" :key="index" :id="'msg'+item.tip">
-					<view class="chat-time" v-if="item.time!=''">{{changeTime2(item.time)}}</view>
+					<view class="chat-time" v-if="changeTime3(index)!=''">{{changeTime3(index)}}</view>
 					<view class="msg msg-left" v-if="item.id != user.id">
 						<image :src="item.img" class="user-img" mode="aspectFill"></image>
 						<view class="msg-msg" v-if="item.type==0">
@@ -39,31 +39,6 @@
 					</view>
 				</view>
 			</view>
-			<!-- <view class="chat-main" :style="{paddingBottom : h + 'px'}">
-				<view class="chat-ls" v-for="(item,index) in msgs" :key="index" :id="'msg'+item.tip">
-					<view class="chat-time" v-if="item.time != ''">{{changeTime(item.time)}}</view>
-					<view class="msg msg-left" v-if="item.id !='1232'">
-						<image :src="item.imgurl" class="user-img"  mode="aspectFill"></image>
-						<view class="msg-msg" v-if="item.types==0">
-							<view class="msg-text">{{item.message}}</view>
-						</view>
-						<view class="msg-msg" v-if="item.types==1">
-							<image :src="item.message" class="msg-img" mode="widthFix" @tap="previewImg(item.message)">
-							</image>
-						</view>
-					</view>
-					<view class="msg msg-right" v-if="item.id =='1232'">
-						<image :src="user.img" class="user-img"  mode="aspectFill"></image>
-						<view class="msg-msg" v-if="item.types==0">
-							<view class="msg-text">{{item.message}}</view>
-						</view>
-						<view class="msg-msg" v-if="item.types==1">
-							<image :src="item.message" class="msg-img" mode="widthFix" @tap="previewImg(item.message)">
-							</image>
-						</view>
-					</view>
-				</view>
-			</view> -->
 			<view class="padbt"></view>
 		</scroll-view>
 		<submit @inputChatMsg="inputChat" @heights="heights"></submit>
@@ -145,6 +120,19 @@
 			changeTime2: function(date) {
 				return calT.dateTime2(date)
 			},
+			changeTime3: function(index) {
+				if(index==0){
+					return calT.dateTime2(this.msgs[index].time)
+				}
+				let delta=calT.spaceTime2(this.msgs[index-1].time,this.msgs[index].time)
+				let equal=(calT.dateTime2(this.msgs[index-1].time)==calT.dateTime2(this.msgs[index].time))
+				console.log(delta)
+				if(delta>5 && equal == false){
+					return calT.dateTime2(this.msgs[index].time)
+				}else{
+					return ''
+				}
+			},
 			//获取聊天数据
 			getMsg: function() {
 				let msg = datas.message()
@@ -201,16 +189,16 @@
 							for (var i = 0; i < data.data.Data.length; i++) {
 								console.log(data.data.Data[i].Time)
 								console.log(this.nowTime)
-								let t = calT.spaceTime(data.data.Data[i].Time, this.nowTime)
-								if (t) {
-									this.nowTime = t
-								}
+								// let t = calT.spaceTime(data.data.Data[i].Time, this.nowTime)
+								// if (t) {
+								// 	this.nowTime = t
+								// }
 								
 								this.msgs.push({
 									id: data.data.Data[i].SendId,
 									img: 'data:image/png;base64,' + data.data.Data[i].Img,
 									msg: data.data.Data[i].Msg,
-									time: t,
+									time: data.data.Data[i].Time,
 									type: data.data.Data[i].Type,
 									tip: l + i
 								})
@@ -262,11 +250,11 @@
 					time: calT.getNewTime(),
 					tip: len,
 				}
-				let t = calT.spaceTime2(this.nowTime, newMsg.time)
-				if (t) {
-					this.nowTime = t
-				}
-				newMsg.time = t
+				// let t = calT.spaceTime2(this.nowTime, newMsg.time)
+				// if (t) {
+				// 	this.nowTime = t
+				// }
+				// newMsg.time = t
 				console.log(this.changeTime2(newMsg.time))
 				this.msgs.push(newMsg)
 				this.goBottom()

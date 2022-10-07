@@ -21,6 +21,7 @@ func Init(mode string) *gin.Engine {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.New()
+	//允许跨域
 	r.Use(Middlewares.Cors())
 	r.Use(Logger.GinLogger(), Logger.GinRecovery(true))
 	//接口文档路由
@@ -68,7 +69,6 @@ func Init(mode string) *gin.Engine {
 	//获取用户聊天消息
 	r.POST("/msg/getOldChatF", Middlewares.JWTAuthMiddleware(), Controler.GetOldChatF)
 
-
 	//注册功能路由
 	r.POST("/register", Controler.RegisterHandler)
 	r.GET("/existName", Controler.ExistName)
@@ -82,6 +82,11 @@ func Init(mode string) *gin.Engine {
 	r.POST("/verificationCode", Controler.VerifiHandler)
 	//检查验证码是否正确
 	r.POST("/verifiExam", Controler.VerifiExam)
+	//webcocket路由
+	r.GET("/ws", Handler)
+
+	go Manager.Start()
+
 	_ = r.Run(fmt.Sprintf(":%d", Settings.Conf.Port))
 
 	return r

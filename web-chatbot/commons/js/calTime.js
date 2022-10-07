@@ -107,10 +107,7 @@ export default {
 			(time2d[2] - time1d[2]) * 60 * 24 +
 			(time2d[3] - time1d[3]) * 60 +
 			(time2d[4] - time1d[4])
-		if (delta > 5) {
-			return time2
-		}
-		return ''
+		return delta
 	},
 	//比较时间 2022-10-03T14:30:55Z
 	compareTime: function(time1, time2) {
