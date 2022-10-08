@@ -72,8 +72,8 @@
 				</view>
 			</view> -->
 		</view>
-		<view class="submit" @tap="getNewMsg">Test</view>
-		<view class="submit" @tap="Test2">Test2</view>
+		<!-- <view class="submit" @tap="getNewMsg">Test</view> -->
+		<view class="submit" @tap="Test">Test2</view>
 		<!-- <image src="data:image/png;base64,{{imgData}}"></image> -->
 	</view>
 </template>
@@ -117,7 +117,7 @@
 			this.getFriends()
 			this.getFriendsReq()
 			this.getFriends2()
-
+			this.join()
 		},
 		onShow() {
 			this.userInit()
@@ -135,11 +135,29 @@
 			}, 1000)
 		},
 		methods: {
+			join: function() {
+				console.log('hello')
+				uni.connectSocket({
+					url: config.socketurl,
+					success: data => {
+						console.log(data)
+					}
+				})
+				uni.onSocketMessage(function (res) {
+					console.log('收到服务器内容：' + res.data);
+				});
+				// uni.onSocketOpen(function () {
+				//   uni.closeSocket()
+				// })
+			},
 			goRequest: function() {
 				uni.navigateTo({ url: '../friendReq/friendReq' })
 			},
 			goChatRoom: function(item) {
-				uni.navigateTo({ url: '../chatRoom/chatRoom?friendInfo='+ encodeURIComponent(JSON.stringify(item)) +'&type=0' })
+				uni.navigateTo({
+					url: '../chatRoom/chatRoom?friendInfo=' + encodeURIComponent(JSON.stringify(item)) +
+						'&type=0'
+				})
 			},
 			changeTime: function(date) {
 				return calT.dateTime(date)
@@ -322,8 +340,8 @@
 						method: 'POST',
 						header: { 'Authorization': 'Bearer ' + this.atoken },
 						data: {
-							'send_id': this.user.id,
-							'accept_id': fid
+							'send_id': fid,
+							'accept_id': this.user.id
 						},
 						success: async data => {
 							console.log(data.data)
@@ -370,25 +388,14 @@
 				}
 			},
 			Test: function() {
-				var img = document.createElement('img')
-				var tempP = ''
-				img.src = '../../static/test/1 (1).jpg'
-				uni.compressImage({
-					src: img.src,
-					quality: 80,
-					success: res => {
-						tempP = res.tempFilePath
-						console.log(res.tempFilePath)
-					}
-				})
-				uni.request({
-					url: tempP,
-					method: 'GET',
-					responseType: 'arraybuffer',
-					success: ress => {
-						let base64 = wx.arrayBufferToBase64(ress.data) //把arraybuffer转成base64 
-						base64 = 'data:image/jpeg;base64,' + base64 //不加上这串字符，在页面无法显示的哦
-						console.log(base64)
+				console.log("{\"type\": 1,\"message\": \"啦啦啦德玛西亚\"}")
+				uni.sendSocketMessage({
+					data: "{\"type\": 1,\"message\": \"啦啦啦德玛西亚\"}",
+					success: data=>{
+						console.log(data)
+					},
+					fail: data=>{
+						console.log(data)
 					}
 				})
 			}

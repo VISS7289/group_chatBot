@@ -4,9 +4,7 @@ import App from './App'
 import Vue from 'vue'
 Vue.config.productionTip = false
 App.mpType = 'app'
-const app = new Vue({
-    ...App
-})
+const app = new Vue({ ...App })
 app.$mount()
 // #endif
 
@@ -14,8 +12,8 @@ app.$mount()
 import { createSSRApp } from 'vue'
 export function createApp() {
   const app = createSSRApp(App)
-  return {
-    app
-  }
+  return { app }
 }
 // #endif
+
+Vue.prototype.socketurl = 'ws://81.69.253.180:3250/ws'

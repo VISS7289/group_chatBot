@@ -175,7 +175,7 @@ func (manager *CliendManager) Start() {
 				InsertMsg := Models.NewMsg{
 					SendId:   splitId[0],
 					AcceptId: splitId[1],
-					State:    true,
+					State:    false,
 					Msg:      string(message),
 					Type:     0,
 				}
@@ -199,7 +199,7 @@ func (manager *CliendManager) Start() {
 				InsertMsg := Models.NewMsg{
 					SendId:   splitId[0],
 					AcceptId: splitId[1],
-					State:    false,
+					State:    true,
 					Msg:      string(message),
 					Type:     0,
 				}

@@ -1,6 +1,7 @@
 package Mysql
 
 import (
+	"database/sql"
 	"go-chatbot/Models"
 )
 
@@ -15,7 +16,7 @@ func GetNewMsgOne(sendid string, acceptid string) (Models.MsgRes, error) {
 
 func GetUnKnowMsgNum(sendid string, acceptid string) (num int, err error) {
 	sqlStr := `SELECT COUNT(id) FROM singleMessage WHERE send_id = ? AND accept_id = ? AND state=?`
-	if err := db.Get(&num, sqlStr, sendid, acceptid, 0); err != nil {
+	if err := db.Get(&num, sqlStr, sendid, acceptid, 1); err != nil {
 		return 0, err
 	}
 	return num, nil
@@ -27,6 +28,14 @@ func GetOldMsgF(p *Models.ParmGetOldChat) ([]Models.MsgOldF, error) {
 	var info []Models.MsgOldF
 	if err := db.Select(&info, sqlStr, p.UserId, p.FriendId, p.FriendId, p.UserId, p.NowPage*p.MaxPage, (p.NowPage+1)*p.MaxPage); err != nil {
 		return info, err
+	}
+	sqlStr = `UPDATE singleMessage SET state = ? WHERE id = ? AND send_id = ?`
+	for i:=0;i<len(info);i++ {
+		if _, err := db.Exec(sqlStr, 0, info[i].Id, p.FriendId); err != nil {
+			if err != sql.ErrNoRows{
+				return info,err
+			}
+		}
 	}
 	return info, nil
 }
