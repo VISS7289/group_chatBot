@@ -129,8 +129,8 @@ func (manager *CliendManager) Start() {
 			fmt.Printf("有新连接：%v\n", conn.ID)
 			Manager.Client[conn.ID] = conn
 			replymsg := ReplyMsg{
-				Code: Models.CodeSuccess,
-				Msg:  "已经连接到服务器",
+				Code: Models.CodeWSSuccess,
+				Msg:  Models.CodeWSSuccess.Msg(),
 			}
 			msg, _ := json.Marshal(replymsg)
 			_ = conn.Socket.WriteMessage(websocket.TextMessage, msg)

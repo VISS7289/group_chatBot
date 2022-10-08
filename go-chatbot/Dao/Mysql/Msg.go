@@ -24,7 +24,7 @@ func GetUnKnowMsgNum(sendid string, acceptid string) (num int, err error) {
 
 func GetOldMsgF(p *Models.ParmGetOldChat) ([]Models.MsgOldF, error) {
 	//sqlStr := `SELECT send_id, accept_id, time, message, type FROM singleMessage WHERE (send_id = ? AND accept_id = ?) OR (send_id = ? AND accept_id = ?) ORDER BY time DESC LIMIT ?,?`
-	sqlStr := `SELECT send_id, id, time, message, type FROM singleMessage WHERE (send_id = ? AND accept_id = ?) OR (send_id = ? AND accept_id = ?) ORDER BY time LIMIT ?,?`
+	sqlStr := `SELECT send_id, id, time, message, type FROM singleMessage WHERE (send_id = ? AND accept_id = ?) OR (send_id = ? AND accept_id = ?) ORDER BY time DESC LIMIT ?,?`
 	var info []Models.MsgOldF
 	if err := db.Select(&info, sqlStr, p.UserId, p.FriendId, p.FriendId, p.UserId, p.NowPage*p.MaxPage, (p.NowPage+1)*p.MaxPage); err != nil {
 		return info, err

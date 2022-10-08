@@ -21,6 +21,7 @@ const (
 	CodeWebSocketEnd
 	CodeWebSocketReply
 	CodeWebSocketReplyNoOne
+	CodeWSSuccess
 )
 
 var CodeMesMap = map[ResCode]string{
@@ -42,6 +43,7 @@ var CodeMesMap = map[ResCode]string{
 	CodeWebSocketEnd:        "连接中断",
 	CodeWebSocketReply:      "对方在线应答",
 	CodeWebSocketReplyNoOne: "对方不在线",
+	CodeWSSuccess:           "websocket连接成功",
 }
 
 func (c ResCode) Msg() string {

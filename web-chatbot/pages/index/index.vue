@@ -73,7 +73,7 @@
 			</view> -->
 		</view>
 		<!-- <view class="submit" @tap="getNewMsg">Test</view> -->
-		<view class="submit" @tap="Test">Test2</view>
+		<view class="submit" @tap="exit">Test2</view>
 		<!-- <image src="data:image/png;base64,{{imgData}}"></image> -->
 	</view>
 </template>
@@ -117,7 +117,6 @@
 			this.getFriends()
 			this.getFriendsReq()
 			this.getFriends2()
-			this.join()
 		},
 		onShow() {
 			this.userInit()
@@ -140,15 +139,29 @@
 				uni.connectSocket({
 					url: config.socketurl,
 					success: data => {
-						console.log(data)
+						console.log(data.errMsg)
+						console.log(typeof(data.errMsg))
 					}
 				})
 				uni.onSocketMessage(function (res) {
 					console.log('收到服务器内容：' + res.data);
 				});
-				// uni.onSocketOpen(function () {
-				//   uni.closeSocket()
-				// })
+			},
+			exit: function(){
+				console.log("hello")
+				uni.onSocketMessage(function(res) {  
+					console.log("收到服务器内容："  + res.data);  
+
+					uni.closeSocket({  
+						success: function(res) {  
+							console.log("WebSocket关闭成功！");  
+						},  
+						fail: function(res) {  
+							console.log("WebSocket关闭失败！");  
+						}  
+					})  
+
+				}) 
 			},
 			goRequest: function() {
 				uni.navigateTo({ url: '../friendReq/friendReq' })
@@ -391,7 +404,11 @@
 				console.log("{\"type\": 1,\"message\": \"啦啦啦德玛西亚\"}")
 				uni.sendSocketMessage({
 					data: "{\"type\": 1,\"message\": \"啦啦啦德玛西亚\"}",
+					// data: "{\"type\": 1,\"message\": \"啦啦啦德玛西亚}",
 					success: data=>{
+						if(data.errMsg=='sendSocketMessage:fail WebSocket is not connected'){
+							this.join()
+						}
 						console.log(data)
 					},
 					fail: data=>{

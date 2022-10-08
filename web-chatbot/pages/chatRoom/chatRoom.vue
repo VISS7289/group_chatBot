@@ -65,32 +65,73 @@
 				user: {},
 				nowpage: 0,
 				maxpage: 10,
+				loadOver: false,
 			}
 		},
 		onLoad(option) {
+			this.loadOver = false
 			this.userInit()
 			this.friend = JSON.parse(decodeURIComponent(option.friendInfo))
 			console.log(this.friend)
 			console.log(option.type)
 			this.getMsg2()
-			// this.timer = setInterval(() => {
-			//     //this.test()
-			// 	let len = this.msgs.length;
-			// 	let newMsg = this.msgs[len-1];
-			// 	if(len == 1){
-			// 		this.answerRandomUser(newMsg.message);
-			// 	}else{
-			// 		let newMsg2 = this.msgs[len-2];
-			// 		//console.log(newMsg2.message+'.'+newMsg.message);
-			// 		console.log(3);
-			// 		this.answerRandomUser(newMsg2.message+' '+newMsg.message);
-			// 	}
-
-			// 	//console.log(this.answerRandomUser(newMsg.message));
-			// }, 2000+Math.round(4000*Math.random()));
+			this.join()
+			this.loadOver = true
+		},
+		beforeDestroy() {
+			this.exit();
 		},
 		components: { submit, },
 		methods: {
+			join: function() {
+				console.log('hello')
+				uni.connectSocket({
+					url: config.socketurl+'?send_id='+this.user.id+'&accept_id='+this.friend.id,
+					success: data => {
+						console.log(data.errMsg)
+					}
+				})
+				uni.onSocketMessage(res => {
+					let data=JSON.parse(res.data);
+					console.log('收到服务器内容：' + res.data);
+					if(data.code == 1000 && this.loadOver){
+						this.reciveMsg(this.friend.id,this.friend.img,data.message,0)
+					}
+				});
+			},
+			exit: function(){
+				console.log(666)
+				uni.closeSocket({  
+					success: function(res) {  
+						console.log("WebSocket关闭成功！");  
+					},  
+					fail: function(res) {  
+						console.log("WebSocket关闭失败！");  
+					}  
+				})  
+
+			},
+			scoketSent: function(e) {
+				return new Promise((resolve, reject)=>{
+					console.log("{\"type\": 1,\"message\": \""+e+"\"}")
+					uni.sendSocketMessage({
+						data: "{\"type\": 1,\"message\": \""+e+"\"}",
+						success: data=>{
+							if(data.errMsg=='sendSocketMessage:fail WebSocket is not connected'){
+								this.join()
+								resolve(false)
+							}else{
+								resolve(true)
+							}
+							console.log(data.errMsg)
+						},
+						fail: data=>{
+							resolve(false)
+							console.log(data.errMsg)
+						}
+					})
+				})
+			},
 			userInit: function() {
 				try {
 					const value = uni.getStorageSync('user')
@@ -126,7 +167,6 @@
 				}
 				let delta=calT.spaceTime2(this.msgs[index-1].time,this.msgs[index].time)
 				let equal=(calT.dateTime2(this.msgs[index-1].time)==calT.dateTime2(this.msgs[index].time))
-				console.log(delta)
 				if(delta>5 && equal == false){
 					return calT.dateTime2(this.msgs[index].time)
 				}else{
@@ -186,14 +226,7 @@
 						} else if (data.data.Code == 1000) {
 							console.log(data.data.Data)
 							let l = this.msgs.length
-							for (var i = 0; i < data.data.Data.length; i++) {
-								console.log(data.data.Data[i].Time)
-								console.log(this.nowTime)
-								// let t = calT.spaceTime(data.data.Data[i].Time, this.nowTime)
-								// if (t) {
-								// 	this.nowTime = t
-								// }
-								
+							for (var i = data.data.Data.length -1; i >= 0; i--) {
 								this.msgs.push({
 									id: data.data.Data[i].SendId,
 									img: 'data:image/png;base64,' + data.data.Data[i].Img,
@@ -236,9 +269,13 @@
 					}
 				})
 			},
-			inputChat: function(inf) {
+			inputChat: async function(inf) {
 				console.log(calT.getNewTime())
-				this.reciveMsg(this.user.id,this.user.img,inf,0)
+				let res = await this.scoketSent(inf)
+				
+				if(res){
+					this.reciveMsg(this.user.id,this.user.img,inf,0)
+				}
 			},
 			reciveMsg: function(id,img,msg,type) {
 				let len = this.msgs.length
@@ -250,11 +287,6 @@
 					time: calT.getNewTime(),
 					tip: len,
 				}
-				// let t = calT.spaceTime2(this.nowTime, newMsg.time)
-				// if (t) {
-				// 	this.nowTime = t
-				// }
-				// newMsg.time = t
 				console.log(this.changeTime2(newMsg.time))
 				this.msgs.push(newMsg)
 				this.goBottom()
