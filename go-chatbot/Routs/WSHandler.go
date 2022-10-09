@@ -34,7 +34,7 @@ func Handler(c *gin.Context) {
 		ID:CreateId(uid,touid),
 		SendId:CreateId(touid,uid),
 		Socket:conn,
-		Send: make(chan []byte),
+		Send: make(chan *JsonMsg),
 	}
 	// 用户注册到用户管理
 	Manager.Register <- client

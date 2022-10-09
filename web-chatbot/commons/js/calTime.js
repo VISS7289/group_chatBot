@@ -129,7 +129,7 @@ export default {
 	},
 	mySortByTime: function(arr, obj, type) {
 		//type 1 降序 0 升序
-		console.log(arr[0][obj])
+		// console.log(arr[0][obj])
 		if (type == 0) {
 			for (let i = 1; i < arr.length; i++) {
 				for (let j = i; j > 0; j--) {

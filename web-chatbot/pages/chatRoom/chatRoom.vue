@@ -69,16 +69,19 @@
 			}
 		},
 		onLoad(option) {
-			this.loadOver = false
 			this.userInit()
 			this.friend = JSON.parse(decodeURIComponent(option.friendInfo))
 			console.log(this.friend)
 			console.log(option.type)
 			this.getMsg2()
-			this.join()
-			this.loadOver = true
 		},
-		beforeDestroy() {
+		onShow(){
+			this.join()
+		},
+		onHide() {
+			this.exit();
+		},
+		onUnload() {
 			this.exit();
 		},
 		components: { submit, },
@@ -91,10 +94,14 @@
 						console.log(data.errMsg)
 					}
 				})
+				uni.onSocketError(res => {
+					console.log('WebSocket连接打开失败，请检查！'+res);
+					this.join()
+				});
 				uni.onSocketMessage(res => {
 					let data=JSON.parse(res.data);
 					console.log('收到服务器内容：' + res.data);
-					if(data.code == 1000 && this.loadOver){
+					if(data.code == 1000){
 						this.reciveMsg(this.friend.id,this.friend.img,data.message,0)
 					}
 				});

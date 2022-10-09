@@ -24,12 +24,17 @@ type ReplyMsg struct {
 	Msg    string         `json:"message"`
 }
 
+type JsonMsg struct {
+	SendId string `json:"send_id"`
+	Msg    []byte `json:"message"`
+}
+
 // 用户结构体
 type Client struct {
 	ID     string
 	SendId string
 	Socket *websocket.Conn
-	Send   chan []byte
+	Send   chan *JsonMsg
 }
 
 // 广播类（包括广播内容和源用户）
@@ -111,8 +116,9 @@ func (c *Client) Write() {
 				return
 			}
 			replymsg := ReplyMsg{
+				SendId: mssage.SendId,
 				Code: Models.CodeSuccess,
-				Msg:  fmt.Sprintf("%s", string(mssage)),
+				Msg:  fmt.Sprintf("%s", string(mssage.Msg)),
 			}
 			msg, _ := json.Marshal(replymsg)
 			_ = c.Socket.WriteMessage(websocket.TextMessage, msg)
@@ -149,26 +155,32 @@ func (manager *CliendManager) Start() {
 		case broadcast := <-Manager.Broadcast: //1->2
 			message := broadcast.Message
 			sendid := broadcast.Client.SendId //2->1
-			flag := false                     // 默认对方不在线
+			id := broadcast.Client.ID         //1->2
+			splitId := strings.Split(id, "->")
+			// 编辑发送的消息
+			smsg := &JsonMsg{
+				SendId: splitId[0],
+				Msg: message,
+			}
+			flag := false // 默认对方不在线
 			for id, conn := range Manager.Client {
 				if id != sendid {
 					continue
 				}
 				select {
-				case conn.Send <- message:
+				case conn.Send <- smsg:
 					flag = true
 				default:
 					close(conn.Send)
 					delete(Manager.Client, conn.ID)
 				}
 			}
-			id := broadcast.Client.ID //1->2
-			splitId := strings.Split(id, "->")
 			if flag {
 				fmt.Println("对方在线")
 				replymsg := ReplyMsg{
-					Code: Models.CodeWebSocketReply,
-					Msg:  Models.CodeWebSocketReply.Msg(),
+					SendId: splitId[0],
+					Code:   Models.CodeWebSocketReply,
+					Msg:    Models.CodeWebSocketReply.Msg(),
 				}
 				msg, _ := json.Marshal(replymsg)
 				_ = broadcast.Client.Socket.WriteMessage(websocket.TextMessage, msg)
@@ -190,10 +202,33 @@ func (manager *CliendManager) Start() {
 				}
 			} else {
 				fmt.Println("对方不在线")
-				replymsg := ReplyMsg{
-					Code: Models.CodeWebSocketReplyNoOne,
-					Msg:  Models.CodeWebSocketReplyNoOne.Msg(),
+				// 如果对方不在线，查看是否在app内
+				flag2 := false                    // 默认对方不在app
+				idWithApp := splitId[1] + "->app" //2->app
+				for id, conn := range Manager.Client {
+					if id != idWithApp {
+						continue
+					}
+					select {
+					case conn.Send <- smsg:
+						flag2 = true
+					default:
+						close(conn.Send)
+						delete(Manager.Client, conn.ID)
+					}
 				}
+				if flag2 {
+					fmt.Println("但在app")
+				} else {
+					fmt.Println("且不在app")
+				}
+
+				replymsg := ReplyMsg{
+					SendId: splitId[0],
+					Code:   Models.CodeWebSocketReplyNoOne,
+					Msg:    Models.CodeWebSocketReplyNoOne.Msg(),
+				}
+				fmt.Println(replymsg)
 				msg, _ := json.Marshal(replymsg)
 				_ = broadcast.Client.Socket.WriteMessage(websocket.TextMessage, msg)
 				InsertMsg := Models.NewMsg{
@@ -206,6 +241,7 @@ func (manager *CliendManager) Start() {
 				if err := Mysql.InsertMsg(InsertMsg); err != nil {
 					zap.L().Error("Verifi Parm Error", zap.Error(err))
 				}
+
 			}
 
 		}

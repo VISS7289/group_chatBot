@@ -56,25 +56,8 @@
 					</view>
 				</view>
 			</view>
-			<!-- <view class="friends" v-for="(item,index) in friends" :key="index">
-				<view class="friends-list">
-					<view class="friends-list-l">
-						<text class="tip" v-if="item.tip>0">{{item.tip}}</text>
-						<image :src="item.imgurl" mode="aspectFill"></image>
-					</view>
-					<view class="friends-list-r">
-						<view class="top">
-							<view class="name">{{item.name}}</view>
-							<view class="time">{{changeTime(item.time)}}</view>
-						</view>
-						<view class="info">{{item.info}}</view>
-					</view>
-				</view>
-			</view> -->
 		</view>
-		<!-- <view class="submit" @tap="getNewMsg">Test</view> -->
 		<view class="submit" @tap="exit">Test2</view>
-		<!-- <image src="data:image/png;base64,{{imgData}}"></image> -->
 	</view>
 </template>
 
@@ -123,6 +106,7 @@
 			this.getFriends()
 			this.getFriendsReq()
 			this.getFriends2()
+			this.join()
 		},
 		onPullDownRefresh() {
 			this.userInit()
@@ -133,38 +117,54 @@
 				uni.stopPullDownRefresh()
 			}, 1000)
 		},
+		onHide() {
+			this.exit();
+		},
+		onUnload() {
+			this.exit();
+		},
 		methods: {
 			join: function() {
 				console.log('hello')
 				uni.connectSocket({
-					url: config.socketurl,
+					url: config.socketurl + '?send_id=' + this.user.id + '&accept_id=app',
 					success: data => {
 						console.log(data.errMsg)
-						console.log(typeof(data.errMsg))
 					}
 				})
-				uni.onSocketMessage(function (res) {
+				uni.onSocketError(res => {
+					console.log('WebSocket连接打开失败，请检查！' + res);
+					this.join()
+				});
+				uni.onSocketMessage(res => {
+					let data = JSON.parse(res.data);
 					console.log('收到服务器内容：' + res.data);
+					if (data.code == 1000) {
+						for (let i = 0; i < this.friends2.length; i++) {
+							if (this.friends2[i].id == data.send_id) {
+								this.friends2[i].info = data.message
+								this.friends2[i].tip += 1
+							}
+						}
+					}
 				});
 			},
-			exit: function(){
-				console.log("hello")
-				uni.onSocketMessage(function(res) {  
-					console.log("收到服务器内容："  + res.data);  
+			exit: function() {
+				console.log(666)
+				uni.closeSocket({
+					success: function(res) {
+						console.log("WebSocket关闭成功！");
+					},
+					fail: function(res) {
+						console.log("WebSocket关闭失败！");
+					}
+				})
 
-					uni.closeSocket({  
-						success: function(res) {  
-							console.log("WebSocket关闭成功！");  
-						},  
-						fail: function(res) {  
-							console.log("WebSocket关闭失败！");  
-						}  
-					})  
-
-				}) 
 			},
 			goRequest: function() {
-				uni.navigateTo({ url: '../friendReq/friendReq' })
+				uni.navigateTo({
+					url: '../friendReq/friendReq'
+				})
 			},
 			goChatRoom: function(item) {
 				uni.navigateTo({
@@ -189,13 +189,15 @@
 				uni.request({
 					url: config.myurl + '/friend/myFriend',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': this.user.id,
 						'state': 0
 					},
 					success: async data => {
-						console.log(data.data)
+						// console.log(data.data)
 						if (data.data.Code == 1009) {
 							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
@@ -206,10 +208,10 @@
 								// err
 							}
 						} else if (data.data.Code == 1000) {
-							console.log('friends')
+							// console.log('friends')
 							if (data.data.Data != null) {
 								this.noone = false
-								console.log(data.data.Data)
+								// console.log(data.data.Data)
 								this.friends2 = []
 								for (let i = 0; i < data.data.Data.length; i++) {
 									let frinick = data.data.Data[i].FriendNick
@@ -245,13 +247,15 @@
 				uni.request({
 					url: config.myurl + '/friend/myFriend',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': this.user.id,
 						'state': 1
 					},
 					success: async data => {
-						console.log(data.data)
+						// console.log(data.data)
 						if (data.data.Code == 1009) {
 							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
@@ -262,7 +266,7 @@
 								// err
 							}
 						} else if (data.data.Code == 1000) {
-							console.log('Req')
+							// console.log('Req')
 							if (data.data.Data != null) {
 								this.friendReq.tip = data.data.Data.length
 								this.friendReq.time = data.data.Data[0].LastTime
@@ -275,7 +279,7 @@
 									}
 
 								}
-								console.log(this.friendReq.tip)
+								// console.log(this.friendReq.tip)
 							} else {
 								this.friendReq = {
 									img: '../../static/index/addUser.png',
@@ -305,13 +309,15 @@
 					uni.request({
 						url: config.myurl + '/msg/newone',
 						method: 'POST',
-						header: { 'Authorization': 'Bearer ' + this.atoken },
+						header: {
+							'Authorization': 'Bearer ' + this.atoken
+						},
 						data: {
 							'send_id': this.user.id,
 							'accept_id': fid
 						},
 						success: async data => {
-							console.log(data.data)
+							// console.log(data.data)
 							if (data.data.Code == 1009) {
 								let newCode = await refersh.refersh(config.myurl, this.atoken, this
 									.rtoken)
@@ -351,13 +357,15 @@
 					uni.request({
 						url: config.myurl + '/msg/unread',
 						method: 'POST',
-						header: { 'Authorization': 'Bearer ' + this.atoken },
+						header: {
+							'Authorization': 'Bearer ' + this.atoken
+						},
 						data: {
 							'send_id': fid,
 							'accept_id': this.user.id
 						},
 						success: async data => {
-							console.log(data.data)
+							// console.log(data.data)
 							if (data.data.Code == 1009) {
 								let newCode = await refersh.refersh(config.myurl, this.atoken, this
 									.rtoken)
@@ -379,7 +387,9 @@
 
 			},
 			toSerch: function() {
-				uni.navigateTo({ url: '../serch/serch?user=' + encodeURIComponent(JSON.stringify(this.user)), })
+				uni.navigateTo({
+					url: '../serch/serch?user=' + encodeURIComponent(JSON.stringify(this.user)),
+				})
 			},
 			userInit: function() {
 				try {
@@ -393,7 +403,9 @@
 						this.atoken = uni.getStorageSync('atoken')
 						this.rtoken = uni.getStorageSync('rtoken')
 					} else {
-						uni.navigateTo({ url: '../signin/signin', })
+						uni.navigateTo({
+							url: '../signin/signin',
+						})
 					}
 					console.log(value)
 				} catch (e) {
@@ -405,13 +417,13 @@
 				uni.sendSocketMessage({
 					data: "{\"type\": 1,\"message\": \"啦啦啦德玛西亚\"}",
 					// data: "{\"type\": 1,\"message\": \"啦啦啦德玛西亚}",
-					success: data=>{
-						if(data.errMsg=='sendSocketMessage:fail WebSocket is not connected'){
+					success: data => {
+						if (data.errMsg == 'sendSocketMessage:fail WebSocket is not connected') {
 							this.join()
 						}
 						console.log(data)
 					},
-					fail: data=>{
+					fail: data => {
 						console.log(data)
 					}
 				})
