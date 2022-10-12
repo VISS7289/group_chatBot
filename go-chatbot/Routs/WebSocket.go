@@ -7,8 +7,11 @@ import (
 	"go-chatbot/Dao/Mysql"
 	"go-chatbot/Dao/Redis"
 	"go-chatbot/Models"
+	"go-chatbot/Pkg/Chat"
 	"go.uber.org/zap"
+	"math/rand"
 	"strings"
+	"time"
 )
 
 // 发送消息
@@ -101,6 +104,28 @@ func (c *Client) Read() {
 				Message: []byte(sendmsg.Msg),
 			}
 		}
+		// 需要机器人主动发消息
+		if sendmsg.Type == 0 {
+			msgs, _ := Chat.GetChat(sendmsg.Msg)
+			splitId := strings.Split(c.ID, "->")
+			replymsg := ReplyMsg{
+				Code: Models.CodeSuccess,
+				Msg:  string(msgs),
+			}
+			msg, _ := json.Marshal(replymsg)
+			_ = c.Socket.WriteMessage(websocket.TextMessage, msg)
+			InsertMsg := Models.NewMsg{
+				SendId:   splitId[1],
+				AcceptId: splitId[0],
+				State:    false,
+				Msg:      string(msgs),
+				Type:     0,
+			}
+			if err := Mysql.InsertMsg(InsertMsg); err != nil {
+				zap.L().Error("Verifi Parm Error", zap.Error(err))
+			}
+		}
+
 	}
 }
 
@@ -117,8 +142,8 @@ func (c *Client) Write() {
 			}
 			replymsg := ReplyMsg{
 				SendId: mssage.SendId,
-				Code: Models.CodeSuccess,
-				Msg:  fmt.Sprintf("%s", string(mssage.Msg)),
+				Code:   Models.CodeSuccess,
+				Msg:    fmt.Sprintf("%s", string(mssage.Msg)),
 			}
 			msg, _ := json.Marshal(replymsg)
 			_ = c.Socket.WriteMessage(websocket.TextMessage, msg)
@@ -160,8 +185,51 @@ func (manager *CliendManager) Start() {
 			// 编辑发送的消息
 			smsg := &JsonMsg{
 				SendId: splitId[0],
-				Msg: message,
+				Msg:    message,
 			}
+
+			// 对机器人特殊处理
+			// 判断是否为机器人
+			if splitId[1] == "00000000000000000" {
+				fmt.Println("对方是机器人")
+				msgs, _ := Chat.GetChat(string(message))
+				InsertMsg := Models.NewMsg{
+					SendId:   splitId[0],
+					AcceptId: splitId[1],
+					State:    false,
+					Msg:      string(message),
+					Type:     0,
+				}
+				if err := Mysql.InsertMsg(InsertMsg); err != nil {
+					zap.L().Error("Verifi Parm Error", zap.Error(err))
+				}
+				replymsg := ReplyMsg{
+					SendId: splitId[1],
+					Code:   Models.CodeSuccess,
+					Msg:    string(msgs),
+				}
+				time.Sleep(time.Duration(rand.Intn(3)+1) * time.Second)
+				msg, _ := json.Marshal(replymsg)
+				_ = broadcast.Client.Socket.WriteMessage(websocket.TextMessage, msg)
+				InsertMsg = Models.NewMsg{
+					SendId:   splitId[1],
+					AcceptId: splitId[0],
+					State:    false,
+					Msg:      string(msgs),
+					Type:     0,
+				}
+				if err := Mysql.InsertMsg(InsertMsg); err != nil {
+					zap.L().Error("Verifi Parm Error", zap.Error(err))
+				}
+				if err := Redis.RedisDelete(id); err != nil {
+					zap.L().Error("Verifi Parm Error", zap.Error(err))
+				}
+				if err := Redis.RedisDelete(splitId[1] + "->" + splitId[0]); err != nil {
+					zap.L().Error("Verifi Parm Error", zap.Error(err))
+				}
+				continue
+			}
+
 			flag := false // 默认对方不在线
 			for id, conn := range Manager.Client {
 				if id != sendid {

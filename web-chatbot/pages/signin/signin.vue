@@ -24,7 +24,7 @@
 			<view class="tips" v-if="wrong">{{this.errInfo}}</view>
 		</view>
 		<view class="submit" @tap="subInfo">登录</view>
-		<view class="submit" @tap="Test">Test</view>
+		<!-- <view class="submit" @tap="Test">Test</view> -->
 	</view>
 </template>
 

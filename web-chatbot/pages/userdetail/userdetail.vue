@@ -115,6 +115,10 @@
 	import config from '../../commons/js/config.js'
 	import refersh from '../../commons/js/refershToken.js'
 	//import {saveBase64Img,dataURItoBlob} from '../../commons/js/blobImg.js';
+	import {
+		pathToBase64,
+		base64ToPath
+	} from '../../commons/js/imgDel.js'
 	export default {
 		data() {
 			return {
@@ -142,7 +146,9 @@
 					userinfo: {}
 				},
 				array: ['男', '女', '未知'],
-				date: this.getDate({ format: true }),
+				date: this.getDate({
+					format: true
+				}),
 				url: '',
 			}
 		},
@@ -158,7 +164,9 @@
 					this.getUserDetail()
 					this.getUserNick()
 				} else {
-					uni.navigateTo({ url: '../signin/signin', })
+					uni.navigateTo({
+						url: '../signin/signin',
+					})
 				}
 			} catch (e) {
 				// error
@@ -174,7 +182,9 @@
 		},
 		methods: {
 			exit: function() {
-				uni.navigateTo({ url: '../signin/signin' })
+				uni.navigateTo({
+					url: '../signin/signin'
+				})
 			},
 			delFriend: function() {
 				uni.showModal({
@@ -186,7 +196,9 @@
 							uni.request({
 								url: config.myurl + '/friend/deleate',
 								method: 'POST',
-								header: { 'Authorization': 'Bearer ' + this.atoken },
+								header: {
+									'Authorization': 'Bearer ' + this.atoken
+								},
 								data: {
 									'user_id': this.userid,
 									'friend_id': this.optid
@@ -210,7 +222,7 @@
 											delta: 1,
 											success: function() {
 												beforePage
-												.delfriend() // 执行上一页的onLoad方法
+													.delfriend() // 执行上一页的onLoad方法
 											}
 										})
 									} else {
@@ -230,7 +242,9 @@
 				let beforePage = pages[pages.length - 2]
 
 				beforePage.$vm.refersh(this.userDetail)
-				uni.navigateBack({ delta: 1 })
+				uni.navigateBack({
+					delta: 1
+				})
 			},
 			refersh: function(parm) {
 				this.userDetail[parm.type] = parm.req
@@ -240,8 +254,12 @@
 				uni.request({
 					url: config.myurl + '/user/detial',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
-					data: { 'id': this.optid },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
+					data: {
+						'id': this.optid
+					},
 					success: async data => {
 						console.log(data.data)
 						if (data.data.Code == 1009) {
@@ -282,7 +300,9 @@
 				uni.request({
 					url: config.myurl + '/serch/isfriend',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': this.userid,
 						'friend_id': this.optid
@@ -362,40 +382,57 @@
 			async onok(ev) {
 				this.url = ''
 				console.log(this.userDetail)
+				let res = await this.compressImg(ev.path)
+				console.log(res)
 				var fn = () => {
 					console.log(2020)
 					try {
 						let value = uni.getStorageSync('user')
 						if (value) {
-							value.img = ev.base64.substring(22)
-							this.userDetail['img'] = ev.base64
+							value.img = res.substring(23)
+							this.userDetail['img'] = 'data:image/png;base64,' + res.substring(23)
 							uni.setStorageSync('user', value)
 						} else {
-							uni.navigateTo({ url: '../signin/signin', })
+							uni.navigateTo({
+								url: '../signin/signin',
+							})
 						}
 						console.log(value)
 					} catch (e) {
 						console.log(e)
 					}
 				}
-				let res= await this.compressImg(ev.base64)
 				this.update('imgBase64', this.optid, res.substring(23), '', fn)
 			},
+			// getImgInfo(url) {
+			// 	return new Promise((resolve, reject) => {
+			// 		let image = new Image()
+			// 		image.src = url
+			// 		let timer = setInterval(() => {
+			// 			if (image.width > 0 || image.height > 0) {
+			// 				resolve([image.width, image.height]) // 图片宽*高
+			// 				clearInterval(timer)
+			// 			}
+			// 		}, 50)
+			// 	})
+			// },
 			getImgInfo(url) {
 				return new Promise((resolve, reject) => {
-					let image = new Image()
-					image.src = url
-					let timer = setInterval(() => {
-						if (image.width > 0 || image.height > 0) {
-							resolve([image.width, image.height]) // 图片宽*高
-							clearInterval(timer)
+					wx.getImageInfo({
+						src: url,
+						success: function(res) {
+							resolve([res.width, res.height])
+						},
+						fail: function(res) {
+							reject(res)
 						}
-					}, 50)
+					})
 				})
 			},
-			compressImg: function(src){
-				return new Promise(async (resolve, reject)=> {
-					var ctx = uni.createCanvasContext('cv',this)
+			compressImg: function(src) {
+				return new Promise(async (resolve, reject) => {
+					console.log(src)
+					var ctx = uni.createCanvasContext('cv', this)
 					let w, h
 					await this.getImgInfo(src).then(res => {
 						w = res[0]
@@ -403,22 +440,35 @@
 					})
 					let d = this.Afill(w, h, 100, 100)
 					ctx.drawImage(src, d[0], d[1], d[2], d[3], 0, 0, 100, 100)
-					ctx.draw(false,()=>{
+					ctx.draw(false, () => {
 						uni.canvasToTempFilePath({
-						  canvasId: 'cv',
-						  fileType: 'jpg',
-						  quality: 0.8,
-						  success: function(res) {
-						    // 在H5平台下，tempFilePath 为 base64
-							console.log(res.tempFilePath)
-							resolve(res.tempFilePath)
-						  } ,
-						  fail: function() {
-							  reject('error')
-						  }
-						},this)
+							canvasId: 'cv',
+							fileType: 'jpg',
+							quality: 0.8,
+							success: function(res) {
+								// #ifdef H5
+								// 在H5平台下，tempFilePath 为 base64
+								console.log(res)
+								resolve(res.tempFilePath)
+								// #endif
+								// #ifndef H5
+								pathToBase64(res.tempFilePath)
+									.then(base64 => {
+										console.log(base64)
+										resolve(base64)
+									})
+									.catch(error => {
+										console.error(error)
+										reject(error)
+									})
+								// #endif
+							},
+							fail: function() {
+								reject('error')
+							}
+						}, this)
 					}) //绘制
-				}) 
+				})
 			},
 			Afill: function(imageWidth, imageHeight, canvasWidth, canvasHeight) {
 				const imageRate = imageWidth / imageHeight
@@ -444,14 +494,18 @@
 			goModify: function(type) {
 				this.modifyInfo.type = type
 				this.modifyInfo.userinfo = this.userDetail
-				uni.navigateTo({ url: '../modify/modify?modifyInfo=' + encodeURIComponent(JSON.stringify(this.modifyInfo)) })
+				uni.navigateTo({
+					url: '../modify/modify?modifyInfo=' + encodeURIComponent(JSON.stringify(this.modifyInfo))
+				})
 			},
 			update(type, optid, data, psw, fn) {
 				console.log(fn)
 				uni.request({
 					url: config.myurl + '/change/update',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': optid,
 						'data': data,

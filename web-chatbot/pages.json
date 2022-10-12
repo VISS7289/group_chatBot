@@ -12,7 +12,11 @@
             "style" :                                                                                    
             {
                 "navigationStyle":"custom",
-                "enablePullDownRefresh": false
+                "enablePullDownRefresh": false,
+				//手机软键盘升起不让其将页面头部上推
+				"app-plus": {
+					"softinputMode": "adjustResize"
+				}
             }
             
         }
@@ -87,6 +91,15 @@
 		    }
 		    
 		}
+        ,{
+            "path" : "pages/buildgroup/buildgroup",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

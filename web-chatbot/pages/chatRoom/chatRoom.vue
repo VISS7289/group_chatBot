@@ -66,6 +66,8 @@
 				nowpage: 0,
 				maxpage: 10,
 				loadOver: false,
+				botnum: 2,
+				timer: null,
 			}
 		},
 		onLoad(option) {
@@ -75,8 +77,31 @@
 			console.log(option.type)
 			this.getMsg2()
 		},
-		onShow(){
+		onShow() {
 			this.join()
+			if(this.friend.id=='00000000000000000'){
+				this.timer = setInterval(() => {
+					this.botnum-=1
+					console.log(this.botnum)
+					if(this.botnum < 0){
+						this.botnum = 0
+					}else{
+						console.log(this.msgs[this.msgs.length-1])
+						uni.sendSocketMessage({
+							data: "{\"type\": 0,\"message\": \"" + this.msgs[this.msgs.length-1].msg + "\"}",
+							success: data => {
+								if (data.errMsg ==
+									'sendSocketMessage:fail WebSocket is not connected') {
+									this.join()
+								}
+							},
+							fail: data => {
+								console.log(data.errMsg)
+							}
+						})
+					}
+				}, 4000+Math.round(10000*Math.random()));
+			}
 		},
 		onHide() {
 			this.exit();
@@ -84,55 +109,61 @@
 		onUnload() {
 			this.exit();
 		},
-		components: { submit, },
+		components: {
+			submit,
+		},
 		methods: {
 			join: function() {
 				console.log('hello')
 				uni.connectSocket({
-					url: config.socketurl+'?send_id='+this.user.id+'&accept_id='+this.friend.id,
+					url: config.socketurl + '?send_id=' + this.user.id + '&accept_id=' + this.friend.id,
 					success: data => {
 						console.log(data.errMsg)
 					}
 				})
 				uni.onSocketError(res => {
-					console.log('WebSocket连接打开失败，请检查！'+res);
+					console.log('WebSocket连接打开失败，请检查！' + res);
 					this.join()
 				});
 				uni.onSocketMessage(res => {
-					let data=JSON.parse(res.data);
+					let data = JSON.parse(res.data);
 					console.log('收到服务器内容：' + res.data);
-					if(data.code == 1000){
-						this.reciveMsg(this.friend.id,this.friend.img,data.message,0)
+					if (data.code == 1000) {
+						this.reciveMsg(this.friend.id, this.friend.img, data.message, 0)
 					}
 				});
 			},
-			exit: function(){
+			exit: function() {
 				console.log(666)
-				uni.closeSocket({  
-					success: function(res) {  
-						console.log("WebSocket关闭成功！");  
-					},  
-					fail: function(res) {  
-						console.log("WebSocket关闭失败！");  
-					}  
-				})  
+				uni.closeSocket({
+					success: function(res) {
+						console.log("WebSocket关闭成功！");
+					},
+					fail: function(res) {
+						console.log("WebSocket关闭失败！");
+					}
+				})
 
 			},
 			scoketSent: function(e) {
-				return new Promise((resolve, reject)=>{
-					console.log("{\"type\": 1,\"message\": \""+e+"\"}")
+				return new Promise((resolve, reject) => {
+					const items = ['0','0','1','1','2','2','3','4'];
+					this.botnum = items[Math.floor(Math.random()*items.length)];
+					console.log(this.botnum)
+					console.log("{\"type\": 1,\"message\": \"" + e + "\"}")
 					uni.sendSocketMessage({
-						data: "{\"type\": 1,\"message\": \""+e+"\"}",
-						success: data=>{
-							if(data.errMsg=='sendSocketMessage:fail WebSocket is not connected'){
+						data: "{\"type\": 1,\"message\": \"" + e + "\"}",
+						success: data => {
+							if (data.errMsg ==
+								'sendSocketMessage:fail WebSocket is not connected') {
 								this.join()
 								resolve(false)
-							}else{
+							} else {
 								resolve(true)
 							}
 							console.log(data.errMsg)
 						},
-						fail: data=>{
+						fail: data => {
 							resolve(false)
 							console.log(data.errMsg)
 						}
@@ -151,7 +182,9 @@
 						this.atoken = uni.getStorageSync('atoken')
 						this.rtoken = uni.getStorageSync('rtoken')
 					} else {
-						uni.navigateTo({ url: '../signin/signin', })
+						uni.navigateTo({
+							url: '../signin/signin',
+						})
 					}
 					console.log(value)
 				} catch (e) {
@@ -159,7 +192,9 @@
 				}
 			},
 			backOne: function() {
-				uni.navigateBack({ delta: 1 })
+				uni.navigateBack({
+					delta: 1
+				})
 			},
 			//处理时间
 			changeTime: function(date) {
@@ -169,14 +204,14 @@
 				return calT.dateTime2(date)
 			},
 			changeTime3: function(index) {
-				if(index==0){
+				if (index == 0) {
 					return calT.dateTime2(this.msgs[index].time)
 				}
-				let delta=calT.spaceTime2(this.msgs[index-1].time,this.msgs[index].time)
-				let equal=(calT.dateTime2(this.msgs[index-1].time)==calT.dateTime2(this.msgs[index].time))
-				if(delta>5 && equal == false){
+				let delta = calT.spaceTime2(this.msgs[index - 1].time, this.msgs[index].time)
+				let equal = (calT.dateTime2(this.msgs[index - 1].time) == calT.dateTime2(this.msgs[index].time))
+				if (delta > 5 && equal == false) {
 					return calT.dateTime2(this.msgs[index].time)
-				}else{
+				} else {
 					return ''
 				}
 			},
@@ -211,7 +246,9 @@
 				uni.request({
 					url: config.myurl + '/msg/getOldChatF',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': this.user.id,
 						'friend_id': this.friend.id,
@@ -233,7 +270,10 @@
 						} else if (data.data.Code == 1000) {
 							console.log(data.data.Data)
 							let l = this.msgs.length
-							for (var i = data.data.Data.length -1; i >= 0; i--) {
+							if (data.data.Data == null) {
+								return
+							}
+							for (var i = data.data.Data.length - 1; i >= 0; i--) {
 								this.msgs.push({
 									id: data.data.Data[i].SendId,
 									img: 'data:image/png;base64,' + data.data.Data[i].Img,
@@ -279,12 +319,12 @@
 			inputChat: async function(inf) {
 				console.log(calT.getNewTime())
 				let res = await this.scoketSent(inf)
-				
-				if(res){
-					this.reciveMsg(this.user.id,this.user.img,inf,0)
+
+				if (res) {
+					this.reciveMsg(this.user.id, this.user.img, inf, 0)
 				}
 			},
-			reciveMsg: function(id,img,msg,type) {
+			reciveMsg: function(id, img, msg, type) {
 				let len = this.msgs.length
 				let newMsg = {
 					id: id,
@@ -297,7 +337,7 @@
 				console.log(this.changeTime2(newMsg.time))
 				this.msgs.push(newMsg)
 				this.goBottom()
-			
+
 			},
 			answerRandomUser: async function(msg) {
 
@@ -354,8 +394,11 @@
 					uni.request({
 						url: 'http://localhost:8086/chat', //仅为示例，并非真实接口地址。
 						method: 'POST',
-						data: JSON.stringify({ chat_content: message, }),
-						header: { 'custom-header': 'hello' //自定义请求头信息
+						data: JSON.stringify({
+							chat_content: message,
+						}),
+						header: {
+							'custom-header': 'hello' //自定义请求头信息
 						},
 						success: res => {
 							retMsg = res.data.Data
@@ -410,6 +453,8 @@
 	.top-bar {
 		background: rgba(244, 244, 244, 0.98);
 		border-bottom: 1px solid $uni-border-color;
+		position: fixed;
+		top: 0;
 
 		.top-bar-right {
 			margin-right: 9rpx;

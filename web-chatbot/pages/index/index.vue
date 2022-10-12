@@ -14,18 +14,18 @@
 				<view class="serch" @tap="toSerch">
 					<image src="../../static/index/search.png"></image>
 				</view>
-				<view class="add">
+				<view class="add" @tap="toBuildgroup">
 					<image src="../../static/index/add.png"></image>
 				</view>
 			</view>
 		</view>
 		<view class="main">
 			<view class="apply"></view>
-			<view class="noone" v-if="noone">
+<!-- 			<view class="noone" v-if="noone">
 				<image src="../../static/index/lonely.png" mode="aspectFill"></image>
 				<view class="no-title">您还没有好友~</view>
 				<view class="serch-bt" @tap="toSerch">搜索好友</view>
-			</view>
+			</view> -->
 			<view class="friends">
 				<view class="friends-list" v-if="friendReq.tip>0" @tap="goRequest">
 					<view class="friends-list-l">
@@ -38,6 +38,21 @@
 							<view class="time">{{changeTime2(friendReq.time)}}</view>
 						</view>
 						<view class="info">{{friendReq.info}}</view>
+					</view>
+				</view>
+			</view>
+			<view class="friends">
+				<view class="friends-list" @tap="goChatRoom(robotone)">
+					<view class="friends-list-l">
+						<text class="tip" v-if="robotone.tip>0">{{robotone.tip}}</text>
+						<image :src="robotone.img" mode="aspectFill"></image>
+					</view>
+					<view class="friends-list-r">
+						<view class="top">
+							<view class="name">{{robotone.name}}</view>
+							<view class="time">{{changeTime2(robotone.time)}}</view>
+						</view>
+						<view class="info">{{robotone.info}}</view>
 					</view>
 				</view>
 			</view>
@@ -57,7 +72,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="submit" @tap="exit">Test2</view>
+		<!-- <view class="submit" @tap="exit">Test2</view> -->
 	</view>
 </template>
 
@@ -82,6 +97,7 @@
 					nick: 'duan',
 					intr: '这个用户很懒，没有任何简介。这个用户很懒，没有任何简介。这个用户很懒，没有任何简介。'
 				},
+				robotone: {},
 				friendReq: {
 					img: '../../static/index/addUser.png',
 					tip: 0,
@@ -97,12 +113,14 @@
 		},
 		onLoad() {
 			this.userInit()
+			this.getRobote()
 			this.getFriends()
 			this.getFriendsReq()
 			this.getFriends2()
 		},
 		onShow() {
 			this.userInit()
+			this.getRobote()
 			this.getFriends()
 			this.getFriendsReq()
 			this.getFriends2()
@@ -110,6 +128,7 @@
 		},
 		onPullDownRefresh() {
 			this.userInit()
+			this.getRobote()
 			this.getFriends()
 			this.getFriendsReq()
 			this.getFriends2()
@@ -124,6 +143,60 @@
 			this.exit();
 		},
 		methods: {
+			getRobote: function() {
+				uni.request({
+					url: config.myurl + '/user/detial',
+					method: 'POST',
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
+					data: {
+						'id': '00000000000000000'
+					},
+					success: async data => {
+						// console.log(data.data)
+						if (data.data.Code == 1009) {
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							if (newCode == 1000) {
+								this.atoken = uni.getStorageSync('atoken')
+								this.rtoken = uni.getStorageSync('rtoken')
+								this.getRobote()
+							} else {
+								// err
+							}
+						} else if (data.data.Code == 1000) {
+							// console.log('friends')
+							if (data.data.Data != null) {
+								this.noone = false
+								console.log(data.data.Data)
+								console.log(data.data.Data.CreateTime)
+								this.robotone = {
+									id: data.data.Data.UserID,
+									name: data.data.Data.Username,
+									img: 'data:image/png;base64,' + data.data.Data.Img,
+									info: 'unknow',
+									time: data.data.Data.CreateTime,
+									tip: 0
+								}
+								console.log(this.robotone)
+								let msg = await this.getNewMsg(this.robotone.id)
+								console.log(msg)
+								if (msg != null) {
+									console.log(msg)
+									this.robotone.info = msg.Msg
+									this.robotone.time = msg.Time
+								}
+								this.robotone.tip = await this.getUnReadMsg(this.robotone.id)
+							}
+						}
+					}
+				})
+			},
+			toBuildgroup: function() {
+				uni.navigateTo({
+					url: '../buildgroup/buildgroup'
+				})
+			},
 			join: function() {
 				console.log('hello')
 				uni.connectSocket({
@@ -176,6 +249,9 @@
 				return calT.dateTime(date)
 			},
 			changeTime2: function(date) {
+				if (date == undefined) {
+					return
+				}
 				return calT.dateTime2(date)
 			},
 			getFriends: function() {
@@ -299,7 +375,10 @@
 			},
 			refershMsg: async function() {
 				for (let i = 0; i < this.friends2.length; i++) {
-					this.friends2[i].info = await this.getNewMsg(this.friends2[i].id)
+					let msg = await this.getNewMsg(this.friends2[i].id)
+					if(msg != null){
+						this.friends2[i].info = msg.Msg
+					}
 					this.friends2[i].tip = await this.getUnReadMsg(this.friends2[i].id)
 					// this.friends2[i].info=this.getNewMsg(this.friends2[i].id)
 				}
@@ -331,7 +410,7 @@
 							} else if (data.data.Code == 1000) {
 								switch (data.data.Data.Type) {
 									case 0:
-										resolve(data.data.Data.Msg)
+										resolve(data.data.Data)
 										break
 									case 1:
 										resolve('[图片]')
@@ -343,9 +422,9 @@
 										resolve('[位置]')
 										break
 								}
-								resolve('unknow')
+								resolve(data.data.Data)
 							} else {
-								resolve('unknow')
+								resolve(data.data.Data)
 							}
 						}
 					})
