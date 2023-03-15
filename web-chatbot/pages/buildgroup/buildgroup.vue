@@ -25,17 +25,24 @@
 			<!-- 选择用户 -->
 			<view class="friends">
 				<view class="title">用户</view>
-				<view class="friend" v-for="(item,index) in friends" :key="index">
-					<view class="friendline" @tap="choose(index)">
-						<view class="friendselect">
-							<image src="../../static/general/right.png" class="selectimg" mode="aspectFill" v-if="item.select"></image>
-							<!-- <image src="../../static/general/right.png" class="selectimg" mode="aspectFill"></image> -->
+				<scroll-view class="user-scr" scroll-y="true" scroll-with-animation="true"
+					:scroll-into-view="scrollToView">
+					<view class="friend" v-for="(item,index) in friends" :key="index">
+						<view class="friendline" @tap="choose(index)">
+							<view class="friendselect">
+								<image src="../../static/general/right.png" class="selectimg" mode="aspectFill"
+									v-if="item.select"></image>
+								<!-- <image src="../../static/general/right.png" class="selectimg" mode="aspectFill"></image> -->
+							</view>
+							<image :src="item.img" class="friendhead" mode="aspectFill"></image>
+							<view class="friendname">{{item.name}}</view>
 						</view>
-						<image :src="item.img" class="friendhead" mode="aspectFill"></image>
-						<view class="friendname">{{item.name}}</view>
 					</view>
-				</view>
+				</scroll-view>
 			</view>
+		</view>
+		<view class="buttomBig">
+			<view class="buttomText" @tap="getUserDetail" :class="{unselect:select}">创建({{selectnum}})</view>
 		</view>
 		<canvas style="width: 100px; height: 100px; position:fixed;left:100%;" canvas-id="cv" type="2d"></canvas>
 	</view>
@@ -53,15 +60,24 @@
 				atoken: '',
 				rtoken: '',
 				user: {},
+				scrollToView: '',
+				selectnum: 0,
 			}
 		},
 		onLoad() {
 			this.userInit()
 			this.getFriends()
 		},
+		computed: {
+			select: function() {
+				return this.selectnum == 0;
+			}
+		},
 		methods: {
-			choose: function(index){
-				this.friends[index].select = !this.friends[index].select
+			choose: function(index) {
+				this.friends[index].select = !this.friends[index].select;
+				this.selectnum += this.friends[index].select * 2 - 1;
+				console.log(this.selectnum);
 			},
 			backOne: function() {
 				uni.navigateBack({
@@ -265,50 +281,74 @@
 				color: $uni-text-color;
 			}
 		}
-		
-		.friends{
+
+		.friends {
 			padding: $uni-spacing-col-base 0;
 			display: flex;
 			flex-direction: column;
 			width: 100%;
-			.friendline{
+
+			.friendline {
 				display: flex;
 				flex-direction: row;
 				padding: 0 $uni-spacing-row-base;
 				height: 120rpx;
 				align-items: center;
-				.friendselect{
+
+				.friendselect {
 					flex: none;
 					width: 40rpx;
 					height: 40rpx;
 					border-radius: 48rpx;
 					background-color: $uni-color-primary;
 					padding: 10rpx;
-					.selectimg{
+
+					.selectimg {
 						width: 48rpx;
 						height: 48rpx;
 					}
 				}
-				.friendhead{
+
+				.friendhead {
 					width: $uni-img-size-base;
 					height: $uni-img-size-base;
 					border-radius: $uni-border-radius-base;
 					margin: 0 30rpx;
 				}
-				.friendname{
+
+				.friendname {
+					width: 400rpx;
 					font-size: 40rpx;
 					font-weight: 400;
 					color: $uni-text-color;
+					display: -webkit-box;
+					-webkit-box-orient: vertical;
+					-webkit-line-clamp: 1;
+					overflow: hidden;
 				}
 			}
-			.title{
+
+			.title {
 				padding: 0 $uni-spacing-row-base;
 				font-size: 48rpx;
 				font-weight: 520;
 				color: $uni-text-color;
 			}
-			
+
 		}
 
+		.user-scr {
+			height: 800rpx;
+		}
+	}
+
+	.buttomBig {
+		background-color: $uni-bg-color-grey;
+
+		.unselect {
+			background-color: $uni-bg-color-hover;
+		}
+
+		box-shadow: 0rpx 1rpx 0rpx 0rpx $uni-bg-color-mask;
 	}
 </style>
