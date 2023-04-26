@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="73a7be54-64ad-4794-a7fa-31ddff8c0d9b" name="go-chat">
+        <fileTransfer accessType="SFTP" host="81.69.253.180" port="22" sshConfigId="c58e6883-6dbe-4af7-b5d5-2bfa14fe388a" sshConfig="root@81.69.253.180:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -10,6 +10,17 @@ import (
 	"go.uber.org/zap"
 )
 
+// ChatHandler 聊天功能路由
+// @Summary 聊天功能路由
+// @Description 需要发送的聊天消息
+// @Tags 聊天相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmChat false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /chat [post]
 func ChatHandler(c *gin.Context) {
 	var p Models.ParmChat
 	if err := c.ShouldBindJSON(&p); err != nil {
@@ -35,6 +46,17 @@ func ChatHandler(c *gin.Context) {
 	return
 }
 
+// RandChatHandler 随机聊天
+// @Summary 随机聊天
+// @Description 需要发送的聊天消息
+// @Tags 聊天相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmChat false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /chat_rand [post]
 func RandChatHandler(c *gin.Context) {
 	var p Models.ParmChat
 	if err := c.ShouldBindJSON(&p); err != nil {

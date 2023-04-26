@@ -33,28 +33,28 @@ type ParmReturnChat struct {
 }
 
 type ParmQueryUserDetial struct {
-	ID string `json:"id"`
+	ID string `json:"id"` //用户ID
 }
 
 type ParmToken struct {
-	AToken string `json:"a_token"`
-	RToken string `json:"r_token"`
+	AToken string `json:"a_token"` //access token
+	RToken string `json:"r_token"` //refersh token
 }
 
 type ParmSerchUsername struct {
-	Username string `json:"username"`
-	UserId   string `json:"user_id"`
+	Username string `json:"username"` //用户名
+	UserId   string `json:"user_id"` //用户id
 }
 
 type ParmSerchIsFriend struct {
-	UserId   string `json:"user_id"`
-	FriendId string `json:"friend_id"`
+	UserId   string `json:"user_id"` //用户id
+	FriendId string `json:"friend_id"` //目标id
 }
 
 type ParmFriendRequest struct {
-	UserId   string `json:"user_id"`
-	FriendId string `json:"friend_id"`
-	Msg      string `json:"msg"`
+	UserId   string `json:"user_id"` //用户id
+	FriendId string `json:"friend_id"` //好友id
+	Msg      string `json:"msg"` //验证消息
 }
 
 type ParmChangeEmail struct {

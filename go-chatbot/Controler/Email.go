@@ -41,6 +41,17 @@ func VerifiHandler(c *gin.Context) {
 	Models.ResponseSuccess(c, []string{})
 }
 
+// VerifiExam 验证验证码
+// @Summary 验证验证码
+// @Description 需要邮箱与验证码
+// @Tags 注册登录相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.VerifiExam false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /verificationCode [post]
 func VerifiExam(c *gin.Context) {
 	var verifExam Models.VerifiExam
 	if err := c.ShouldBindJSON(&verifExam); err != nil {

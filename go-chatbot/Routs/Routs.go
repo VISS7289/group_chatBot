@@ -71,7 +71,9 @@ func Init(mode string) *gin.Engine {
 
 	//注册功能路由
 	r.POST("/register", Controler.RegisterHandler)
+	//检验名称是否重复
 	r.GET("/existName", Controler.ExistName)
+	//检验邮箱是否重复
 	r.POST("/existEmail", Controler.RegisterHandler)
 	//登录功能路由
 	r.POST("/login", Controler.LoginHandler)

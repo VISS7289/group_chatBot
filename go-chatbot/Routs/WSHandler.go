@@ -15,6 +15,16 @@ func CreateId(uid, toid string) string {
 	return uid + "->" + toid
 }
 
+// Handler websocket聊天
+// @Summary 建立websocket长连接
+// @Description 发送者id，接收者id
+// @Tags 聊天相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmChat false "查询参数"
+// @Security ApiKeyAuth
+// @Router /ws [post]
 func Handler(c *gin.Context) {
 	uid := c.Query("send_id")
 	touid := c.Query("accept_id")

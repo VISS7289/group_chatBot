@@ -7,6 +7,17 @@ import (
 	"go.uber.org/zap"
 )
 
+// FriendRequest 好友申请
+// @Summary 提交好友请求
+// @Description 需要token验证，发起者id为用户id，请求者id为好友id，消息内容为msg
+// @Tags 好友相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmSerchIsFriend false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /friend/request [post]
 func FriendRequest(c *gin.Context) {
 	//参数校验
 	var p Models.ParmFriendRequest
@@ -58,6 +69,17 @@ func FriendRequest(c *gin.Context) {
 
 }
 
+// FriendDeleate 好友删除
+// @Summary 删除某个好友
+// @Description 需要token验证，发起者id为用户id，被删除者id为好友id
+// @Tags 好友相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmSerchIsFriend false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /friend/deleate [post]
 func FriendDeleate(c *gin.Context) {
 	//参数校验
 	var p Models.ParmSerchIsFriend
@@ -78,6 +100,17 @@ func FriendDeleate(c *gin.Context) {
 	Models.ResponseSuccess(c, "success")
 }
 
+// FriendReject 好友请求拒绝
+// @Summary 拒绝某人发起的好友请求
+// @Description 需要token验证，发起者id为用户id，被拒绝者id为好友id
+// @Tags 好友相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmSerchIsFriend false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /friend/reject [post]
 func FriendReject(c *gin.Context)  {
 	//参数校验
 	var p Models.ParmSerchIsFriend
@@ -98,6 +131,17 @@ func FriendReject(c *gin.Context)  {
 	Models.ResponseSuccess(c, "success")
 }
 
+// FriendAccept 好友接受
+// @Summary 接受好友请求
+// @Description 需要token验证，发起者id为用户id，接受者id为好友id
+// @Tags 好友相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmSerchIsFriend false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /friend/accept [post]
 func FriendAccept(c *gin.Context) {
 	//参数校验
 	var p Models.ParmSerchIsFriend
@@ -117,6 +161,17 @@ func FriendAccept(c *gin.Context) {
 	Models.ResponseSuccess(c, "success")
 }
 
+// GetMyFriend 获取好友
+// @Summary 获取到好友列表或好友请求
+// @Description 需要token验证，需要提供用户id与结果方式，0 代表好友列表，1代表好友申请列表
+// @Tags 好友相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmGetFriend false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /friend/myFriend [post]
 func GetMyFriend(c *gin.Context) {
 	//参数校验
 	var p Models.ParmGetFriend

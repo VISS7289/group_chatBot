@@ -10,9 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterHandler 处理用户注册
-// @Summary 处理用户注册接口
-// @Description 处理用户注册接口
+// RegisterHandler 检验邮箱是否重复
+// @Summary 检验邮箱是否重复
+// @Description 需要用户名、密码、确认密码、邮箱与验证码
 // @Tags 注册登录相关接口
 // @Accept application/json
 // @Produce application/json
@@ -20,7 +20,7 @@ import (
 // @Param object query Models.ParmRegister false "查询参数"
 // @Security ApiKeyAuth
 // @Success 200 {object} _ResponsePostList
-// @Router /register [post]
+// @Router /existEmail [post]
 func RegisterHandler(c *gin.Context) {
 	//参数校验
 	var p Models.ParmRegister
@@ -75,6 +75,17 @@ func RegisterHandler(c *gin.Context) {
 	Models.ResponseSuccess(c, info)
 }
 
+// ExistName 检验名称是否重复
+// @Summary 检验名称是否重复
+// @Description 需要发送者用户名
+// @Tags 注册登录相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmGetNewMsgOne false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /existName [get]
 func ExistName(c *gin.Context) {
 	name := c.Query("username")
 	fmt.Println(name)
@@ -128,7 +139,18 @@ func LoginHandler(c *gin.Context) {
 	Models.ResponseSuccess(c, info)
 }
 
-func GetUserDetail(c *gin.Context)  {
+// GetUserDetail 获取用户详情路由
+// @Summary 获取用户详情路由
+// @Description 需要token验证，通过用户ID查找用户
+// @Tags 用户相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmQueryUserDetial false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /user/detial [post]
+func GetUserDetail(c *gin.Context) {
 	var p Models.ParmQueryUserDetial
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))

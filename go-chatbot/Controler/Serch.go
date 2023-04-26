@@ -7,6 +7,17 @@ import (
 	"go.uber.org/zap"
 )
 
+// SerchUsername 根据用户名模糊搜索
+// @Summary 根据用户名模糊搜索
+// @Description 需要token验证，通过用户名称进行模糊搜索
+// @Tags 用户相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmSerchUsername false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /serch/username [post]
 func SerchUsername(c *gin.Context) {
 	//参数校验
 	var p Models.ParmSerchUsername
@@ -30,6 +41,17 @@ func SerchUsername(c *gin.Context) {
 	Models.ResponseSuccess(c, userRes)
 }
 
+// SerchIsFriend 判断两个id是否为好友
+// @Summary 判断两个id是否为好友
+// @Description 需要token验证，根据两用户的id，判断两用户是否为好友
+// @Tags 用户相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmSerchIsFriend false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /serch/isfriend [post]
 func SerchIsFriend(c *gin.Context) {
 	//参数校验
 	var p Models.ParmSerchIsFriend

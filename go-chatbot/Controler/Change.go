@@ -9,7 +9,18 @@ import (
 	"go.uber.org/zap"
 )
 
-func ChangeUserImg(c *gin.Context)  {
+// ChangeUserImg 修改用户图片
+// @Summary 修改用户头像
+// @Description 修改用户头像，需要用户id与base64格式图片
+// @Tags 用户相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmChangeImg false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /change/img [post]
+func ChangeUserImg(c *gin.Context) {
 	var p Models.ParmChangeImg
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
@@ -28,7 +39,18 @@ func ChangeUserImg(c *gin.Context)  {
 
 }
 
-func ChangeUser(c *gin.Context)  {
+// ChangeUser 修改用户简介
+// @Summary 修改用户简介
+// @Description 修改用户头像，需要用户id、修改后数据、修改的数据的类型与密码，对于特定类型数据，需要密码确认才可以修改
+// @Tags 用户相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmChange false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /change/update [post]
+func ChangeUser(c *gin.Context) {
 	var p Models.ParmChange
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
@@ -47,7 +69,18 @@ func ChangeUser(c *gin.Context)  {
 
 }
 
-func ChangeNick(c *gin.Context)  {
+// ChangeNick 修改好友备注
+// @Summary 修改好友备注即昵称
+// @Description 需要用户id，好友id与修改后昵称
+// @Tags 用户相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmFriendRequest false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /change/nick [post]
+func ChangeNick(c *gin.Context) {
 	var p Models.ParmFriendRequest
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
@@ -69,7 +102,7 @@ func ChangeNick(c *gin.Context)  {
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
 	}
-	if friendRes.State != 0{
+	if friendRes.State != 0 {
 		zap.L().Error("SomeOne Illegality Send Friend Request:", zap.Error(err))
 		Models.ResponseError(c, Models.CodeIllegalityFriendReq)
 		return
@@ -87,7 +120,18 @@ func ChangeNick(c *gin.Context)  {
 
 }
 
-func ChangeEmail(c *gin.Context)  {
+// ChangeEmail 修改邮箱
+// @Summary 修改邮箱
+// @Description 需要用户id，新的邮箱与验证码
+// @Tags 用户相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmChangeEmail false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /change/email [post]
+func ChangeEmail(c *gin.Context) {
 	var p Models.ParmChangeEmail
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
@@ -97,7 +141,7 @@ func ChangeEmail(c *gin.Context)  {
 	fmt.Println(p)
 	q := Models.VerifiExam{
 		VerifiCode: p.VerifiCode,
-		Email: p.NewEmail,
+		Email:      p.NewEmail,
 	}
 	val, err := Redis.RedisFind(q.Email)
 	if err != nil {
@@ -111,9 +155,9 @@ func ChangeEmail(c *gin.Context)  {
 	//业务处理
 	s := Models.ParmChange{
 		UserId: p.UserId,
-		Data: p.NewEmail,
-		Type: "email",
-		Psw: "",
+		Data:   p.NewEmail,
+		Type:   "email",
+		Psw:    "",
 	}
 	err = Logic.ChangeUser(&s)
 	if err != nil {
@@ -126,7 +170,18 @@ func ChangeEmail(c *gin.Context)  {
 
 }
 
-func ChangePsw(c *gin.Context)  {
+// ChangePsw 修改密码
+// @Summary 修改密码
+// @Description 需要用户id，邮箱，新的密码，确认密码以及验证码
+// @Tags 用户相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query Models.ParmChangePsw false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /change/psw [post]
+func ChangePsw(c *gin.Context) {
 	var p Models.ParmChangePsw
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
@@ -135,7 +190,7 @@ func ChangePsw(c *gin.Context)  {
 	}
 	q := Models.VerifiExam{
 		VerifiCode: p.VerifiCode,
-		Email: p.Email,
+		Email:      p.Email,
 	}
 	val, err := Redis.RedisFind(q.Email)
 	if err != nil {
@@ -157,9 +212,9 @@ func ChangePsw(c *gin.Context)  {
 	//业务处理
 	s := Models.ParmChange{
 		UserId: p.UserId,
-		Data: p.Password,
-		Type: "password",
-		Psw: "",
+		Data:   p.Password,
+		Type:   "password",
+		Psw:    "",
 	}
 	err = Logic.ChangeUser(&s)
 	if err != nil {
