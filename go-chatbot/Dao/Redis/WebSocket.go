@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// 将指定键的值加1并存储到Redis数据库中
 func RedisAdd(key string) (err error) {
 	res:=rdb.Get(key).Val()
 	val :=0

@@ -46,6 +46,7 @@ var CodeMesMap = map[ResCode]string{
 	CodeWSSuccess:           "websocket连接成功",
 }
 
+//此方法用于根据枚举值查询对应的提示文本
 func (c ResCode) Msg() string {
 	msg, ok := CodeMesMap[c]
 	if !ok {

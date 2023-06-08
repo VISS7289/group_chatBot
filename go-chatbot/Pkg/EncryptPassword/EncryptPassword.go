@@ -7,6 +7,7 @@ import (
 
 const secret = "7289978DUAN"
 
+// 密码md5加密
 func EP(oPassword string) string {
 	h := md5.New()
 	h.Write([]byte(secret))

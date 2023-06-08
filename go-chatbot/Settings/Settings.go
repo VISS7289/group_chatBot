@@ -11,6 +11,7 @@ import (
 
 var Conf = new(AppConfig)
 
+// 项目总设置
 type AppConfig struct {
 	Name        string
 	Mode        string
@@ -25,6 +26,7 @@ type AppConfig struct {
 	EmailConfig `mapstructure:"email"`
 }
 
+// 日志设置
 type LogConfig struct {
 	Level      string
 	FileName   string
@@ -33,6 +35,7 @@ type LogConfig struct {
 	MaxBackUps int `mapstructure:"max_backups"`
 }
 
+// mysql设置
 type MySqlConfig struct {
 	Host         string
 	Port         int
@@ -43,6 +46,7 @@ type MySqlConfig struct {
 	MaxIdleConns int `mapstructure:"max_idle_conns"`
 }
 
+// redis设置
 type RedisConfig struct {
 	Host     string
 	Port     int
@@ -51,6 +55,7 @@ type RedisConfig struct {
 	PoolSize int
 }
 
+// 聊天设置
 type ChatConfig struct {
 	Host string
 	Port int
@@ -58,27 +63,34 @@ type ChatConfig struct {
 	Key  string
 }
 
+// 邮箱设置
 type EmailConfig struct {
-	From string
+	From     string
 	Password string
-	Host string
-	Port int
+	Host     string
+	Port     int
 }
 
-
+// Init 函数用于初始化应用程序的配置
 func Init() (err error) {
+	// 设置配置文件名、文件类型和文件路径
 	viper.SetConfigName("Config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./Configs/")
+	// 读取配置文件
 	if err = viper.ReadInConfig(); err != nil {
 		return err
 	}
+	// 将配置文件中的配置信息反序列化到 Conf 对象中
 	if err = viper.Unmarshal(&Conf); err != nil {
 		return err
 	}
+	// 监听配置文件的变化，并在配置文件发生变化时自动更新配置信息
 	viper.WatchConfig()
+	// 当配置文件发生变化时执行以下操作
 	viper.OnConfigChange(func(in fsnotify.Event) {
 		zap.L().Info("Config Changed...", zap.String("theConfig:", fmt.Sprintf("%v", in)))
+		// 将配置文件中的配置信息反序列化到 Conf 对象中
 		if err = viper.Unmarshal(&Conf); err != nil {
 			zap.L().Error("Config Updata Failed ...", zap.Error(err))
 		}

@@ -71,23 +71,35 @@ var Manager = CliendManager{
 	Unregister: make(chan *Client),
 }
 
+// Read 方法用于从客户端的 websocket 连接中读取数据
 func (c *Client) Read() {
+	// 在函数返回时，先将当前客户端从 Manager 中注销并关闭客户端的 websocket 连接
 	defer func() {
 		Manager.Unregister <- c
 		_ = c.Socket.Close()
 	}()
+	// 进入一个无限循环，不断从客户端的 websocket 连接中读取数据
 	for {
+		// 向客户端发送一个 Pong 消息，以确保连接保持活动状态
 		c.Socket.PongHandler()
+		// 创建一个新的 SendMsg 对象
 		sendmsg := new(SendMsg)
+		// 从客户端的 websocket 连接中读取 JSON 格式的消息，并将其解码为 SendMsg 对象
 		if err := c.Socket.ReadJSON(&sendmsg); err != nil {
+			// 如果读取消息时发生错误，则记录错误日志，并将当前客户端从 Manager 中注销并关闭客户端的 websocket 连接，
+			//然后跳出循环
 			zap.L().Error("Websocket Unknow Error", zap.Error(err))
 			Manager.Unregister <- c
 			_ = c.Socket.Close()
 			break
 		}
+		// 如果消息类型为 1，则表示需要进行广播消息
 		if sendmsg.Type == 1 {
+			// 从 Redis 中获取与当前客户端相关的值
 			r1 := Redis.RedisVal(c.ID)
 			r2 := Redis.RedisVal(c.SendId)
+			// 如果 Redis 中存储的值符合特定条件，则返回错误响应，否则在 Redis 中增加与当前客户端相关的值，
+			//并将消息广播给所有客户端
 			if r1 > "3" && r2 == "" {
 				replymsg := ReplyMsg{
 					Code: Models.CodeExceedMsg,
@@ -104,9 +116,11 @@ func (c *Client) Read() {
 				Message: []byte(sendmsg.Msg),
 			}
 		}
-		// 需要机器人主动发消息
+		// 如果消息类型为 0，则表示需要进行机器人自动回复
 		if sendmsg.Type == 0 {
+			// 调用 Chat 对象的 GetChat 方法获取机器人的回复消息
 			msgs, _ := Chat.GetChat(sendmsg.Msg)
+			// 将机器人的回复消息作为响应消息发送给客户端，并将消息插入到 MySQL 数据库中
 			splitId := strings.Split(c.ID, "->")
 			replymsg := ReplyMsg{
 				Code: Models.CodeSuccess,
@@ -129,17 +143,22 @@ func (c *Client) Read() {
 	}
 }
 
+// Write 方法用于向客户端的 websocket 连接中写入数据
 func (c *Client) Write() {
+	// 在函数返回时，关闭客户端的 websocket 连接
 	defer func() {
 		_ = c.Socket.Close()
 	}()
+	// 进入一个无限循环，不断从客户端的发送消息的通道中读取数据，并向客户端的 websocket 连接中写入数据
 	for {
 		select {
 		case mssage, ok := <-c.Send:
+			// 如果通道已关闭，则向客户端发送关闭消息，并返回
 			if !ok {
 				_ = c.Socket.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
+			// 构建响应消息并将其发送给客户端
 			replymsg := ReplyMsg{
 				SendId: mssage.SendId,
 				Code:   Models.CodeSuccess,
@@ -152,10 +171,13 @@ func (c *Client) Write() {
 	}
 }
 
+// Start 方法用于启动客户端管理器，监听通道的消息并进行处理
 func (manager *CliendManager) Start() {
+	// 进入一个无限循环，不断监听通道的消息
 	for {
 		fmt.Println("-----------监听管道通信-------------")
 		select {
+		// 处理新连接的请求
 		case conn := <-Manager.Register:
 			fmt.Printf("有新连接：%v\n", conn.ID)
 			Manager.Client[conn.ID] = conn
@@ -165,6 +187,7 @@ func (manager *CliendManager) Start() {
 			}
 			msg, _ := json.Marshal(replymsg)
 			_ = conn.Socket.WriteMessage(websocket.TextMessage, msg)
+		// 处理连接断开的请求
 		case conn := <-Manager.Unregister:
 			fmt.Printf("连接失败：%v\n", conn.ID)
 			if _, ok := Manager.Client[conn.ID]; ok {
@@ -177,10 +200,14 @@ func (manager *CliendManager) Start() {
 				close(conn.Send)
 				delete(Manager.Client, conn.ID)
 			}
+		// 处理广播消息的请求
 		case broadcast := <-Manager.Broadcast: //1->2
 			message := broadcast.Message
+			// 发送者 ID，即消息来源
 			sendid := broadcast.Client.SendId //2->1
+			// 接收者 ID，即消息目标
 			id := broadcast.Client.ID         //1->2
+			// 将 ID 按照 "->" 进行分割，得到发送者和接收者的 ID
 			splitId := strings.Split(id, "->")
 			// 编辑发送的消息
 			smsg := &JsonMsg{

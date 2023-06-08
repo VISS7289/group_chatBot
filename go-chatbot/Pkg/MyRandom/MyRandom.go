@@ -7,6 +7,7 @@ import (
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
+// 生成指定长度的随机字符串
 func RandomString(n int) string {
 	b := make([]rune, n)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))

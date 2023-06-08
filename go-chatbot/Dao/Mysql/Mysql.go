@@ -10,6 +10,7 @@ import (
 
 var db *sqlx.DB
 
+// 初始化数据库连接
 func Init(sql Settings.MySqlConfig) (err error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
 		sql.User,
