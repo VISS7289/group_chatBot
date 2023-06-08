@@ -186,6 +186,7 @@
 					url: '../signin/signin'
 				})
 			},
+			// 删除好友
 			delFriend: function() {
 				uni.showModal({
 					title: '提示',
@@ -249,6 +250,7 @@
 			refersh: function(parm) {
 				this.userDetail[parm.type] = parm.req
 			},
+			// 获取用户详情
 			getUserDetail: function() {
 				console.log(this.optid)
 				uni.request({
@@ -293,6 +295,7 @@
 				})
 				console.log(777)
 			},
+			// 获取用户昵称
 			getUserNick: function() {
 				if (this.userid == this.optid) {
 					return
@@ -335,6 +338,7 @@
 					}
 				})
 			},
+			// 性别更改
 			bindPickerChange: function(e) {
 				if (this.userDetail.sex == e.detail.value) {
 					return
@@ -346,6 +350,7 @@
 
 				// this.userDetail.sex = e.detail.value
 			},
+			// 生日更改
 			bindDateChange: function(e) {
 				if (this.userDetail.birthday == e.detail.value) {
 					return
@@ -355,6 +360,7 @@
 				}
 				this.update('birthday', this.optid, e.detail.value.toString(), '', fn)
 			},
+			// 获取日期
 			getDate(type) {
 				const date = new Date()
 				let year = date.getFullYear()
@@ -416,6 +422,7 @@
 			// 		}, 50)
 			// 	})
 			// },
+			// 获取图片
 			getImgInfo(url) {
 				return new Promise((resolve, reject) => {
 					wx.getImageInfo({
@@ -429,6 +436,7 @@
 					})
 				})
 			},
+			// 压缩图片
 			compressImg: function(src) {
 				return new Promise(async (resolve, reject) => {
 					console.log(src)
@@ -491,6 +499,7 @@
 				// url设置为空，隐藏控件
 				this.url = ''
 			},
+			// 修改页面
 			goModify: function(type) {
 				this.modifyInfo.type = type
 				this.modifyInfo.userinfo = this.userDetail
@@ -498,6 +507,7 @@
 					url: '../modify/modify?modifyInfo=' + encodeURIComponent(JSON.stringify(this.modifyInfo))
 				})
 			},
+			// 信息更新
 			update(type, optid, data, psw, fn) {
 				console.log(fn)
 				uni.request({

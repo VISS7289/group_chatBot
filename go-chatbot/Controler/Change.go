@@ -1,7 +1,6 @@
 package Controler
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-chatbot/Dao/Redis"
 	"go-chatbot/Logic"
@@ -21,14 +20,15 @@ import (
 // @Success 200 {object} _ResponsePostList
 // @Router /change/img [post]
 func ChangeUserImg(c *gin.Context) {
+	// 数据绑定，将请求体中的json数据绑定到ParmChangeImg结构体中
 	var p Models.ParmChangeImg
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	err := Logic.ChangeUserImg(&p)
 	//业务处理
+	err := Logic.ChangeUserImg(&p)
 	if err != nil {
 		zap.L().Error("SomeOne Have Unknow Error When Change Img:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
@@ -51,6 +51,7 @@ func ChangeUserImg(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /change/update [post]
 func ChangeUser(c *gin.Context) {
+	// 数据绑定
 	var p Models.ParmChange
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
@@ -81,17 +82,19 @@ func ChangeUser(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /change/nick [post]
 func ChangeNick(c *gin.Context) {
+	// 数据绑定
 	var p Models.ParmFriendRequest
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	fmt.Println(p)
+	// 对绑定的数据进行节选
 	q := Models.ParmSerchIsFriend{
 		UserId:   p.UserId,
 		FriendId: p.FriendId,
 	}
+	// 业务逻辑
 	friendRes, err := Logic.SerchIsFriend(&q)
 	if err != nil {
 		if Models.ErrorIs(err, Models.ErrorWrongPassword) || Models.ErrorIs(err, Models.ErrorUserNotExit) {
@@ -102,6 +105,7 @@ func ChangeNick(c *gin.Context) {
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
 	}
+	// 非法发送好友请求
 	if friendRes.State != 0 {
 		zap.L().Error("SomeOne Illegality Send Friend Request:", zap.Error(err))
 		Models.ResponseError(c, Models.CodeIllegalityFriendReq)
@@ -132,17 +136,19 @@ func ChangeNick(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /change/email [post]
 func ChangeEmail(c *gin.Context) {
+	// 数据绑定
 	var p Models.ParmChangeEmail
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	fmt.Println(p)
+	// 节选部分数据
 	q := Models.VerifiExam{
 		VerifiCode: p.VerifiCode,
 		Email:      p.NewEmail,
 	}
+	// Redis处理验证码
 	val, err := Redis.RedisFind(q.Email)
 	if err != nil {
 		Models.ResponseError(c, Models.CodeVerifiNotFund)
@@ -152,7 +158,7 @@ func ChangeEmail(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeVerifiErr)
 		return
 	}
-	//业务处理
+	//业务逻辑
 	s := Models.ParmChange{
 		UserId: p.UserId,
 		Data:   p.NewEmail,
@@ -182,17 +188,21 @@ func ChangeEmail(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /change/psw [post]
 func ChangePsw(c *gin.Context) {
+	// 数据绑定
 	var p Models.ParmChangePsw
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
+	// 节选部分数据
 	q := Models.VerifiExam{
 		VerifiCode: p.VerifiCode,
 		Email:      p.Email,
 	}
+	// Redis验证验证码
 	val, err := Redis.RedisFind(q.Email)
+	// 错误情况处理
 	if err != nil {
 		Models.ResponseError(c, Models.CodeVerifiNotFund)
 		return

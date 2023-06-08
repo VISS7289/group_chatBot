@@ -21,23 +21,27 @@ import (
 // @Success 200 {object} _ResponsePostList
 // @Router /verificationCode [post]
 func VerifiHandler(c *gin.Context) {
+	// 数据绑定
 	var verifEmail Models.VerifiEmail
 	if err := c.ShouldBindJSON(&verifEmail); err != nil {
 		zap.L().Error("Verifi Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
+	// 生成验证码并发送邮件
 	verifiCode := MyRandom.RandomString(6)
 	if err := Email.SendEmail(verifEmail.To, "验证码", verifEmail.Username, verifiCode); err != nil {
 		zap.L().Error("Verifi Send Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeSendVerifiErr)
 		return
 	}
+	// 将验证码存储到 Redis
 	if err := Redis.RedisSet(verifEmail.To, verifiCode); err != nil {
 		zap.L().Error("Redis Set Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeServerBusy)
 		return
 	}
+	// 返回响应
 	Models.ResponseSuccess(c, []string{})
 }
 
@@ -54,6 +58,7 @@ func VerifiHandler(c *gin.Context) {
 // @Router /verificationCode [post]
 func VerifiExam(c *gin.Context) {
 	var verifExam Models.VerifiExam
+	// 从 Redis 中检查验证码是否匹配
 	if err := c.ShouldBindJSON(&verifExam); err != nil {
 		zap.L().Error("Verifi Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
@@ -65,8 +70,10 @@ func VerifiExam(c *gin.Context) {
 		return
 	}
 	if val == verifExam.VerifiCode {
+		// 验证码匹配，返回成功响应
 		Models.ResponseSuccess(c, []string{})
 	} else {
+		// 验证码不匹配，返回错误响应
 		Models.ResponseError(c, Models.CodeVerifiErr)
 	}
 }

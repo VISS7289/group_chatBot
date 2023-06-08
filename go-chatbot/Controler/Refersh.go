@@ -19,11 +19,13 @@ import (
 // @Router /refersh [post]
 func RefershHandler(c *gin.Context) {
 	var p Models.ParmToken
+	// 刷新令牌
 	if err := c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("Token Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
+	// 返回新的令牌
 	newAToken, newRToken, err := JWT.RefreshToken(p.AToken,p.RToken)
 	if err != nil {
 		Models.ResponseError(c, Models.CodeAuthHeaderValid)

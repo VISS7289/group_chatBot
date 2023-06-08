@@ -42,15 +42,19 @@
 		},
 		
 		methods: {
+			// 页面跳转
 			toSignUp: function() {
 				uni.navigateTo({ url: '../signup/signup', })
 			},
+			// 更新用户名
 			subUsername: function(e) {
 				this.username = e.detail.value
 			},
+			// 更新密码
 			subPassword: function(e) {
 				this.password = e.detail.value
 			},
+			// 登录
 			subInfo: function() {
 				if (this.username && this.password) {
 					uni.request({

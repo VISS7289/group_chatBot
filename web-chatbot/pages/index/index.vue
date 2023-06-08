@@ -112,10 +112,15 @@
 			}
 		},
 		onLoad() {
+			// 用户初始化
 			this.userInit()
+			// 获取聊天机器人
 			this.getRobote()
+			
 			this.getFriends()
+			// 获取好友请求
 			this.getFriendsReq()
+			// 获取好友列表
 			this.getFriends2()
 		},
 		onShow() {
@@ -126,6 +131,7 @@
 			this.getFriends2()
 			this.join()
 		},
+		// 下拉刷新
 		onPullDownRefresh() {
 			this.userInit()
 			this.getRobote()
@@ -143,6 +149,7 @@
 			this.exit();
 		},
 		methods: {
+			// 获取聊天机器人
 			getRobote: function() {
 				uni.request({
 					url: config.myurl + '/user/detial',
@@ -192,11 +199,13 @@
 					}
 				})
 			},
+			// 页面跳转
 			toBuildgroup: function() {
 				uni.navigateTo({
 					url: '../buildgroup/buildgroup'
 				})
 			},
+			// 与后端简历websocket连接
 			join: function() {
 				console.log('hello')
 				uni.connectSocket({
@@ -222,6 +231,7 @@
 					}
 				});
 			},
+			// socket验证
 			exit: function() {
 				console.log(666)
 				uni.closeSocket({
@@ -234,26 +244,31 @@
 				})
 
 			},
+			// 跳转
 			goRequest: function() {
 				uni.navigateTo({
 					url: '../friendReq/friendReq'
 				})
 			},
+			// 跳转
 			goChatRoom: function(item) {
 				uni.navigateTo({
 					url: '../chatRoom/chatRoom?friendInfo=' + encodeURIComponent(JSON.stringify(item)) +
 						'&type=0'
 				})
 			},
+			// 日期格式更改
 			changeTime: function(date) {
 				return calT.dateTime(date)
 			},
+			// 日期格式更改
 			changeTime2: function(date) {
 				if (date == undefined) {
 					return
 				}
 				return calT.dateTime2(date)
 			},
+			// 从缓存获取好友
 			getFriends: function() {
 				this.friends = datas.friends()
 				for (let i = 0; i < this.friends.length; i++) {
@@ -261,6 +276,7 @@
 				}
 				//console.log(this.friends);
 			},
+			// 获取好友列表
 			getFriends2: function() {
 				uni.request({
 					url: config.myurl + '/friend/myFriend',
@@ -318,6 +334,7 @@
 					}
 				})
 			},
+			// 获取好友请求
 			getFriendsReq: function() {
 				console.log('send')
 				uni.request({
@@ -373,6 +390,7 @@
 				})
 				console.log('get')
 			},
+			// 从缓存获取信息
 			refershMsg: async function() {
 				for (let i = 0; i < this.friends2.length; i++) {
 					let msg = await this.getNewMsg(this.friends2[i].id)
@@ -383,6 +401,7 @@
 					// this.friends2[i].info=this.getNewMsg(this.friends2[i].id)
 				}
 			},
+			// 获取最新消息
 			getNewMsg: function(fid) {
 				return new Promise((resolve, reject) => {
 					uni.request({
@@ -431,6 +450,7 @@
 				})
 
 			},
+			// 获取未读消息
 			getUnReadMsg: function(fid) {
 				return new Promise((resolve, reject) => {
 					uni.request({
@@ -465,11 +485,13 @@
 				})
 
 			},
+			// 跳转
 			toSerch: function() {
 				uni.navigateTo({
 					url: '../serch/serch?user=' + encodeURIComponent(JSON.stringify(this.user)),
 				})
 			},
+			// 用户初始化
 			userInit: function() {
 				try {
 					const value = uni.getStorageSync('user')

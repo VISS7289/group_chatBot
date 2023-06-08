@@ -153,6 +153,7 @@
 				wrong: false
 			}
 		},
+		// 根据修改信息的种类不同修改页面
 		onLoad: function(option) {
 			this.modifyInfo = JSON.parse(decodeURIComponent(option.modifyInfo))
 			switch (this.modifyInfo.type) {
@@ -192,15 +193,18 @@
 			}
 		},
 		methods: {
+			// 返回上一个页面
 			backOne: function() {
 				uni.navigateBack({ delta: 1 })
 			},
+			// 输入验证码
 			inputVerifi: function(e) {
 				this.verifiValue = e.detail.value
 			},
 			inputVerifi2: function(e) {
 				this.verifiValue2 = e.detail.value
 			},
+			// 修改信息
 			infoChange: function() {
 				var fn = () => {
 					console.log(2020)
@@ -268,6 +272,7 @@
 			toSignIn: function() {
 				uni.navigateTo({ url: '../signin/signin', })
 			},
+			// 查看密码
 			lookPassword: function() {
 				if (this.look) {
 					this.type = 'password'
@@ -276,6 +281,7 @@
 				}
 				this.look = !this.look
 			},
+			// 验证用户名是否合法
 			isUsername: function(e) {
 				if (e.detail.cursor > 0) {
 					this.modifyInfo.userinfo.name = e.detail.value
@@ -300,6 +306,7 @@
 					}
 				}
 			},
+			// 验证邮箱是否合法
 			isEmail: function(e) {
 				let reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
 				if (e.detail.cursor > 0) {
@@ -316,6 +323,7 @@
 					}
 				}
 			},
+			// 验证手机是否合法
 			isPhone: function(e) {
 				let reg = /^([0-9])/
 				if (e.detail.cursor > 0) {
@@ -330,6 +338,7 @@
 					}
 				}
 			},
+			// 验证密码是否正确
 			isUserPassword: function(e) {
 				if (e.detail.cursor > 0) {
 					this.userPassword = e.detail.value
@@ -346,6 +355,7 @@
 					}
 				}
 			},
+			// 密码重复是否正确
 			isUserPasswordRe: function(e) {
 				if (e.detail.cursor > 0) {
 					this.userPasswordRe = e.detail.value
@@ -360,6 +370,7 @@
 					}
 				}
 			},
+			// 用户昵称是否合法
 			isUserNick: function(e) {
 				if (e.detail.cursor > 0) {
 					this.modifyInfo.userinfo.nick = e.detail.value
@@ -367,6 +378,7 @@
 					this.modifyInfo.userinfo.nick = this.userRequest
 				}
 			},
+			// 添加好友是否合法
 			isAddFriend: function(e) {
 				this.ok = true
 				if (e.detail.cursor > 0) {
@@ -376,6 +388,7 @@
 				}
 
 			},
+			// 用户信息是否合法
 			isUserIntr: function(e) {
 				this.ok = true
 				if (e.detail.cursor > 0) {
@@ -384,6 +397,7 @@
 					this.modifyInfo.userinfo.intr = this.userRequest
 				}
 			},
+			// 更新数据
 			update(type, optid, data, psw, fn) {
 				console.log(fn)
 				uni.request({
@@ -416,6 +430,7 @@
 					}
 				})
 			},
+			// 更新昵称
 			updateNick(optid, msg, fn) {
 				console.log(fn)
 				uni.request({
@@ -447,6 +462,7 @@
 					}
 				})
 			},
+			// 添加好友
 			addFriend: function() {
 				uni.request({
 					url: config.myurl + '/friend/request',
@@ -492,6 +508,7 @@
 					}
 				})
 			},
+			// 上传验证码
 			subInfo: function() {
 				console.log(this.modifyInfo.userinfo.email)
 				console.log(this.verifiValue)
@@ -515,6 +532,7 @@
 					}
 				})
 			},
+			// 更改邮箱
 			subInfo2: function(){
 				console.log(this.verifiValue2)
 				uni.request({
@@ -558,6 +576,7 @@
 					}
 				})
 			},
+			// 更改密码
 			subInfoPsw: function() {
 				uni.request({
 					url: config.myurl + '/change/psw',
@@ -593,6 +612,7 @@
 					}
 				})
 			},
+			// 发送验证码
 			sendVertify: function() {
 				if (!this.unSend) {
 					this.send = false
@@ -625,6 +645,7 @@
 					this.invilid = !this.okEmail
 				}
 			},
+			// 发送验证码
 			sendVertify2: function() {
 				if (!this.unSend) {
 					this.send2 = false

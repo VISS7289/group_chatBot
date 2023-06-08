@@ -100,6 +100,7 @@
 				}
 				this.look = !this.look
 			},
+			// 用户名是否合法
 			isUsername: function(e) {
 				if (e.detail.cursor > 0) {
 					this.userValue = e.detail.value
@@ -124,6 +125,7 @@
 					}
 				}
 			},
+			// 邮箱是否合法
 			isEmail: function(e) {
 				let reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
 				if (e.detail.cursor > 0) {
@@ -137,6 +139,7 @@
 					}
 				}
 			},
+			// 密码是否合法
 			isUserPassword: function(e) {
 				if (e.detail.cursor > 0) {
 					this.userPassword = e.detail.value
@@ -153,6 +156,7 @@
 					}
 				}
 			},
+			// 验证密码是否合法
 			isUserPasswordRe: function(e) {
 				if (e.detail.cursor > 0) {
 					this.userPasswordRe = e.detail.value
@@ -165,9 +169,11 @@
 					}
 				}
 			},
+			// 输入验证码
 			inputVerifi: function(e) {
 				this.verifiValue = e.detail.value
 			},
+			// 注册
 			subInfo: function() {
 				this.wrong = !this.wrong
 				if (this.okUsername && this.okEmail && this.okPa && this.okRe) {
@@ -215,6 +221,7 @@
 				}
 
 			},
+			// 发送验证码
 			sendVertify: function() {
 				if (this.okEmail && !this.unSend) {
 					this.send = false

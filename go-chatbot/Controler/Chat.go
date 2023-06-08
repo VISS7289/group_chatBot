@@ -28,6 +28,7 @@ func ChatHandler(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
+	// 发送 POST 请求到 Python 服务器
 	url := "http://localhost:8087/chat"
 	post := "{\"chat_content\":\"" + p.ChatContent +
 		"\"}"
@@ -41,6 +42,8 @@ func ChatHandler(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeServerBusy)
 		return
 	}
+
+	// 读取响应体并返回响应
 	body, _ := ioutil.ReadAll(resp.Body)
 	Models.ResponseSuccess(c, string(body))
 	return
@@ -64,6 +67,7 @@ func RandChatHandler(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
+	// 发送 POST 请求到 Python 服务器
 	url := "http://localhost:8087/chat_rand"
 	post := "{\"chat_content\":\"" + p.ChatContent +
 		"\"}"
@@ -77,6 +81,7 @@ func RandChatHandler(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeServerBusy)
 		return
 	}
+	// 读取响应体并返回响应
 	body, _ := ioutil.ReadAll(resp.Body)
 	Models.ResponseSuccess(c, string(body))
 	return

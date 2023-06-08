@@ -93,16 +93,20 @@
 					this.userDel(serchVal)
 				}
 			}, 500),
+			// 添加好友成功
 			AddSuccess: function() {
 				this.userArr[this.queryIndex].state = 1
 			},
+			// 删除好友成功
 			DeleteSuccess: function(){
 				this.userArr[this.queryIndex].state = 2
 			},
+			// 刷新
 			refersh: function() {
 				console.log(this.serchname)
 				this.userDel(this.serchname)
 			},
+			// 根据用户名获取用户
 			userDel(e) {
 				this.serchname = e
 				console.log(this.serchname)
@@ -159,9 +163,11 @@
 				})
 
 			},
+			// 页面跳转
 			toIndex: function() {
 				uni.navigateTo({ url: '../index/index', })
 			},
+			// 页面跳转
 			goModify: function(type, item, index) {
 				this.queryIndex = index
 				this.modifyInfo.type = type
@@ -170,6 +176,7 @@
 				this.modifyInfo.userRequest = this.user.name + '请求加为好友~'
 				uni.navigateTo({ url: '../modify/modify?modifyInfo=' + encodeURIComponent(JSON.stringify(this.modifyInfo)) })
 			},
+			// 页面跳转
 			goUserhome: function(item,index) {
 				this.queryIndex = index
 				uni.navigateTo({ url: '../userhome/userhome?user=' + encodeURIComponent(JSON.stringify(item)) })

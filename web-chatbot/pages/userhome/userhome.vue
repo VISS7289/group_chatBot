@@ -79,6 +79,7 @@
 				userRequest: '',
 			}
 		},
+		// 初始化用户
 		onLoad: function(option) {
 			this.user = JSON.parse(decodeURIComponent(option.user))
 			try {
@@ -123,11 +124,13 @@
 				}
 
 			},
+			// 删除好友
 			delfriend: function() {
 				this.user.state = 2
 				this.isDelete = true
 				this.userNick = this.user.name
 			},
+			// 讲用户头像设为背景
 			getElementStyle: function() {
 				const query = uni.createSelectorQuery().in(this)
 				query.select('.background').boundingClientRect(data => {
@@ -138,6 +141,7 @@
 				}).exec()
 				this.pageTop = uni.getSystemInfoSync().statusBarHeight
 			},
+			// 获取好友昵称
 			getUserNick: function() {
 				if (this.userid == this.user.id) {
 					this.userNick = this.user.name
@@ -182,6 +186,7 @@
 					}
 				})
 			},
+			// 为页面加载动效
 			addFriendAnmi: function() {
 				this.isAdd = !this.isAdd
 				var animation = uni.createAnimation({
@@ -227,6 +232,7 @@
 				this.animationData4 = animation4.export()
 
 			},
+			// 获取用户详情
 			getUserDetail: function() {
 				console.log(666)
 				uni.request({
@@ -255,6 +261,7 @@
 					}
 				})
 			},
+			// 添加好友请求
 			addFriend: function() {
 				uni.request({
 					url: config.myurl + '/friend/request',
@@ -300,6 +307,7 @@
 					}
 				})
 			},
+			// 请求添加好友
 			AddFriend: function(e) {
 				this.ok = true
 				if (e.detail.cursor > 0) {
