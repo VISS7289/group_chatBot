@@ -18,13 +18,14 @@ from io import open
 import itertools
 import math
 
+# 设置GPU
 USE_CUDA = torch.cuda.is_available()
 device = torch.device("cuda" if USE_CUDA else "cpu")
-
+# 数据集名称
 corpus_name = "cornell movie-dialogs corpus"
 corpus = os.path.join("data", corpus_name)
 
-
+# 输出读取到的数据
 def printLines(file, n=10):
     with open(file, 'rb') as datafile:
         lines = datafile.readlines()

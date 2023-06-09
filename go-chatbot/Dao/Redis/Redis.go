@@ -9,6 +9,7 @@ import (
 
 var rdb *redis.Client
 
+// 初始化Redis客户端并连接到Redis服务器
 func Init() (err error) {
 	rdb = redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d",

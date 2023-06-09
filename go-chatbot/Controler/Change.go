@@ -23,18 +23,20 @@ func ChangeUserImg(c *gin.Context) {
 	// 数据绑定，将请求体中的json数据绑定到ParmChangeImg结构体中
 	var p Models.ParmChangeImg
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	//业务处理
+	// 业务处理，调用Logic层的ChangeUserImg函数进行用户头像更改操作
 	err := Logic.ChangeUserImg(&p)
 	if err != nil {
+		// 如果业务处理出现错误，则记录错误日志，并返回自定义的CodeInvalidParm错误和错误信息
 		zap.L().Error("SomeOne Have Unknow Error When Change Img:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
 	}
-	//返回响应
+	// 返回响应，返回成功状态码和消息
 	Models.ResponseSuccess(c, "success")
 
 }
@@ -51,21 +53,23 @@ func ChangeUserImg(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /change/update [post]
 func ChangeUser(c *gin.Context) {
-	// 数据绑定
+	// 数据绑定，将请求体中的json数据绑定到ParmChange结构体中
 	var p Models.ParmChange
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	//业务处理
+	// 业务处理，调用Logic层的ChangeUser函数进行用户信息更改操作
 	err := Logic.ChangeUser(&p)
 	if err != nil {
+		// 如果业务处理出现错误，则记录错误日志，并返回自定义的CodeInvalidParm错误和错误信息
 		zap.L().Error("SomeOne Have Unknow Error When Change Img:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, err)
 		return
 	}
-	//返回响应
+	// 返回响应，返回成功状态码和消息
 	Models.ResponseSuccess(c, "success")
 
 }
@@ -82,21 +86,23 @@ func ChangeUser(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /change/nick [post]
 func ChangeNick(c *gin.Context) {
-	// 数据绑定
+	// 数据绑定，将请求体中的json数据绑定到ParmFriendRequest结构体中
 	var p Models.ParmFriendRequest
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	// 对绑定的数据进行节选
+	// 对绑定的数据进行节选，只选取UserId和FriendId
 	q := Models.ParmSerchIsFriend{
 		UserId:   p.UserId,
 		FriendId: p.FriendId,
 	}
-	// 业务逻辑
+	// 业务逻辑，调用Logic层的SerchIsFriend函数查询是否是好友关系
 	friendRes, err := Logic.SerchIsFriend(&q)
 	if err != nil {
+		// 如果查询好友关系出现错误，则根据错误类型返回相应的错误信息
 		if Models.ErrorIs(err, Models.ErrorWrongPassword) || Models.ErrorIs(err, Models.ErrorUserNotExit) {
 			Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, err.Error())
 			return
@@ -105,21 +111,21 @@ func ChangeNick(c *gin.Context) {
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
 	}
-	// 非法发送好友请求
+	// 如果不是好友关系，则返回IllegalityFriendReq错误
 	if friendRes.State != 0 {
 		zap.L().Error("SomeOne Illegality Send Friend Request:", zap.Error(err))
 		Models.ResponseError(c, Models.CodeIllegalityFriendReq)
 		return
 	}
-	//业务处理
+	// 业务处理，调用Logic层的ChangeNick函数进行用户昵称更改操作
 	//state 0为好友 1为申请中 2为非好友
-
 	if err := Logic.ChangeNick(&p); err != nil {
+		// 如果业务处理出现错误，则记录错误日志，并返回自定义的CodeInvalidParm错误和错误信息
 		zap.L().Error("SomeOne Have Unknow Error When Login:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
 	}
-	//返回响应
+	// 返回响应，返回成功状态码和消息
 	Models.ResponseSuccess(c, "success")
 
 }
@@ -136,9 +142,10 @@ func ChangeNick(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /change/email [post]
 func ChangeEmail(c *gin.Context) {
-	// 数据绑定
+	// 数据绑定，将请求体中的json数据绑定到ParmChangeEmail结构体中
 	var p Models.ParmChangeEmail
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
@@ -148,7 +155,7 @@ func ChangeEmail(c *gin.Context) {
 		VerifiCode: p.VerifiCode,
 		Email:      p.NewEmail,
 	}
-	// Redis处理验证码
+	// Redis处理验证码，从Redis中获取该邮箱的验证码，并进行比对
 	val, err := Redis.RedisFind(q.Email)
 	if err != nil {
 		Models.ResponseError(c, Models.CodeVerifiNotFund)
@@ -158,20 +165,23 @@ func ChangeEmail(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeVerifiErr)
 		return
 	}
-	//业务逻辑
+	// 业务逻辑
+	// 构造ParmChange结构体，将数据类型设置为"email"
 	s := Models.ParmChange{
 		UserId: p.UserId,
 		Data:   p.NewEmail,
 		Type:   "email",
 		Psw:    "",
 	}
+	// 调用Logic层的ChangeUser函数进行用户信息更改操作
 	err = Logic.ChangeUser(&s)
 	if err != nil {
+		// 如果业务处理出现错误，则记录错误日志，并返回自定义的CodeInvalidParm错误和错误信息
 		zap.L().Error("SomeOne Have Unknow Error When Change Img:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, err)
 		return
 	}
-	//返回响应
+	// 返回响应，返回成功状态码和消息
 	Models.ResponseSuccess(c, "success")
 
 }
@@ -188,9 +198,10 @@ func ChangeEmail(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /change/psw [post]
 func ChangePsw(c *gin.Context) {
-	// 数据绑定
+	// 数据绑定，将请求体中的json数据绑定到ParmChangePsw结构体中
 	var p Models.ParmChangePsw
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Get User Detail Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
@@ -200,7 +211,7 @@ func ChangePsw(c *gin.Context) {
 		VerifiCode: p.VerifiCode,
 		Email:      p.Email,
 	}
-	// Redis验证验证码
+	// Redis验证验证码，从Redis中获取该邮箱的验证码，并进行比对
 	val, err := Redis.RedisFind(q.Email)
 	// 错误情况处理
 	if err != nil {
@@ -211,6 +222,7 @@ func ChangePsw(c *gin.Context) {
 		Models.ResponseError(c, Models.CodeVerifiErr)
 		return
 	}
+	// 对密码进行规则校验
 	if len(p.Password) < 8 {
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "密码过短")
 		return
@@ -220,19 +232,22 @@ func ChangePsw(c *gin.Context) {
 		return
 	}
 	//业务处理
+	// 构造ParmChange结构体，将数据类型设置为"password"
 	s := Models.ParmChange{
 		UserId: p.UserId,
 		Data:   p.Password,
 		Type:   "password",
 		Psw:    "",
 	}
+	// 调用Logic层的ChangeUser函数进行用户信息更改操作
 	err = Logic.ChangeUser(&s)
 	if err != nil {
+		// 如果业务处理出现错误，则记录错误日志，并返回自定义的CodeInvalidParm错误和错误信息
 		zap.L().Error("SomeOne Have Unknow Error When Change Img:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, err)
 		return
 	}
-	//返回响应
+	// 返回响应，返回成功状态码和消息
 	Models.ResponseSuccess(c, "success")
 
 }

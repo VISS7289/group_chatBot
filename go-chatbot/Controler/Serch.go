@@ -19,20 +19,23 @@ import (
 // @Success 200 {object} _ResponsePostList
 // @Router /serch/username [post]
 func SerchUsername(c *gin.Context) {
-	//参数校验
+	//参数校验，将请求体中的json数据绑定到ParmSerchUsername结构体中
 	var p Models.ParmSerchUsername
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Login Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	//业务处理
+	//业务处理，搜索用户名
 	userRes, err := Logic.SerchUser(&p)
 	if err != nil {
+		// 如果发生错误，则根据错误类型返回相应的错误码和错误信息
 		if Models.ErrorIs(err, Models.ErrorWrongPassword) || Models.ErrorIs(err, Models.ErrorUserNotExit) {
 			Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, err.Error())
 			return
 		}
+		// 否则，记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("SomeOne Have Unknow Error When Login:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return

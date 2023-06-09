@@ -22,22 +22,28 @@ import (
 // @Success 200 {object} _ResponsePostList
 // @Router /chat [post]
 func ChatHandler(c *gin.Context) {
+	// 数据绑定，将请求体中的json数据绑定到ParmChat结构体中
 	var p Models.ParmChat
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Request Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
 	// 发送 POST 请求到 Python 服务器
+	// 构造POST请求的URL和请求体
 	url := "http://localhost:8087/chat"
 	post := "{\"chat_content\":\"" + p.ChatContent +
 		"\"}"
 	var jsonStr = []byte(post)
+	// 构造POST请求
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
+	// 发送POST请求并获取响应
 	resp, err := client.Do(req)
 	if err != nil {
+		// 如果发送POST请求出现错误，则记录错误日志，并返回CodeServerBusy错误
 		zap.L().Error("Python Server Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeServerBusy)
 		return
@@ -61,22 +67,28 @@ func ChatHandler(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /chat_rand [post]
 func RandChatHandler(c *gin.Context) {
+	// 数据绑定，将请求体中的json数据绑定到ParmChat结构体中
 	var p Models.ParmChat
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Request Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
 	// 发送 POST 请求到 Python 服务器
+	// 构造POST请求的URL和请求体
 	url := "http://localhost:8087/chat_rand"
 	post := "{\"chat_content\":\"" + p.ChatContent +
 		"\"}"
 	var jsonStr = []byte(post)
+	// 构造POST请求
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
+	// 发送POST请求并获取响应
 	resp, err := client.Do(req)
 	if err != nil {
+		// 如果发送POST请求出现错误，则记录错误日志，并返回CodeServerBusy错误
 		zap.L().Error("Python Server Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeServerBusy)
 		return

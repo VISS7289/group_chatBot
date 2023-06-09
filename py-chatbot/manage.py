@@ -3,7 +3,7 @@
 import os
 import sys
 
-
+# django启动
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')

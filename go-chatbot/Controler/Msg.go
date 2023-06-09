@@ -19,16 +19,18 @@ import (
 // @Success 200 {object} _ResponsePostList
 // @Router /msg/newone [post]
 func GetNewMsgOne(c *gin.Context) {
-	//参数校验
+	//参数校验，将请求体中的json数据绑定到ParmGetNewMsgOne结构体中
 	var p Models.ParmGetNewMsgOne
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Login Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	//业务处理
+	//业务处理，获取与指定用户的最新消息
 	info, err := Logic.GetNewMsgOne(&p)
 	if err != nil {
+		// 如果发生未知错误，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("SomeOne Have Unknow Error When Delete Friend:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
@@ -49,16 +51,18 @@ func GetNewMsgOne(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /msg/unread [post]
 func GetUnReadMsgNum(c *gin.Context) {
-	//参数校验
+	//参数校验，将请求体中的json数据绑定到ParmGetNewMsgOne结构体中
 	var p Models.ParmGetNewMsgOne
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Login Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	//业务处理
+	//业务处理，获取未读消息数量
 	num, err := Logic.GetUnReadMsgNum(&p)
 	if err != nil {
+		// 如果发生未知错误，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("SomeOne Have Unknow Error When Delete Friend:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
@@ -79,16 +83,18 @@ func GetUnReadMsgNum(c *gin.Context) {
 // @Success 200 {object} _ResponsePostList
 // @Router /msg/getOldChatF [post]
 func GetOldChatF(c *gin.Context) {
-	//参数校验
+	//参数校验，将请求体中的json数据绑定到ParmGetOldChat结构体中
 	var p Models.ParmGetOldChat
 	if err := c.ShouldBindJSON(&p); err != nil {
+		// 如果绑定数据失败，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("Login Parm Error", zap.Error(err))
 		Models.ResponseError(c, Models.CodeInvalidParm)
 		return
 	}
-	//业务处理
+	//业务处理，获取与指定好友的历史聊天记录
 	info, err := Logic.GetOldMsgF(&p)
 	if err != nil {
+		// 如果发生未知错误，则记录错误日志，并返回CodeInvalidParm错误
 		zap.L().Error("SomeOne Have Unknow Error When Delete Friend:", zap.Error(err))
 		Models.ResponseErrorWithMsg(c, Models.CodeInvalidParm, "未知错误")
 		return
