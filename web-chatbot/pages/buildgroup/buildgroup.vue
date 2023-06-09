@@ -49,69 +49,70 @@
 </template>
 
 <script>
-	import config from '../../commons/js/config.js'
-	import refersh from '../../commons/js/refershToken.js'
+	import config from '../../commons/js/config.js' // 导入config.js模块
+	import refersh from '../../commons/js/refershToken.js' // 导入refershToken.js模块
 	export default {
 		data() {
 			return {
-				url: '',
-				img: '../../static/index/group.png',
-				friends: [],
-				atoken: '',
-				rtoken: '',
-				user: {},
-				scrollToView: '',
-				selectnum: 0,
+				url: '', // 图片URL
+				img: '../../static/index/group.png', // 图片路径
+				friends: [], // 好友列表
+				atoken: '', // 访问令牌
+				rtoken: '', // 刷新令牌
+				user: {}, // 用户信息
+				scrollToView: '', // 滚动到指定位置
+				selectnum: 0, // 选择数量
 			}
 		},
 		onLoad() {
-			this.userInit()
-			this.getFriends()
+			this.userInit() // 用户初始化
+			this.getFriends() // 获取好友列表
 		},
 		computed: {
 			select: function() {
-				return this.selectnum == 0;
+				return this.selectnum == 0; // 根据选择数量判断是否为0
 			}
 		},
 		methods: {
 			choose: function(index) {
-				this.friends[index].select = !this.friends[index].select;
-				this.selectnum += this.friends[index].select * 2 - 1;
-				console.log(this.selectnum);
+				this.friends[index].select = !this.friends[index].select; // 切换好友选择状态
+				this.selectnum += this.friends[index].select * 2 - 1; // 更新选择数量
+				console.log(this.selectnum); // 打印选择数量
 			},
 			backOne: function() {
 				uni.navigateBack({
-					delta: 1
+					delta: 1 // 返回上一页
 				})
 			},
 			getFriends: function() {
 				uni.request({
-					url: config.myurl + '/friend/myFriend',
+					url: config.myurl + '/friend/myFriend', // 请求好友接口URL
 					method: 'POST',
 					header: {
-						'Authorization': 'Bearer ' + this.atoken
+						'Authorization': 'Bearer ' + this.atoken // 设置请求头中的Authorization字段
 					},
 					data: {
-						'user_id': this.user.id,
-						'state': 0
+						'user_id': this.user.id, // 用户ID
+						'state': 0 // 好友状态
 					},
 					success: async data => {
 						// console.log(data.data)
-						if (data.data.Code == 1009) {
-							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+						if (data.data.Code == 1009) { // 判断返回的Code是否为1009
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this
+								.rtoken) // 刷新令牌
 							if (newCode == 1000) {
-								this.atoken = uni.getStorageSync('atoken')
-								this.rtoken = uni.getStorageSync('rtoken')
-								this.getFriends()
+								this.atoken = uni.getStorageSync('atoken') // 更新访问令牌
+								this.rtoken = uni.getStorageSync('rtoken') // 更新刷新令牌
+								this.getFriends() // 重新获取好友列表
 							} else {
 								// err
 							}
-						} else if (data.data.Code == 1000) {
+						} else if (data.data.Code == 1000) { // 判断返回的Code是否为1000
 							// console.log('friends')
 							if (data.data.Data != null) {
 								this.noone = false
 								// console.log(data.data.Data)
-								this.friends = []
+								this.friends = [] // 清空好友列表
 								for (let i = 0; i < data.data.Data.length; i++) {
 									let frinick = data.data.Data[i].FriendNick
 									if (frinick == '') {
@@ -128,7 +129,7 @@
 								}
 								console.log(this.friends)
 							} else {
-								this.friends = []
+								this.friends = [] // 清空好友列表
 							}
 
 						} else {
@@ -141,25 +142,23 @@
 				uni.chooseImage({
 					count: 1,
 					success: rst => {
-						// 设置url的值，显示控件
-						this.url = rst.tempFilePaths[0]
+						this.url = rst.tempFilePaths[0] // 设置图片URL，显示控件
 					}
 				})
 			},
 			oncancel() {
-				// url设置为空，隐藏控件
-				this.url = ''
+				this.url = '' // 清空图片URL，隐藏控件
 			},
 			compressImg: function(src) {
 				return new Promise(async (resolve, reject) => {
-					var ctx = uni.createCanvasContext('cv', this)
+					var ctx = uni.createCanvasContext('cv', this) // 清空图片URL，隐藏控件
 					let w, h
 					await this.getImgInfo(src).then(res => {
-						w = res[0]
-						h = res[1]
+						w = res[0] // 获取图片宽度
+						h = res[1] // 获取图片高度
 					})
-					let d = this.Afill(w, h, 100, 100)
-					ctx.drawImage(src, d[0], d[1], d[2], d[3], 0, 0, 100, 100)
+					let d = this.Afill(w, h, 100, 100) // 计算裁剪区域
+					ctx.drawImage(src, d[0], d[1], d[2], d[3], 0, 0, 100, 100) // 在画布上绘制裁剪后的图片
 					ctx.draw(false, () => {
 						uni.canvasToTempFilePath({
 							canvasId: 'cv',
@@ -167,11 +166,11 @@
 							quality: 0.8,
 							success: function(res) {
 								// 在H5平台下，tempFilePath 为 base64
-								console.log(res.tempFilePath)
-								resolve(res.tempFilePath)
+								console.log(res.tempFilePath) // 打印压缩后的图片路径
+								resolve(res.tempFilePath) // 返回压缩后的图片路径
 							},
 							fail: function() {
-								reject('error')
+								reject('error') // 压缩失败
 							}
 						}, this)
 					}) //绘制
@@ -183,7 +182,7 @@
 					image.src = url
 					let timer = setInterval(() => {
 						if (image.width > 0 || image.height > 0) {
-							resolve([image.width, image.height]) // 图片宽*高
+							resolve([image.width, image.height]) // 返回图片宽度和高度
 							clearInterval(timer)
 						}
 					}, 50)
@@ -204,27 +203,27 @@
 					sx = 0
 					sy = (imageHeight - sh) / 2
 				}
-				return [sx, sy, sw, sh]
+				return [sx, sy, sw, sh] // 返回裁剪区域坐标和尺寸
 			},
 			async onok(ev) {
-				this.img = await this.compressImg(ev.base64)
-				console.log(ev.base64)
-				this.url = "";
+				this.img = await this.compressImg(ev.base64) // 压缩图片并设置图片路径
+				console.log(ev.base64) // 打印压缩后的图片数据
+				this.url = ""; // 清空图片URL
 			},
 			userInit: function() {
 				try {
-					const value = uni.getStorageSync('user')
+					const value = uni.getStorageSync('user') // 获取用户信息
 					if (value) {
 						this.user.img = 'data:image/png;base64,' + value.img
 						this.user.id = value.id
 						this.user.email = value.email
 						this.user.name = value.name
 						this.user.nick = value.name
-						this.atoken = uni.getStorageSync('atoken')
-						this.rtoken = uni.getStorageSync('rtoken')
+						this.atoken = uni.getStorageSync('atoken') // 获取访问令牌
+						this.rtoken = uni.getStorageSync('rtoken') // 获取刷新令牌
 					} else {
 						uni.navigateTo({
-							url: '../signin/signin',
+							url: '../signin/signin', // 跳转到登录页面
 						})
 					}
 					console.log(value)

@@ -40,11 +40,13 @@
 				errInfo: '输入用户名或密码错误！'
 			}
 		},
-		
+
 		methods: {
 			// 页面跳转
 			toSignUp: function() {
-				uni.navigateTo({ url: '../signup/signup', })
+				uni.navigateTo({
+					url: '../signup/signup',
+				})
 			},
 			// 更新用户名
 			subUsername: function(e) {
@@ -57,23 +59,27 @@
 			// 登录
 			subInfo: function() {
 				if (this.username && this.password) {
+					// 发起登录请求
 					uni.request({
-						url: config.myurl + '/login',
-						method: 'POST',
+						url: config.myurl + '/login', // 登录接口的URL
+						method: 'POST', // 请求方法为POST
 						data: {
-							'username': this.username,
-							'password': this.password,
+							'username': this.username, // 提交用户名
+							'password': this.password, // 提交密码
 						},
 						success: data => {
+							// 请求成功回调函数
 							// console.log(data.data)
 							if (data.data.Code != 1000) {
+								// 登录失败，显示错误信息
 								this.wrong = true
 								this.errInfo = data.data.Msg
 							} else {
-								//登录成功
+								// 登录成功
 								this.wrong = false
 								let res = data.data.Data
 								try {
+									// 将用户信息存储到本地缓存
 									uni.setStorageSync('user', {
 										'id': res.UserID,
 										'img': res.Img,
@@ -87,30 +93,40 @@
 									console.log(e)
 								}
 								console.log(res)
-								uni.navigateTo({ url: '../index/index', })
-
+								// 跳转到首页
+								uni.navigateTo({
+									url: '../index/index'
+								})
 							}
 						}
 					})
 				} else {
+					// 用户名或密码为空，显示错误
 					this.wrong = true
 				}
 			},
+
 			Test: function() {
-				console.log(uni.getStorageSync('aToken'))
-				console.log(uni.getStorageSync('rToken'))
+				console.log(uni.getStorageSync('aToken')) // 打印本地缓存中的aToken
+				console.log(uni.getStorageSync('rToken')) // 打印本地缓存中的rToken
+
+				// 发起ping请求
 				uni.request({
-					url: config.myurl + '/ping',
-					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + uni.getStorageSync('aToken') },
+					url: config.myurl + '/ping', // ping接口的URL
+					method: 'POST', // 请求方法为POST
+					header: {
+						'Authorization': 'Bearer ' + uni.getStorageSync('aToken')
+					}, // 在请求头中添加授权信息
 					success: data => {
-						console.log(data.data)
+						console.log(data.data) // 打印ping请求的返回数据
 						if (data.data.Code == 1009) {
-							common.refersh(config.myurl)
+							// 若返回Code为1009，则表示需要刷新令牌
+							common.refersh(config.myurl) // 调用刷新令牌的方法
 						}
 					}
 				})
 			}
+
 		}
 	}
 </script>
