@@ -21,7 +21,7 @@
 		</view>
 		<view class="main">
 			<view class="apply"></view>
-<!-- 			<view class="noone" v-if="noone">
+			<!-- 			<view class="noone" v-if="noone">
 				<image src="../../static/index/lonely.png" mode="aspectFill"></image>
 				<view class="no-title">您还没有好友~</view>
 				<view class="serch-bt" @tap="toSerch">搜索好友</view>
@@ -116,7 +116,7 @@
 			this.userInit()
 			// 获取聊天机器人
 			this.getRobote()
-			
+
 			this.getFriends()
 			// 获取好友请求
 			this.getFriendsReq()
@@ -151,32 +151,42 @@
 		methods: {
 			// 获取聊天机器人
 			getRobote: function() {
+				// 发起网络请求
 				uni.request({
-					url: config.myurl + '/user/detial',
-					method: 'POST',
+					url: config.myurl + '/user/detial', // 请求的URL
+					method: 'POST', // 请求方法为POST
 					header: {
-						'Authorization': 'Bearer ' + this.atoken
+						'Authorization': 'Bearer ' + this.atoken // 设置请求头中的Authorization字段，包含访问令牌
 					},
 					data: {
-						'id': '00000000000000000'
+						'id': '00000000000000000' // 提供的数据，包含一个id字段
 					},
 					success: async data => {
+						// 请求成功的回调函数
 						// console.log(data.data)
 						if (data.data.Code == 1009) {
+							// 判断返回的Code是否为1009
+							// 通过调用其他函数重新获取访问令牌，并将新的令牌保存在atoken和rtoken变量中
 							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								// 如果刷新令牌成功（返回的Code为1000），更新atoken和rtoken的值
 								this.atoken = uni.getStorageSync('atoken')
 								this.rtoken = uni.getStorageSync('rtoken')
+								// 递归调用getRobote函数，重新获取聊天机器人信息
 								this.getRobote()
 							} else {
+								// 刷新令牌失败，处理错误
 								// err
 							}
 						} else if (data.data.Code == 1000) {
+							// 返回的Code为1000，表示获取聊天机器人信息成功
 							// console.log('friends')
 							if (data.data.Data != null) {
+								// 判断返回的数据Data是否为null
 								this.noone = false
 								console.log(data.data.Data)
 								console.log(data.data.Data.CreateTime)
+								// 将返回的数据解析并存储在robotone对象中
 								this.robotone = {
 									id: data.data.Data.UserID,
 									name: data.data.Data.Username,
@@ -186,120 +196,144 @@
 									tip: 0
 								}
 								console.log(this.robotone)
+								// 调用getNewMsg函数获取与聊天机器人的最新消息
 								let msg = await this.getNewMsg(this.robotone.id)
 								console.log(msg)
 								if (msg != null) {
 									console.log(msg)
+									// 如果有最新消息，更新robotone的info和time字段
 									this.robotone.info = msg.Msg
 									this.robotone.time = msg.Time
 								}
+								// 调用getUnReadMsg函数获取与聊天机器人的未读消息数量
 								this.robotone.tip = await this.getUnReadMsg(this.robotone.id)
 							}
 						}
 					}
 				})
 			},
+
 			// 页面跳转
 			toBuildgroup: function() {
 				uni.navigateTo({
 					url: '../buildgroup/buildgroup'
 				})
 			},
-			// 与后端简历websocket连接
+			// 与后端建立 WebSocket 连接
 			join: function() {
-				console.log('hello')
+				console.log('hello');
 				uni.connectSocket({
-					url: config.socketurl + '?send_id=' + this.user.id + '&accept_id=app',
+					url: config.socketurl + '?send_id=' + this.user.id +
+						'&accept_id=app', // 连接的 WebSocket 地址，包含发送者和接收者的ID
 					success: data => {
-						console.log(data.errMsg)
+						console.log(data.errMsg); // 输出连接成功的消息
 					}
-				})
+				});
 				uni.onSocketError(res => {
-					console.log('WebSocket连接打开失败，请检查！' + res);
-					this.join()
+					console.log('WebSocket连接打开失败，请检查！' + res); // WebSocket 连接失败的回调函数
+					this.join(); // 重新尝试建立连接
 				});
 				uni.onSocketMessage(res => {
-					let data = JSON.parse(res.data);
-					console.log('收到服务器内容：' + res.data);
+					let data = JSON.parse(res.data); // 解析接收到的消息数据为 JSON 对象
+					console.log('收到服务器内容：' + res.data); // 输出接收到的服务器内容
 					if (data.code == 1000) {
+						// 如果接收到的消息 code 为 1000，表示有新的消息到达
 						for (let i = 0; i < this.friends2.length; i++) {
 							if (this.friends2[i].id == data.send_id) {
-								this.friends2[i].info = data.message
-								this.friends2[i].tip += 1
+								// 找到与发送者ID匹配的朋友
+								this.friends2[i].info = data.message; // 更新朋友的消息内容
+								this.friends2[i].tip += 1; // 未读消息数量加一
 							}
 						}
 					}
 				});
 			},
-			// socket验证
+
+			// 关闭 WebSocket 连接
 			exit: function() {
-				console.log(666)
+				console.log(666);
 				uni.closeSocket({
 					success: function(res) {
-						console.log("WebSocket关闭成功！");
+						console.log("WebSocket关闭成功！"); // WebSocket 关闭成功的回调函数
 					},
 					fail: function(res) {
-						console.log("WebSocket关闭失败！");
+						console.log("WebSocket关闭失败！"); // WebSocket 关闭失败的回调函数
 					}
-				})
-
+				});
 			},
-			// 跳转
+
+			// 跳转到好友请求页面
 			goRequest: function() {
 				uni.navigateTo({
-					url: '../friendReq/friendReq'
-				})
+					url: '../friendReq/friendReq' // 跳转到 friendReq 页面
+				});
 			},
-			// 跳转
+
+			// 跳转到聊天室页面
 			goChatRoom: function(item) {
 				uni.navigateTo({
 					url: '../chatRoom/chatRoom?friendInfo=' + encodeURIComponent(JSON.stringify(item)) +
 						'&type=0'
-				})
+					// 跳转到 chatRoom 页面，并传递参数 friendInfo 和 type
+					// friendInfo 参数是 item 对象的 JSON 字符串形式，需要使用 encodeURIComponent 进行编码
+					// type 参数为 0
+				});
 			},
-			// 日期格式更改
+
+			// 修改日期格式
 			changeTime: function(date) {
-				return calT.dateTime(date)
+				return calT.dateTime(date); // 调用 calT.dateTime() 函数，修改日期格式并返回结果
 			},
-			// 日期格式更改
+
+			// 修改日期格式
 			changeTime2: function(date) {
 				if (date == undefined) {
-					return
+					return; // 如果 date 为 undefined，直接返回
 				}
-				return calT.dateTime2(date)
+				return calT.dateTime2(date); // 调用 calT.dateTime2() 函数，修改日期格式并返回结果
 			},
-			// 从缓存获取好友
+
+			// 从缓存中获取好友列表
 			getFriends: function() {
-				this.friends = datas.friends()
+				this.friends = datas.friends(); // 调用 datas.friends() 函数，从缓存中获取好友列表，并赋值给 this.friends 变量
 				for (let i = 0; i < this.friends.length; i++) {
-					this.friends[i].imgurl = '../../static/index/' + this.friends[i].imgurl
+					this.friends[i].imgurl = '../../static/index/' + this.friends[i]
+						.imgurl; // 修改好友列表中每个好友对象的 imgurl 属性
 				}
 				//console.log(this.friends);
 			},
+
 			// 获取好友列表
 			getFriends2: function() {
 				uni.request({
-					url: config.myurl + '/friend/myFriend',
-					method: 'POST',
+					url: config.myurl + '/friend/myFriend', // 请求的URL
+					method: 'POST', // 请求方法为POST
 					header: {
-						'Authorization': 'Bearer ' + this.atoken
+						'Authorization': 'Bearer ' + this.atoken // 设置请求头中的Authorization字段，包含访问令牌
 					},
 					data: {
-						'user_id': this.user.id,
+						'user_id': this.user.id, // 提供的数据，包含一个user_id字段和一个state字段
 						'state': 0
 					},
 					success: async data => {
+						// 请求成功的回调函数
 						// console.log(data.data)
 						if (data.data.Code == 1009) {
+							// 判断返回的Code是否为1009
+							// 通过调用其他函数重新获取访问令牌，并将新的令牌保存在atoken和rtoken变量中
 							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								// 如果刷新令牌成功（返回的Code为1000），更新atoken和rtoken的值
 								this.atoken = uni.getStorageSync('atoken')
 								this.rtoken = uni.getStorageSync('rtoken')
+								// 递归调用getFriends2函数，重新获取好友列表
 								this.getFriends2()
 							} else {
+								// 刷新令牌失败，处理错误
 								// err
 							}
 						} else if (data.data.Code == 1000) {
+							// 返回的Code为1000，表示获取好友列表成功
 							// console.log('friends')
 							if (data.data.Data != null) {
 								this.noone = false
@@ -310,6 +344,7 @@
 									if (frinick == '') {
 										frinick = data.data.Data[i].FriendName
 									}
+									// 将返回的数据解析并存储在friends2数组中
 									this.friends2.push({
 										id: data.data.Data[i].Friendid,
 										name: frinick,
@@ -321,59 +356,68 @@
 										tip: 0
 									})
 								}
+								// 对friends2数组按照时间进行排序
 								this.friends2 = calT.mySortByTime(this.friends2, 'time', 1)
-								this.refershMsg()
+								this.refershMsg() // 刷新消息
 							} else {
 								this.noone = true
 								this.friends2 = []
 							}
-
 						} else {
 							//err
 						}
 					}
 				})
 			},
+
 			// 获取好友请求
 			getFriendsReq: function() {
-				console.log('send')
+				console.log('send');
 				uni.request({
-					url: config.myurl + '/friend/myFriend',
-					method: 'POST',
+					url: config.myurl + '/friend/myFriend', // 请求的URL
+					method: 'POST', // 请求方法为POST
 					header: {
-						'Authorization': 'Bearer ' + this.atoken
+						'Authorization': 'Bearer ' + this.atoken // 设置请求头中的Authorization字段，包含访问令牌
 					},
 					data: {
-						'user_id': this.user.id,
+						'user_id': this.user.id, // 提供的数据，包含一个user_id字段和一个state字段
 						'state': 1
 					},
 					success: async data => {
+						// 请求成功的回调函数
 						// console.log(data.data)
 						if (data.data.Code == 1009) {
+							// 判断返回的Code是否为1009
+							// 通过调用其他函数重新获取访问令牌，并将新的令牌保存在atoken和rtoken变量中
 							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
 							if (newCode == 1000) {
+								// 如果刷新令牌成功（返回的Code为1000），更新atoken和rtoken的值
 								this.atoken = uni.getStorageSync('atoken')
 								this.rtoken = uni.getStorageSync('rtoken')
+								// 递归调用getFriendsReq函数，重新获取好友请求
 								this.getFriendsReq()
 							} else {
+								// 刷新令牌失败，处理错误
 								// err
 							}
 						} else if (data.data.Code == 1000) {
+							// 返回的Code为1000，表示获取好友请求成功
 							// console.log('Req')
 							if (data.data.Data != null) {
+								// 存在好友请求数据
 								this.friendReq.tip = data.data.Data.length
 								this.friendReq.time = data.data.Data[0].LastTime
 								for (let i = 0; i < data.data.Data.length; i++) {
+									// 比较时间，找到最新的请求时间
 									//1第1个大 2第2个大 0 一样大
 									if (calT.compareTime(data.data.Data[i].LastTime, this.friendReq
-											.time) ==
-										1) {
+											.time) == 1) {
 										this.friendReq.time = data.data.Data[i].LastTime
 									}
-
 								}
 								// console.log(this.friendReq.tip)
 							} else {
+								// 不存在好友请求数据
 								this.friendReq = {
 									img: '../../static/index/addUser.png',
 									tip: 0,
@@ -382,28 +426,33 @@
 									time: '19:46:35'
 								}
 							}
-
 						} else {
 							//err
 						}
 					}
 				})
-				console.log('get')
+				console.log('get');
 			},
+
 			// 从缓存获取信息
 			refershMsg: async function() {
 				for (let i = 0; i < this.friends2.length; i++) {
+					// 通过调用getNewMsg函数获取最新的消息
 					let msg = await this.getNewMsg(this.friends2[i].id)
-					if(msg != null){
+					if (msg != null) {
+						// 如果消息不为空，则更新好友列表中的info字段
 						this.friends2[i].info = msg.Msg
 					}
+					// 调用getUnReadMsg函数获取未读消息数量，并更新好友列表中的tip字段
 					this.friends2[i].tip = await this.getUnReadMsg(this.friends2[i].id)
 					// this.friends2[i].info=this.getNewMsg(this.friends2[i].id)
 				}
 			},
+
 			// 获取最新消息
 			getNewMsg: function(fid) {
 				return new Promise((resolve, reject) => {
+					// 发起请求获取最新消息
 					uni.request({
 						url: config.myurl + '/msg/newone',
 						method: 'POST',
@@ -427,6 +476,7 @@
 									// err
 								}
 							} else if (data.data.Code == 1000) {
+								// 根据消息类型处理返回的数据
 								switch (data.data.Data.Type) {
 									case 0:
 										resolve(data.data.Data)
@@ -448,11 +498,12 @@
 						}
 					})
 				})
-
 			},
+
 			// 获取未读消息
 			getUnReadMsg: function(fid) {
 				return new Promise((resolve, reject) => {
+					// 发起请求获取未读消息
 					uni.request({
 						url: config.myurl + '/msg/unread',
 						method: 'POST',
@@ -483,19 +534,22 @@
 						}
 					})
 				})
-
 			},
-			// 跳转
+
+			// 跳转到搜索页面
 			toSerch: function() {
 				uni.navigateTo({
 					url: '../serch/serch?user=' + encodeURIComponent(JSON.stringify(this.user)),
 				})
 			},
+
 			// 用户初始化
 			userInit: function() {
 				try {
+					// 从缓存中获取用户信息
 					const value = uni.getStorageSync('user')
 					if (value) {
+						// 如果存在用户信息，则将用户信息赋值给对应的属性
 						this.user.img = 'data:image/png;base64,' + value.img
 						this.user.id = value.id
 						this.user.email = value.email
@@ -504,6 +558,7 @@
 						this.atoken = uni.getStorageSync('atoken')
 						this.rtoken = uni.getStorageSync('rtoken')
 					} else {
+						// 如果不存在用户信息，则跳转到登录页面
 						uni.navigateTo({
 							url: '../signin/signin',
 						})
@@ -513,6 +568,7 @@
 					// error
 				}
 			},
+
 			Test: function() {
 				console.log("{\"type\": 1,\"message\": \"啦啦啦德玛西亚\"}")
 				uni.sendSocketMessage({
@@ -529,6 +585,7 @@
 					}
 				})
 			}
+
 		}
 	}
 </script>

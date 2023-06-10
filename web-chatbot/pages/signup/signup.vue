@@ -63,205 +63,220 @@
 	export default {
 		data() {
 			return {
-				type: 'password',
-				occupyUsername: false,
-				okUsername: false,
-				occupyEmail: false,
-				invilid: false,
-				okEmail: false,
-				shortUsername: false,
-				shortPassword: false,
-				look: false,
-				shortRe: false,
-				okRe: false,
-				okPa: false,
-				userValue: '',
-				emailValue: '',
-				userPassword: '',
-				userPasswordRe: '',
-				verifiValue: '',
-				wrong: false,
-				send: true,
-				reSend: false,
-				unSend: false,
-				time: 60,
-				errInfo: ''
+				type: 'password', // 密码输入框的类型
+				occupyUsername: false, // 是否占用用户名（用于验证用户名是否已被占用）
+				okUsername: false, // 用户名是否合法
+				occupyEmail: false, // 是否占用电子邮件地址（用于验证电子邮件地址是否已被占用）
+				invilid: false, // 输入是否无效（用于验证输入是否有效）
+				okEmail: false, // 电子邮件地址是否合法
+				shortUsername: false, // 用户名是否过短
+				shortPassword: false, // 密码是否过短
+				look: false, // 是否显示密码（用于切换密码输入框的可见性）
+				shortRe: false, // 重新输入的密码是否过短
+				okRe: false, // 重新输入的密码是否匹配原密码
+				okPa: false, // 密码是否合法
+				userValue: '', // 用户名输入框的值
+				emailValue: '', // 电子邮件地址输入框的值
+				userPassword: '', // 密码输入框的值
+				userPasswordRe: '', // 重新输入的密码输入框的值
+				verifiValue: '', // 验证码输入框的值
+				wrong: false, // 输入是否错误
+				send: true, // 是否发送验证码
+				reSend: false, // 是否重新发送验证码
+				unSend: false, // 是否无法发送验证码
+				time: 60, // 验证码倒计时的时间（单位：秒）
+				errInfo: '' // 错误信息
 			}
 		},
+
 		methods: {
 			toSignIn: function() {
-				uni.navigateTo({ url: '../signin/signin', })
+				uni.navigateTo({
+					url: '../signin/signin'
+				}) // 导航到登录页面
 			},
+
 			lookPassword: function() {
 				if (this.look) {
-					this.type = 'password'
+					this.type = 'password' // 如果密码输入框当前是可见的，将其类型设置为密码类型（隐藏密码）
 				} else {
-					this.type = 'text'
+					this.type = 'text' // 如果密码输入框当前是隐藏的，将其类型设置为文本类型（显示密码）
 				}
-				this.look = !this.look
+				this.look = !this.look // 切换密码输入框的可见性状态
 			},
 			// 用户名是否合法
 			isUsername: function(e) {
-				if (e.detail.cursor > 0) {
-					this.userValue = e.detail.value
-					if (e.detail.cursor >= 6) {
-						this.shortUsername = false
+				if (e.detail.cursor > 0) { // 检查光标位置，确保输入不为空
+					this.userValue = e.detail.value // 获取用户名输入框的值
+					if (e.detail.cursor >= 6) { // 检查用户名长度是否大于等于6
+						this.shortUsername = false // 用户名长度合法
 						uni.request({
-							url: config.myurl + '/existName?username=' + this.userValue,
+							url: config.myurl + '/existName?username=' + this
+								.userValue, // 向服务器发起验证用户名是否已被占用的请求
 							method: 'GET',
 							success: data => {
 								console.log(data.data)
-								if (data.data.Code == 1002) {
-									this.occupyUsername = true
+								if (data.data.Code == 1002) { // 判断服务器返回的结果码，1002表示用户名已被占用
+									this.occupyUsername = true // 用户名已被占用
 								} else {
-									this.occupyUsername = false
+									this.occupyUsername = false // 用户名未被占用
 								}
-								this.okUsername = !(this.occupyUsername || this.shortUsername)
+								this.okUsername = !(this.occupyUsername || this
+									.shortUsername) // 检查用户名的合法性，不能被占用且长度合法
 							},
 						})
 					} else {
-						this.shortUsername = true
-						this.occupyUsername = false
+						this.shortUsername = true // 用户名长度过短
+						this.occupyUsername = false // 用户名未被占用
 					}
 				}
 			},
 			// 邮箱是否合法
 			isEmail: function(e) {
 				let reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
-				if (e.detail.cursor > 0) {
-					this.emailValue = e.detail.value
-					if (reg.test(this.emailValue)) {
-						this.okEmail = true
-						this.invilid = false
+				if (e.detail.cursor > 0) { // 检查光标位置，确保输入不为空
+					this.emailValue = e.detail.value // 获取邮箱输入框的值
+					if (reg.test(this.emailValue)) { // 使用正则表达式验证邮箱格式是否合法
+						this.okEmail = true // 邮箱合法
+						this.invilid = false // 输入无效（即非法字符）
 					} else {
-						this.okEmail = false
-						this.invilid = true
+						this.okEmail = false // 邮箱不合法
+						this.invilid = true // 输入无效（即非法字符）
 					}
 				}
 			},
 			// 密码是否合法
 			isUserPassword: function(e) {
-				if (e.detail.cursor > 0) {
-					this.userPassword = e.detail.value
-					if (e.detail.cursor >= 6) {
-						this.okPa = true
-						this.shortPassword = false
-						if (this.userPasswordRe && this.userPasswordRe != this.userPassword) {
-							this.okRe = false
-							this.shortRe = true
+				if (e.detail.cursor > 0) { // 检查光标位置，确保输入不为空
+					this.userPassword = e.detail.value // 获取密码输入框的值
+					if (e.detail.cursor >= 6) { // 检查密码长度是否大于等于6
+						this.okPa = true // 密码合法
+						this.shortPassword = false // 密码长度合法
+						if (this.userPasswordRe && this.userPasswordRe != this.userPassword) { // 检查重新输入的密码是否存在且与原密码不匹配
+							this.okRe = false // 重新输入的密码不匹配
+							this.shortRe = true // 重新输入的密码长度合法
 						}
 					} else {
-						this.okPa = false
-						this.shortPassword = true
+						this.okPa = false // 密码不合法
+						this.shortPassword = true // 密码长度过短
 					}
 				}
 			},
 			// 验证密码是否合法
 			isUserPasswordRe: function(e) {
-				if (e.detail.cursor > 0) {
-					this.userPasswordRe = e.detail.value
-					if (e.detail.cursor >= 6 && this.userPasswordRe == this.userPassword) {
-						this.okRe = true
-						this.shortRe = false
+				if (e.detail.cursor > 0) { // 检查光标位置，确保输入不为空
+					this.userPasswordRe = e.detail.value // 获取重新输入的密码输入框的值
+					if (e.detail.cursor >= 6 && this.userPasswordRe == this
+						.userPassword) { // 检查重新输入的密码长度是否大于等于6且与原密码匹配
+						this.okRe = true // 重新输入的密码合法且与原密码匹配
+						this.shortRe = false // 重新输入的密码长度合法
 					} else {
-						this.okRe = false
-						this.shortRe = true
+						this.okRe = false // 重新输入的密码不合法或与原密码不匹配
+						this.shortRe = true // 重新输入的密码长度合法
 					}
 				}
 			},
+
 			// 输入验证码
 			inputVerifi: function(e) {
 				this.verifiValue = e.detail.value
 			},
 			// 注册
 			subInfo: function() {
-				this.wrong = !this.wrong
-				if (this.okUsername && this.okEmail && this.okPa && this.okRe) {
+				this.wrong = !this.wrong // 切换错误状态，将错误状态设置为相反的值
+
+				if (this.okUsername && this.okEmail && this.okPa && this.okRe) { // 检查用户名、邮箱、密码和重新输入的密码是否都合法
 					uni.request({
-						url: config.myurl + '/register',
+						url: config.myurl + '/register', // 向服务器发送注册请求的URL
 						method: 'POST',
 						data: {
-							'username': this.userValue,
-							'password': this.userPassword,
-							're_password': this.userPasswordRe,
-							'email': this.emailValue,
-							'verifiCode': this.verifiValue
+							'username': this.userValue, // 提交的用户名
+							'password': this.userPassword, // 提交的密码
+							're_password': this.userPasswordRe, // 提交的重新输入的密码
+							'email': this.emailValue, // 提交的邮箱
+							'verifiCode': this.verifiValue // 提交的验证码
 						},
 						success: data => {
 							console.log(data.data)
-							if (data.data.Code != 1000) {
-								this.wrong = true
-								this.errInfo = data.data.Msg
+							if (data.data.Code != 1000) { // 判断服务器返回的结果码，非1000表示注册失败
+								this.wrong = true // 设置错误状态为true
+								this.errInfo = data.data.Msg // 设置错误信息为服务器返回的错误信息
 							} else {
-								this.wrong = false
-								let res = data.data.Data
+								this.wrong = false // 设置错误状态为false
+								let res = data.data.Data // 从服务器返回的数据中获取注册成功的用户信息
 								try {
-									uni.setStorageSync('user', {
+									uni.setStorageSync('user', { // 将用户信息存储到本地缓存中
 										'id': res.UserID,
 										'img': res.Img,
 										'email': res.Email,
 										'name': res.Username
 									})
-									uni.setStorageSync('atoken', res.AToken)
-									uni.setStorageSync('rtoken', res.RToken)
+									uni.setStorageSync('atoken', res.AToken) // 存储访问令牌到本地缓存中
+									uni.setStorageSync('rtoken', res.RToken) // 存储刷新令牌到本地缓存中
 								} catch (e) {
 									console.log('数据存储出错')
 									console.log(e)
 								}
 								console.log(res)
-								uni.navigateTo({ url: '../index/index', })
+								uni.navigateTo({ // 导航到首页
+									url: '../index/index',
+								})
 							}
 						}
 					})
 				} else {
-					this.shortUsername = !this.okUsername
-					this.invilid = !this.okEmail
-					this.shortPassword = !this.okPa
-					this.shortRe = !this.okRe
+					// 如果用户名、邮箱、密码或重新输入的密码有不合法的情况，则设置相应的状态为true，以提示用户输入错误
+					this.shortUsername = !this.okUsername // 用户名长度过短
+					this.invilid = !this.okEmail // 邮箱不合法
+					this.shortPassword = !this.okPa // 密码长度过短
+					this.shortRe = !this.okRe // 重新输入的密码长度过短
 				}
-
 			},
+
 			// 发送验证码
 			sendVertify: function() {
-				if (this.okEmail && !this.unSend) {
-					this.send = false
-					this.reSend = false
-					this.unSend = true
-					this.time = 60
-					var obj = setInterval(() => {
-						if (this.time <= 0) {
-							this.time = 0
-							this.reSend = true
-							this.unSend = false
-							clearInterval(obj)
+				if (this.okEmail && !this.unSend) { // 检查邮箱是否合法且未发送验证码
+					this.send = false // 设置发送状态为false
+					this.reSend = false // 设置重新发送状态为false
+					this.unSend = true // 设置不发送状态为true
+					this.time = 60 // 设置倒计时时间为60秒
+
+					var obj = setInterval(() => { // 创建计时器
+						if (this.time <= 0) { // 如果倒计时时间到达0
+							this.time = 0 // 设置倒计时时间为0
+							this.reSend = true // 设置重新发送状态为true
+							this.unSend = false // 设置不发送状态为false
+							clearInterval(obj) // 清除计时器
 						} else {
-							this.time = this.time - 1
+							this.time = this.time - 1 // 将倒计时时间减1
 						}
-					}, 1000)
+					}, 1000) // 每隔1秒执行一次计时器函数
+
 					uni.request({
-						url: config.myurl + '/verificationCode',
+						url: config.myurl + '/verificationCode', // 向服务器发送获取验证码的请求的URL
 						method: 'POST',
 						data: {
-							'to': this.emailValue,
-							'username': this.userValue
+							'to': this.emailValue, // 需要发送验证码的邮箱
+							'username': this.userValue // 用户名
 						},
 						success: data => {
 							console.log(data.data)
-							//登录成功
+							// 登录成功
 							if (data.data.Code == 1000) {
-								uni.setStorageSync('aToken', data.data.Data[0])
-								uni.setStorageSync('rToken', data.data.Data[1])
+								uni.setStorageSync('aToken', data.data.Data[0]) // 将访问令牌存储到本地缓存中
+								uni.setStorageSync('rToken', data.data.Data[1]) // 将刷新令牌存储到本地缓存中
 							}
 						}
 					})
 				} else {
-					this.invilid = !this.okEmail
+					this.invilid = !this.okEmail // 如果邮箱不合法，则设置输入无效的状态为true，以提示用户输入错误
 				}
 			},
-			timeReduce: function(t) {
 
-				return
+			timeReduce: function(t) {
+				return // 这个方法没有实际操作，直接返回
 			}
+
 		}
 	}
 </script>

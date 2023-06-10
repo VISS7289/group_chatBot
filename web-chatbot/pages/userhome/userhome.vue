@@ -57,28 +57,29 @@
 	export default {
 		data() {
 			return {
-				dis: false,
-				myname: 'duan',
-				animationData: {},
-				animationData1: {},
-				animationData2: {},
-				animationData3: {},
-				animationData4: {},
-				isAdd: false,
-				isDelete: false,
-				pageTop: 0,
-				imgTop: 0,
-				pageHeight: 0,
-				user: {},
-				userDetail: {},
-				userid: '',
-				userNick: '',
-				atoken: '',
-				rtoken: '',
-				relation: 0, //0好友 1申请中 2非好友 3自己
-				userRequest: '',
+				dis: false, // 控制某个元素是否可见的标志位
+				myname: 'duan', // 当前用户的名字
+				animationData: {}, // 动画数据对象
+				animationData1: {}, // 动画数据对象1
+				animationData2: {}, // 动画数据对象2
+				animationData3: {}, // 动画数据对象3
+				animationData4: {}, // 动画数据对象4
+				isAdd: false, // 是否添加的标志位
+				isDelete: false, // 是否删除的标志位
+				pageTop: 0, // 页面顶部的位置
+				imgTop: 0, // 图片顶部的位置
+				pageHeight: 0, // 页面的高度
+				user: {}, // 用户对象
+				userDetail: {}, // 用户详细信息对象
+				userid: '', // 用户ID
+				userNick: '', // 用户昵称
+				atoken: '', // 访问令牌
+				rtoken: '', // 刷新令牌
+				relation: 0, // 用户关系状态，0表示好友，1表示申请中，2表示非好友，3表示自己
+				userRequest: '', // 用户请求
 			}
 		},
+
 		// 初始化用户
 		onLoad: function(option) {
 			this.user = JSON.parse(decodeURIComponent(option.user))
@@ -91,7 +92,9 @@
 					this.getUserDetail()
 					this.getUserNick()
 				} else {
-					uni.navigateTo({ url: '../signin/signin', })
+					uni.navigateTo({
+						url: '../signin/signin',
+					})
 				}
 			} catch (e) {
 				// error
@@ -103,58 +106,62 @@
 		},
 		methods: {
 			refersh: function(parm) {
-				this.user.img = parm.img
-				this.user.name = parm.name
-				this.userDetail.Intr = parm.intr
-				this.userDetail.Gender = parm.sex
-				this.userNick = parm.nick
+				this.user.img = parm.img // 更新用户头像
+				this.user.name = parm.name // 更新用户姓名
+				this.userDetail.Intr = parm.intr // 更新用户简介
+				this.userDetail.Gender = parm.sex // 更新用户性别
+				this.userNick = parm.nick // 更新用户昵称
 			},
+
 			backOne: function() {
-				if (!this.isDelete) {
-					uni.navigateBack({ delta: 1 })
+				if (!this.isDelete) { // 如果没有删除操作
+					uni.navigateBack({
+						delta: 1
+					}) // 返回上一页
 				} else {
-					let pages = getCurrentPages() // 当前页面
-					let beforePage = pages[pages.length - 2]
+					let pages = getCurrentPages() // 获取当前页面栈
+					let beforePage = pages[pages.length - 2] // 获取上一页
 					uni.navigateBack({
 						delta: 1,
 						success: function() {
-							beforePage.DeleteSuccess() // 执行上一页的onLoad方法
+							beforePage.DeleteSuccess() // 执行上一页的DeleteSuccess方法
 						}
 					})
 				}
-
 			},
 			// 删除好友
 			delfriend: function() {
-				this.user.state = 2
-				this.isDelete = true
-				this.userNick = this.user.name
+				this.user.state = 2 // 将用户状态设置为2，表示非好友
+				this.isDelete = true // 将isDelete标志位设置为true，表示进行了删除操作
+				this.userNick = this.user.name // 将用户昵称设置为用户姓名
 			},
 			// 讲用户头像设为背景
 			getElementStyle: function() {
-				const query = uni.createSelectorQuery().in(this)
+				const query = uni.createSelectorQuery().in(this) // 创建选择器查询实例
 				query.select('.background').boundingClientRect(data => {
-					this.pageHeight = data.height
+					this.pageHeight = data.height // 获取背景元素的高度，并将其赋值给pageHeight属性
 				}).exec()
 				query.select('.userImg').boundingClientRect(data => {
-					this.imgTop = data.top
+					this.imgTop = data.top // 获取用户头像元素的top值，并将其赋值给imgTop属性
 				}).exec()
-				this.pageTop = uni.getSystemInfoSync().statusBarHeight
+				this.pageTop = uni.getSystemInfoSync().statusBarHeight // 获取系统状态栏的高度，并将其赋值给pageTop属性
 			},
 			// 获取好友昵称
 			getUserNick: function() {
 				if (this.userid == this.user.id) {
-					this.userNick = this.user.name
-					this.relation = 3
+					this.userNick = this.user.name // 如果userid等于当前用户id，将用户昵称设置为用户姓名
+					this.relation = 3 // 将关系状态设置为3，表示自己
 					return
 				}
 				uni.request({
-					url: config.myurl + '/serch/isfriend',
+					url: config.myurl + '/serch/isfriend', // 请求好友关系接口的URL
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					}, // 请求头部，包含访问令牌
 					data: {
-						'user_id': this.userid,
-						'friend_id': this.user.id
+						'user_id': this.userid, // 请求参数，当前用户id
+						'friend_id': this.user.id // 请求参数，好友id
 					},
 					success: async data => {
 						console.log(data.data)
@@ -168,17 +175,16 @@
 								// err
 							}
 						} else if (data.data.Code == 1000) {
-							this.relation = data.data.Data.State
-							if (data.data.Data.State == 0) {
-								if (data.data.Data.Markname.length != 0) {
+							this.relation = data.data.Data.State // 将关系状态设置为返回的好友关系状态
+							if (data.data.Data.State == 0) { // 如果关系状态为0，表示好友
+								if (data.data.Data.Markname.length != 0) { // 如果有备注名
 									console.log(this.userNick)
-									this.userNick = data.data.Data.Markname
+									this.userNick = data.data.Data.Markname // 将备注名设置为用户昵称
 								} else {
-									this.userNick = this.user.name
+									this.userNick = this.user.name // 否则，将用户姓名设置为用户昵称
 								}
-
 							} else {
-								this.userNick = this.user.name
+								this.userNick = this.user.name // 如果关系状态非0，将用户姓名设置为用户昵称
 							}
 						} else {
 							// err
@@ -186,9 +192,11 @@
 					}
 				})
 			},
+
 			// 为页面加载动效
 			addFriendAnmi: function() {
-				this.isAdd = !this.isAdd
+				this.isAdd = !this.isAdd // 切换isAdd标志位的值，用于控制动画效果的显示与隐藏
+
 				var animation = uni.createAnimation({
 					duration: 300,
 					timingFunction: 'ease',
@@ -209,80 +217,90 @@
 					duration: 300,
 					timingFunction: 'ease',
 				})
-				if (this.isAdd) {
-					animation.bottom(0).step()
-					animation1.bottom(0).step()
+
+				if (this.isAdd) { // 如果isAdd为true，执行展开动画
+					animation.bottom(0).step() // 动画1：底部上移至0位置
+					animation1.bottom(0).step() // 动画2：底部上移至0位置
 					animation2.height('240rpx').width('240rpx').top(0.17 * this.pageHeight - 2 * this.pageTop + 'px')
-						.left('-30%').step()
-					animation3.opacity(0).top(0.27 * this.pageHeight - 2 * this.pageTop + 'px').left('10%').step()
-					animation4.backgroundColor('rgba(255,248,49,0.3)').step()
-				} else {
-					animation.bottom('-75%').step()
-					animation1.bottom('-10%').step()
+						.left('-30%').step() // 动画3：设置高度、宽度、位置
+					animation3.opacity(0).top(0.27 * this.pageHeight - 2 * this.pageTop + 'px').left('10%')
+						.step() // 动画4：设置透明度、位置
+					animation4.backgroundColor('rgba(255,248,49,0.3)').step() // 动画5：设置背景颜色
+				} else { // 如果isAdd为false，执行收起动画
+					animation.bottom('-75%').step() // 动画1：底部下移至-75%位置
+					animation1.bottom('-10%').step() // 动画2：底部下移至-10%位置
 					animation2.height('400rpx').width('400rpx').top(this.imgTop - 2 * this.pageTop + 'px').left(0)
-						.step()
-					animation3.opacity(1).top('465rpx').left('324rpx').step()
-					animation4.backgroundColor('rgba(255,248,49,0)').step()
+						.step() // 动画3：设置高度、宽度、位置
+					animation3.opacity(1).top('465rpx').left('324rpx').step() // 动画4：设置透明度、位置
+					animation4.backgroundColor('rgba(255,248,49,0)').step() // 动画5：设置背景颜色
 				}
 
+				// 将动画效果导出并赋值给相应的数据属性
 				this.animationData = animation.export()
 				this.animationData1 = animation1.export()
 				this.animationData2 = animation2.export()
 				this.animationData3 = animation3.export()
 				this.animationData4 = animation4.export()
-
 			},
+
 			// 获取用户详情
 			getUserDetail: function() {
-				console.log(666)
+				console.log(666) // 打印日志，用于调试
 				uni.request({
-					url: config.myurl + '/user/detial',
+					url: config.myurl + '/user/detial', // 请求用户详情接口的URL
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
-					data: { 'id': this.user.id },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					}, // 请求头部，包含访问令牌
+					data: {
+						'id': this.user.id
+					}, // 请求参数，用户id
 					success: async data => {
-						console.log(data.data)
-						if (data.data.Code == 1009) {
-							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
-							if (newCode == 1000) {
-								this.atoken = uni.getStorageSync('atoken')
-								this.rtoken = uni.getStorageSync('rtoken')
-								this.getUserDetail()
+						console.log(data.data) // 打印返回的数据，用于调试
+						if (data.data.Code == 1009) { // 如果返回的Code等于1009，表示访问令牌过期
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this
+								.rtoken) // 刷新访问令牌
+							if (newCode == 1000) { // 如果刷新成功
+								this.atoken = uni.getStorageSync('atoken') // 更新访问令牌
+								this.rtoken = uni.getStorageSync('rtoken') // 更新刷新令牌
+								this.getUserDetail() // 重新调用getUserDetail方法
 							} else {
 								// err
 							}
-						} else if (data.data.Code == 1000) {
-							// console.log(data.data.Data)
-							this.userDetail = data.data.Data
-
+						} else if (data.data.Code == 1000) { // 如果返回的Code等于1000，表示请求成功
+							this.userDetail = data.data.Data // 将返回的用户详情数据赋值给userDetail
 						} else {
 							// err
 						}
 					}
 				})
 			},
+
 			// 添加好友请求
 			addFriend: function() {
 				uni.request({
-					url: config.myurl + '/friend/request',
+					url: config.myurl + '/friend/request', // 请求添加好友接口的URL
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken // 请求头部，包含访问令牌
+					},
 					data: {
-						'user_id': this.userid,
-						'friend_id': this.user.id,
-						'msg': this.userRequest,
+						'user_id': this.userid, // 当前用户的id
+						'friend_id': this.user.id, // 好友的id
+						'msg': this.userRequest, // 好友请求的消息
 					},
 					success: async data => {
-						if (data.data.Code == 1009) {
-							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
-							if (newCode == 1000) {
-								this.atoken = uni.getStorageSync('atoken')
-								this.rtoken = uni.getStorageSync('rtoken')
-								this.addFriend()
+						if (data.data.Code == 1009) { // 如果返回的Code等于1009，表示访问令牌过期
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this
+								.rtoken) // 刷新访问令牌
+							if (newCode == 1000) { // 如果刷新成功
+								this.atoken = uni.getStorageSync('atoken') // 更新访问令牌
+								this.rtoken = uni.getStorageSync('rtoken') // 更新刷新令牌
+								this.addFriend() // 重新调用addFriend方法
 							} else {
 								// err
 							}
-						} else if (data.data.Code == 1000) {
+						} else if (data.data.Code == 1000) { // 如果返回的Code等于1000，表示请求成功
 							uni.showToast({
 								title: '好友请求发送成功',
 								icon: 'none',
@@ -294,7 +312,7 @@
 							uni.navigateBack({
 								delta: 1,
 								success: function() {
-									beforePage.AddSuccess() // 执行上一页的onLoad方法
+									beforePage.AddSuccess() // 执行上一页的AddSuccess方法
 								}
 							})
 						} else {
@@ -307,6 +325,7 @@
 					}
 				})
 			},
+
 			// 请求添加好友
 			AddFriend: function(e) {
 				this.ok = true
@@ -320,7 +339,9 @@
 			//跳转用户详情页面
 			Touserdetail: function() {
 				console.log(this.user.id)
-				uni.navigateTo({ url: '../userdetail/userdetail?id=' + this.user.id })
+				uni.navigateTo({
+					url: '../userdetail/userdetail?id=' + this.user.id
+				})
 			},
 		}
 	}

@@ -108,48 +108,127 @@
 	export default {
 		data() {
 			return {
+				// infoType 变量用于存储信息类型的数组
 				infoType: ['昵称', '密码', '签名', '邮箱', '电话', '备注', '添加好友'],
+
+				// modifyInfo 变量是一个对象，包含两个属性
 				modifyInfo: {
-					type: 0, //0text 1pwd 2emain
-					userinfo: {}
+					type: 0, // type 用于指示要修改的信息类型，0表示文本，1表示密码，2表示邮箱
+					userinfo: {} // userinfo 用于存储用户信息的对象
 				},
+
+				// type 变量用于存储当前信息类型的字符串
 				type: 'password',
+
+				// occupyUsername 变量用于指示用户名是否已被占用
 				occupyUsername: false,
+
+				// okUsername 变量用于指示用户名是否有效
 				okUsername: false,
+
+				// occupyEmail 变量用于指示邮箱是否已被占用
 				occupyEmail: false,
+
+				// invilid 变量用于指示输入是否无效
 				invilid: false,
+
+				// okEmail 变量用于指示邮箱是否有效
 				okEmail: false,
+
+				// ok 变量用于指示操作是否成功
 				ok: false,
+
+				// look 变量用于指示是否查看详情
 				look: false,
+
+				// short 变量用于指示密码是否过短
 				short: false,
+
+				// occupy 变量用于指示用户名是否已被占用
 				occupy: false,
+
+				// okRe 变量用于指示密码是否有效
 				okRe: false,
+
+				// okPa 变量用于指示密码是否有效
 				okPa: false,
+
+				// userValue 变量用于存储用户输入的用户名
 				userValue: '',
+
+				// emailValue 变量用于存储用户输入的邮箱
 				emailValue: '',
+
+				// phoneValue 变量用于存储用户输入的电话号码
 				phoneValue: '',
+
+				// userPassword 变量用于存储用户输入的密码
 				userPassword: '',
+
+				// userPasswordRe 变量用于存储用户再次输入的密码
 				userPasswordRe: '',
+
+				// userRequest 变量用于存储用户的请求
 				userRequest: '',
+
+				// atoken 变量用于存储访问令牌
 				atoken: '',
+
+				// rtoken 变量用于存储刷新令牌
 				rtoken: '',
+
+				// typeRes 变量用于存储类型响应
 				typeRes: '',
+
+				// reqRes 变量用于存储请求响应
 				reqRes: '',
+
+				// userid 变量用于存储用户ID
 				userid: '',
+
+				// verifi 变量用于指示是否已验证
 				verifi: false,
+
+				// shortPassword 变量用于指示密码是否过短
 				shortPassword: false,
+
+				// shortRe 变量用于指示再次输入的密码是否过短
 				shortRe: false,
+
+				// verifiValue 变量用于存储验证码的值
 				verifiValue: '',
+
+				// verifiValue2 变量用于存储第二个验证码的值
 				verifiValue2: '',
+
+				// time 变量用于存储时间
 				time: 0,
+
+				// send 变量用于指示是否发送
 				send: true,
+
+				// reSend 变量用于指示是否重新发送
 				reSend: false,
+
+				// unSend 变量用于指示是否未发送
 				unSend: false,
+
+				// send2 变量用于指示是否发送
 				send2: true,
+
+				// reSend2 变量用于指示是否重新发送
 				reSend2: false,
+
+				// unSend2 变量用于指示是否未发送
 				unSend2: false,
+
+				// okEmail 变量用于指示邮箱是否有效
 				okEmail: false,
+
+				// errInfo 变量用于存储错误信息
 				errInfo: '',
+
+				// wrong 变量用于指示是否出错
 				wrong: false
 			}
 		},
@@ -195,7 +274,9 @@
 		methods: {
 			// 返回上一个页面
 			backOne: function() {
-				uni.navigateBack({ delta: 1 })
+				uni.navigateBack({
+					delta: 1
+				})
 			},
 			// 输入验证码
 			inputVerifi: function(e) {
@@ -204,206 +285,253 @@
 			inputVerifi2: function(e) {
 				this.verifiValue2 = e.detail.value
 			},
-			// 修改信息
 			infoChange: function() {
+				// 定义一个箭头函数，该函数在后面的代码中被调用
 				var fn = () => {
-					console.log(2020)
+					console.log(2020);
 					try {
-						let value = uni.getStorageSync('user')
+						let value = uni.getStorageSync('user');
 						if (value) {
-							value[this.typeRes] = this.reqRes
-							// console.log(value)
-							this.modifyInfo[this.typeRes] = this.reqRes
-							uni.setStorageSync('user', value)
+							value[this.typeRes] = this.reqRes;
+							this.modifyInfo[this.typeRes] = this.reqRes;
+							uni.setStorageSync('user', value);
 
-							let pages = getCurrentPages() // 当前页面
-							let beforePage = pages[pages.length - 2]
+							// 获取当前页面和前一个页面
+							let pages = getCurrentPages();
+							let beforePage = pages[pages.length - 2];
+
+							// 调用前一个页面的 `refersh` 方法，并传递相关参数
 							beforePage.$vm.refersh({
 								'type': this.typeRes,
 								'req': this.reqRes
-							})
-							uni.navigateBack({ delta: 1 })
+							});
+
+							// 返回上一个页面
+							uni.navigateBack({
+								delta: 1
+							});
 						} else {
-							uni.navigateTo({ url: '../signin/signin', })
+							uni.navigateTo({
+								url: '../signin/signin'
+							});
 						}
 					} catch (e) {
-						console.log(e)
+						console.log(e);
 					}
-				}
-				console.log(this.ok)
+				};
+
+				console.log(this.ok);
 				if (this.ok) {
 					switch (this.modifyInfo.type) {
 						case 6:
-							this.addFriend()
-							break
+							this.addFriend();
+							break;
 						case 2:
-							this.typeRes = 'intr'
-							this.reqRes = this.modifyInfo.userinfo.intr
-							this.update('intr', this.modifyInfo.userinfo.id, this.modifyInfo.userinfo.intr, '',
-								fn)
-							break
+							// 修改签名信息
+							this.typeRes = 'intr';
+							this.reqRes = this.modifyInfo.userinfo.intr;
+							this.update('intr', this.modifyInfo.userinfo.id, this.modifyInfo.userinfo.intr, '', fn);
+							break;
 						case 0:
-							this.typeRes = 'name'
-							this.reqRes = this.modifyInfo.userinfo.name
+							// 修改用户名信息
+							this.typeRes = 'name';
+							this.reqRes = this.modifyInfo.userinfo.name;
 							this.update('username', this.modifyInfo.userinfo.id, this.modifyInfo.userinfo.name, '',
-								fn)
-							break
+								fn);
+							break;
 						case 4:
-							this.typeRes = 'phone'
-							this.reqRes = this.modifyInfo.userinfo.phone
-							this.update('phone', this.modifyInfo.userinfo.id, this.modifyInfo.userinfo.phone, '',
-								fn)
-							break
+							// 修改电话信息
+							this.typeRes = 'phone';
+							this.reqRes = this.modifyInfo.userinfo.phone;
+							this.update('phone', this.modifyInfo.userinfo.id, this.modifyInfo.userinfo.phone, '', fn);
+							break;
 						case 5:
-							this.typeRes = 'nick'
-							this.reqRes = this.modifyInfo.userinfo.nick
-							this.updateNick(this.modifyInfo.userinfo.id, this.modifyInfo.userinfo.nick, fn)
-							break
+							// 修改昵称信息
+							this.typeRes = 'nick';
+							this.reqRes = this.modifyInfo.userinfo.nick;
+							this.updateNick(this.modifyInfo.userinfo.id, this.modifyInfo.userinfo.nick, fn);
+							break;
 						case 3:
-							this.subInfo2()
-							break
+							this.subInfo2();
+							break;
 						case 1:
-							this.subInfoPsw()
-							break
+							this.subInfoPsw();
+							break;
 					}
-
 				}
 			},
+
+			// 跳转到登录页面
 			toSignIn: function() {
-				uni.navigateTo({ url: '../signin/signin', })
+				uni.navigateTo({
+					url: '../signin/signin',
+				});
 			},
+
 			// 查看密码
 			lookPassword: function() {
 				if (this.look) {
-					this.type = 'password'
+					// 如果已经查看密码，则将输入框类型设置为 password
+					this.type = 'password';
 				} else {
-					this.type = 'text'
+					// 如果未查看密码，则将输入框类型设置为 text
+					this.type = 'text';
 				}
-				this.look = !this.look
-			},
+				// 切换查看密码状态
+				this.look = !this.look;
+			}
+
 			// 验证用户名是否合法
 			isUsername: function(e) {
+				// 判断输入框中的字符数是否大于 0
 				if (e.detail.cursor > 0) {
-					this.modifyInfo.userinfo.name = e.detail.value
+					// 更新用户信息中的用户名字段
+					this.modifyInfo.userinfo.name = e.detail.value;
+
+					// 判断输入的字符数是否大于等于 6
 					if (e.detail.cursor >= 6) {
-						this.short = false
+						this.short = false;
+
+						// 发起网络请求，验证用户名是否已存在
 						uni.request({
 							url: config.myurl + '/existName?username=' + this.modifyInfo.userinfo.name,
 							method: 'GET',
 							success: data => {
-								console.log(data.data)
+								console.log(data.data);
 								if (data.data.Code == 1002) {
-									this.occupy = true
+									// 用户名已被占用
+									this.occupy = true;
 								} else {
-									this.occupy = false
+									// 用户名未被占用
+									this.occupy = false;
 								}
-								this.ok = !(this.occupy || this.short)
+								// 根据占用和长度是否合法来判断用户名是否有效
+								this.ok = !(this.occupy || this.short);
 							},
-						})
+						});
 					} else {
-						this.short = true
-						this.occupy = false
+						// 用户名长度不合法
+						this.short = true;
+						this.occupy = false;
 					}
 				}
 			},
+
 			// 验证邮箱是否合法
 			isEmail: function(e) {
-				let reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+				// 正则表达式匹配邮箱格式
+				let reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
 				if (e.detail.cursor > 0) {
 					if (reg.test(e.detail.value)) {
-						this.okEmail = true
-						this.modifyInfo.userinfo.email = e.detail.value
-						this.invilid = false
-						this.ok = true
+						// 邮箱格式合法
+						this.okEmail = true;
+						this.modifyInfo.userinfo.email = e.detail.value;
+						this.invilid = false;
+						this.ok = true;
 					} else {
-						this.okEmail = false
-						this.invilid = true
-						this.modifyInfo.userinfo.email = this.userRequest
-						this.ok = false
+						// 邮箱格式不合法
+						this.okEmail = false;
+						this.invilid = true;
+						this.modifyInfo.userinfo.email = this.userRequest;
+						this.ok = false;
 					}
 				}
 			},
+
 			// 验证手机是否合法
 			isPhone: function(e) {
-				let reg = /^([0-9])/
+				// 正则表达式匹配手机号格式
+				let reg = /^([0-9])/;
 				if (e.detail.cursor > 0) {
 					if (reg.test(e.detail.value) && e.detail.cursor > 6) {
-						this.ok = true
-						this.modifyInfo.userinfo.phone = e.detail.value
-						this.invilid = false
+						// 手机号格式合法
+						this.ok = true;
+						this.modifyInfo.userinfo.phone = e.detail.value;
+						this.invilid = false;
 					} else {
-						this.modifyInfo.userinfo.phone = this.userRequest
-						this.ok = false
-						this.invilid = true
+						// 手机号格式不合法
+						this.modifyInfo.userinfo.phone = this.userRequest;
+						this.ok = false;
+						this.invilid = true;
 					}
 				}
 			},
+
 			// 验证密码是否正确
 			isUserPassword: function(e) {
+				// 判断输入框中的字符数是否大于 0
 				if (e.detail.cursor > 0) {
-					this.userPassword = e.detail.value
+					this.userPassword = e.detail.value;
 					if (e.detail.cursor >= 6) {
-						this.okPa = true
-						this.shortPassword = false
+						this.okPa = true;
+						this.shortPassword = false;
 						if (this.userPasswordRe && this.userPasswordRe != this.userPassword) {
-							this.okRe = false
-							this.shortRe = true
+							this.okRe = false;
+							this.shortRe = true;
 						}
 					} else {
-						this.okPa = false
-						this.shortPassword = true
+						this.okPa = false;
+						this.shortPassword = true;
 					}
 				}
 			},
+
 			// 密码重复是否正确
 			isUserPasswordRe: function(e) {
+				// 判断输入框中的字符数是否大于 0
 				if (e.detail.cursor > 0) {
-					this.userPasswordRe = e.detail.value
+					this.userPasswordRe = e.detail.value;
 					if (e.detail.cursor >= 6 && this.userPasswordRe == this.userPassword) {
-						this.okRe = true
-						this.shortRe = false
-						this.ok = true
+						this.okRe = true;
+						this.shortRe = false;
+						this.ok = true;
 					} else {
-						this.okRe = false
-						this.shortRe = true
-						this.ok = false
+						this.okRe = false;
+						this.shortRe = true;
+						this.ok = false;
 					}
 				}
 			},
+
 			// 用户昵称是否合法
 			isUserNick: function(e) {
+				// 判断输入框中的字符数是否大于 0
 				if (e.detail.cursor > 0) {
-					this.modifyInfo.userinfo.nick = e.detail.value
+					this.modifyInfo.userinfo.nick = e.detail.value;
 				} else {
-					this.modifyInfo.userinfo.nick = this.userRequest
+					this.modifyInfo.userinfo.nick = this.userRequest;
 				}
 			},
+
 			// 添加好友是否合法
 			isAddFriend: function(e) {
-				this.ok = true
+				this.ok = true;
 				if (e.detail.cursor > 0) {
-					this.modifyInfo.userRequest = e.detail.value
+					this.modifyInfo.userRequest = e.detail.value;
 				} else {
-					this.modifyInfo.userRequest = this.userRequest
+					this.modifyInfo.userRequest = this.userRequest;
 				}
-
 			},
+
 			// 用户信息是否合法
 			isUserIntr: function(e) {
-				this.ok = true
+				this.ok = true;
 				if (e.detail.cursor > 0) {
-					this.modifyInfo.userinfo.intr = e.detail.value
+					this.modifyInfo.userinfo.intr = e.detail.value;
 				} else {
-					this.modifyInfo.userinfo.intr = this.userRequest
+					this.modifyInfo.userinfo.intr = this.userRequest;
 				}
 			},
+
 			// 更新数据
 			update(type, optid, data, psw, fn) {
-				console.log(fn)
+				console.log(fn);
 				uni.request({
 					url: config.myurl + '/change/update',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': optid,
 						'data': data,
@@ -411,63 +539,79 @@
 						'psw': psw
 					},
 					success: async data => {
-						console.log(data.data)
+						console.log(data.data);
 						if (data.data.Code == 1009) {
-							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							// 如果返回的 Code 是 1009，表示令牌过期，需要刷新令牌
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken);
 							if (newCode == 1000) {
-								this.atoken = uni.getStorageSync('atoken')
-								this.rtoken = uni.getStorageSync('rtoken')
-								this.update(type, optid, data, psw)
+								// 刷新令牌成功，更新当前令牌和刷新令牌，并重新执行更新操作
+								this.atoken = uni.getStorageSync('atoken');
+								this.rtoken = uni.getStorageSync('rtoken');
+								this.update(type, optid, data, psw);
 							} else {
-								//err
+								// 刷新令牌失败，处理错误
+								// TODO: 错误处理逻辑
 							}
 						} else if (data.data.Code == 1000) {
-							console.log(1010)
-							fn.apply()
+							// 更新成功，执行回调函数
+							console.log(1010);
+							fn.apply();
 						} else {
-							//err
+							// 更新失败，处理错误
+							// TODO: 错误处理逻辑
 						}
 					}
-				})
+				});
 			},
+
 			// 更新昵称
 			updateNick(optid, msg, fn) {
-				console.log(fn)
+				console.log(fn);
 				uni.request({
 					url: config.myurl + '/change/nick',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': this.userid,
 						'friend_id': optid,
 						'msg': msg
 					},
 					success: async data => {
-						console.log(data.data)
+						console.log(data.data);
 						if (data.data.Code == 1009) {
-							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							// 如果返回的 Code 是 1009，表示令牌过期，需要刷新令牌
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken);
 							if (newCode == 1000) {
-								this.atoken = uni.getStorageSync('atoken')
-								this.rtoken = uni.getStorageSync('rtoken')
-								this.updateNick(optid, msg, fn)
+								// 刷新令牌成功，更新当前令牌和刷新令牌，并重新执行更新操作
+								this.atoken = uni.getStorageSync('atoken');
+								this.rtoken = uni.getStorageSync('rtoken');
+								this.updateNick(optid, msg, fn);
 							} else {
-								//err
+								// 刷新令牌失败，处理错误
+								// TODO: 错误处理逻辑
 							}
 						} else if (data.data.Code == 1000) {
-							console.log(1010)
-							fn.apply()
+							// 更新成功，执行回调函数
+							console.log(1010);
+							fn.apply();
 						} else {
-							//err
+							// 更新失败，处理错误
+							// TODO: 错误处理逻辑
 						}
 					}
-				})
+				});
 			},
+
 			// 添加好友
 			addFriend: function() {
 				uni.request({
 					url: config.myurl + '/friend/request',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': this.modifyInfo.userid,
 						'friend_id': this.modifyInfo.friendid,
@@ -475,43 +619,49 @@
 					},
 					success: async data => {
 						if (data.data.Code == 1009) {
-							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							// 如果返回的 Code 是 1009，表示令牌过期，需要刷新令牌
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken);
 							if (newCode == 1000) {
-								this.atoken = uni.getStorageSync('atoken')
-								this.rtoken = uni.getStorageSync('rtoken')
-								this.addFriend()
+								// 刷新令牌成功，更新当前令牌和刷新令牌，并重新执行添加好友操作
+								this.atoken = uni.getStorageSync('atoken');
+								this.rtoken = uni.getStorageSync('rtoken');
+								this.addFriend();
 							} else {
-								// err
+								// 刷新令牌失败，处理错误
+								// TODO: 错误处理逻辑
 							}
 						} else if (data.data.Code == 1000) {
+							// 添加好友请求发送成功
 							uni.showToast({
 								title: '好友请求发送成功',
 								icon: 'none',
 								duration: 2000
-							})
+							});
 
-							let pages = getCurrentPages() // 当前页面
-							let beforePage = pages[pages.length - 2]
+							let pages = getCurrentPages(); // 当前页面
+							let beforePage = pages[pages.length - 2];
 							uni.navigateBack({
 								delta: 1,
 								success: function() {
-									beforePage.AddSuccess() // 执行上一页的onLoad方法
+									beforePage.AddSuccess(); // 执行上一页的 AddSuccess 方法
 								}
-							})
+							});
 						} else {
+							// 添加好友请求发送失败
 							uni.showToast({
 								title: '好友请求发送失败',
 								icon: 'none',
 								duration: 2000
-							})
+							});
 						}
 					}
-				})
+				});
 			},
+
 			// 上传验证码
 			subInfo: function() {
-				console.log(this.modifyInfo.userinfo.email)
-				console.log(this.verifiValue)
+				console.log(this.modifyInfo.userinfo.email);
+				console.log(this.verifiValue);
 				uni.request({
 					url: config.myurl + '/verifiExam',
 					method: 'POST',
@@ -520,68 +670,81 @@
 						'verifiCode': this.verifiValue,
 					},
 					success: data => {
-						console.log(data.data)
+						console.log(data.data);
 						if (data.data.Code != 1000) {
-							this.wrong = true
-							this.errInfo = data.data.Msg
+							// 验证码上传失败
+							this.wrong = true;
+							this.errInfo = data.data.Msg;
 						} else {
-							//SUCCESS
-							this.wrong = false
-							this.verifi = true
+							// 验证码上传成功
+							this.wrong = false;
+							this.verifi = true;
 						}
 					}
-				})
+				});
 			},
+
 			// 更改邮箱
-			subInfo2: function(){
-				console.log(this.verifiValue2)
+			subInfo2: function() {
+				console.log(this.verifiValue2);
 				uni.request({
 					url: config.myurl + '/change/email',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': this.modifyInfo.userinfo.id,
 						'n_email': this.modifyInfo.userinfo.email,
 						'verifiCode': this.verifiValue2
 					},
 					success: async data => {
-						console.log(data.data)
+						console.log(data.data);
 						if (data.data.Code == 1009) {
-							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken)
+							let newCode = await refersh.refersh(config.myurl, this.atoken, this.rtoken);
 							if (newCode == 1000) {
-								this.atoken = uni.getStorageSync('atoken')
-								this.rtoken = uni.getStorageSync('rtoken')
-								this.subInfo2()
+								this.atoken = uni.getStorageSync('atoken');
+								this.rtoken = uni.getStorageSync('rtoken');
+								this.subInfo2();
 							} else {
 								// err
 							}
 						} else if (data.data.Code == 1000) {
-							let value = uni.getStorageSync('user')
+							let value = uni.getStorageSync('user');
 							if (value) {
-								value.email = this.modifyInfo.userinfo.email
-								this.modifyInfo.email = this.modifyInfo.userinfo.email
-								uni.setStorageSync('user', value)
-							
-								let pages = getCurrentPages() // 当前页面
-								let beforePage = pages[pages.length - 2]
+								// 更新本地缓存的用户邮箱
+								value.email = this.modifyInfo.userinfo.email;
+								this.modifyInfo.email = this.modifyInfo.userinfo.email;
+								uni.setStorageSync('user', value);
+
+								let pages = getCurrentPages(); // 当前页面
+								let beforePage = pages[pages.length - 2];
+								// 调用上一页的刷新方法，更新显示的邮箱
 								beforePage.$vm.refersh({
 									'type': 'email',
 									'req': this.modifyInfo.userinfo.email
-								})
-								uni.navigateBack({ delta: 1 })
+								});
+								uni.navigateBack({
+									delta: 1
+								});
 							} else {
-								uni.navigateTo({ url: '../signin/signin', })
+								uni.navigateTo({
+									url: '../signin/signin',
+								});
 							}
 						}
 					}
-				})
+				});
 			},
+
 			// 更改密码
 			subInfoPsw: function() {
 				uni.request({
 					url: config.myurl + '/change/psw',
 					method: 'POST',
-					header: { 'Authorization': 'Bearer ' + this.atoken },
+					header: {
+						'Authorization': 'Bearer ' + this.atoken
+					},
 					data: {
 						'user_id': this.modifyInfo.userinfo.id,
 						'email': this.modifyInfo.userinfo.email,
@@ -607,7 +770,9 @@
 							//SUCCESS
 							this.wrong = false
 							this.verifi = true
-							uni.navigateBack({ delta: 1 })
+							uni.navigateBack({
+								delta: 1
+							})
 						}
 					}
 				})
@@ -638,7 +803,7 @@
 						},
 						success: data => {
 							console.log(data.data)
-							
+
 						}
 					})
 				} else {
@@ -703,12 +868,14 @@
 		line-height: 96rpx;
 		text-align: center;
 	}
+
 	.tips {
 		float: left;
 		font-size: $uni-font-size-lg;
 		color: $uni-color-warning;
 		line-height: 56rpx;
 	}
+
 	.main {
 		display: flex;
 		flex-direction: column;
