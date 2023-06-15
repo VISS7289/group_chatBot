@@ -379,7 +379,7 @@
 				}
 				// 切换查看密码状态
 				this.look = !this.look;
-			}
+			},
 
 			// 验证用户名是否合法
 			isUsername: function(e) {

@@ -93,19 +93,19 @@
 						this.botnum = 0
 					} else {
 						console.log(this.msgs[this.msgs.length - 1])
-						uni.sendSocketMessage({
-							data: "{\"type\": 0,\"message\": \"" + this.msgs[this.msgs.length - 1].msg +
-								"\"}",
-							success: data => {
-								if (data.errMsg ==
-									'sendSocketMessage:fail WebSocket is not connected') {
-									this.join()
-								}
-							},
-							fail: data => {
-								console.log(data.errMsg)
-							}
-						})
+						// uni.sendSocketMessage({
+						// 	data: "{\"type\": 0,\"message\": \"" + this.msgs[this.msgs.length - 1].msg +
+						// 		"\"}",
+						// 	success: data => {
+						// 		if (data.errMsg ==
+						// 			'sendSocketMessage:fail WebSocket is not connected') {
+						// 			this.join()
+						// 		}
+						// 	},
+						// 	fail: data => {
+						// 		console.log(data.errMsg)
+						// 	}
+						// })
 					}
 				}, 4000 + Math.round(10000 * Math.random()));
 			}
@@ -355,7 +355,7 @@
 
 			inputChat: async function(inf) {
 				console.log(calT.getNewTime()); // 输出当前时间到控制台
-				let res = await this.scoketSent(inf); // 调用scoketSent函数发送消息并等待返回结果
+				let res = await this.socketSent(inf); // 调用socketSent函数发送消息并等待返回结果
 
 				if (res) {
 					this.reciveMsg(this.user.id, this.user.img, inf, 0); // 调用reciveMsg函数，模拟接收到消息

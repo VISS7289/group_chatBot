@@ -121,18 +121,20 @@ func (c *Client) Read() {
 			// 调用 Chat 对象的 GetChat 方法获取机器人的回复消息
 			msgs, _ := Chat.GetChat(sendmsg.Msg)
 			// 将机器人的回复消息作为响应消息发送给客户端，并将消息插入到 MySQL 数据库中
+
 			splitId := strings.Split(c.ID, "->")
 			replymsg := ReplyMsg{
 				Code: Models.CodeSuccess,
-				Msg:  string(msgs),
+				Msg:  msgs,
 			}
 			msg, _ := json.Marshal(replymsg)
+			fmt.Println(msg)
 			_ = c.Socket.WriteMessage(websocket.TextMessage, msg)
 			InsertMsg := Models.NewMsg{
 				SendId:   splitId[1],
 				AcceptId: splitId[0],
 				State:    false,
-				Msg:      string(msgs),
+				Msg:      msgs,
 				Type:     0,
 			}
 			if err := Mysql.InsertMsg(InsertMsg); err != nil {

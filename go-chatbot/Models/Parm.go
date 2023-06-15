@@ -32,6 +32,14 @@ type ParmChat struct {
 	ChatContent string `json:"chat_content"`
 }
 
+// 聊天服务器返回
+type ParmChatServer struct {
+	Response string `json:"response"`
+	History [][]string `json:"history"`
+	Status int `json:"status"`
+	Time string `json:"time"`
+}
+
 // 聊天
 type ParmReturnChat struct {
 	ChatContent string `json:"chat_content"`

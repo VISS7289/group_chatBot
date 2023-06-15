@@ -6,9 +6,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
+
+var History [][]string
 
 // ChatHandler 聊天功能路由
 // @Summary 聊天功能路由
@@ -32,9 +35,12 @@ func ChatHandler(c *gin.Context) {
 	}
 	// 发送 POST 请求到 Python 服务器
 	// 构造POST请求的URL和请求体
-	url := "http://localhost:8087/chat"
-	post := "{\"chat_content\":\"" + p.ChatContent +
-		"\"}"
+	//url := "http://localhost:8087/chat"
+	//post := "{\"chat_content\":\"" + p.ChatContent +
+	//	"\"}"
+
+	url := "http://localhost:7002"
+	post := "{\"prompt\":" + p.ChatContent + ",\"history\": []}"
 	var jsonStr = []byte(post)
 	// 构造POST请求
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
@@ -51,7 +57,13 @@ func ChatHandler(c *gin.Context) {
 
 	// 读取响应体并返回响应
 	body, _ := ioutil.ReadAll(resp.Body)
-	Models.ResponseSuccess(c, string(body))
+	var ParmServer Models.ParmChatServer
+	if err := json.Unmarshal(body, &ParmServer); err != nil {
+		zap.L().Error("Python Server Error", zap.Error(err))
+		Models.ResponseError(c, Models.CodeServerBusy)
+		return
+	}
+	Models.ResponseSuccess(c, ParmServer.Response)
 	return
 }
 
